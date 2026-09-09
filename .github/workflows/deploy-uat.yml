@@ -1,0 +1,61 @@
+name: deploy-uat
+on:
+  push:
+    branches: [uat]
+permissions:
+  contents: read
+env:
+  APP_NAME: "crs-threatintel-web"     # ALL-LOWERCASE Container App name (see deploy-dev.yml)
+  # dev registry (where dev-approved lives) — hardcoded, not ${{ vars.* }}, so an unprovisioned
+  # env var cannot resolve to empty. UAT promotes the exact image validated in dev — it never builds.
+  ACR_LOGIN_SERVER: craihubdevuaen001.azurecr.io
+  TARGET_PORT: "8080"          # must match the container's listen port (see deploy-dev.yml)
+jobs:
+  deploy:
+    runs-on: [self-hosted, ci]
+    environment: uat            # required reviewers gate (TODO(cpx) to configure)
+    permissions:
+      contents: read
+      id-token: write           # job-scoped per AGT-CICD §8.4
+    steps:
+      - name: Azure login (OIDC — UAT SP)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}          # TODO(cpx): UAT identity
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}            # TODO(cpx)
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}  # TODO(cpx)
+      - name: Login to ACR and pull dev-approved
+        run: |
+          az acr login -n "$(echo "${ACR_LOGIN_SERVER}" | cut -d. -f1)"
+          export HOME="$(getent passwd "$(id -un)" | cut -d: -f6)"
+          rm -f release-manifest.json || true
+          oras pull ${ACR_LOGIN_SERVER}/release-manifests-web:dev-approved
+          cat release-manifest.json
+      - name: Read approved DEV image
+        id: image
+        run: echo "image=$(python3 -c "import json;print(json.load(open('release-manifest.json'))['image'])")" >> "$GITHUB_OUTPUT"
+      - name: Create or update the Container App
+        run: |
+          # Same ingress/min-replicas settings as dev (VNet-limited via --ingress external).
+          RG="${{ vars.RG_GENAIAPP }}"; IMAGE="${{ steps.image.outputs.image }}"
+          if az containerapp show -n "$APP_NAME" -g "$RG" >/dev/null 2>&1; then
+            az containerapp show -n "$APP_NAME" -g "$RG" \
+              --query "properties.latestReadyRevisionName" -o tsv > rollback-revision.txt || true
+            az containerapp update -n "$APP_NAME" -g "$RG" --image "$IMAGE"
+          else
+            az containerapp create -n "$APP_NAME" -g "$RG" \
+              --environment "${{ vars.CONTAINERAPP_ENV }}" --image "$IMAGE" \
+              --user-assigned "${{ vars.PULL_IDENTITY_RESOURCE_ID }}" \
+              --registry-server "$ACR_LOGIN_SERVER" \
+              --registry-identity "${{ vars.PULL_IDENTITY_RESOURCE_ID }}" \
+              --ingress external --target-port "$TARGET_PORT" \
+              --min-replicas 1
+          fi
+      - name: Post-deploy validation (app reachable)
+        run: |
+          FQDN=$(az containerapp show -n "$APP_NAME" -g "${{ vars.RG_GENAIAPP }}" \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          # Frontend (nginx static) — probe the app root. TODO(vendor): adjust path/expected code
+          # if the app serves a health/readiness route.
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "https://$FQDN/" || echo 000)
+          test "$code" = "200" || { echo "app root returned HTTP $code"; exit 1; }

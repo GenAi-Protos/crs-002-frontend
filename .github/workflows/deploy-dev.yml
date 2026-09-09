@@ -1,0 +1,88 @@
+name: deploy-dev
+on:
+  workflow_run:
+    workflows: [build-publish]
+    types: [completed]
+permissions:
+  contents: write
+env:
+  # APP_NAME is the ALL-LOWERCASE Container App name (Azure rejects uppercase). The camelCase
+  # agent slug MUST be lowercased here: e.g. csd-CyberSecAssess -> csd-cybersecassess-web.
+  APP_NAME: "crs-threatintel-web"
+  # Hardcoded to the fixed DEV hub registry login server. dev + uat both use it. Do NOT use
+  # ${{ vars.ACR_LOGIN_SERVER }} — an unprovisioned env var resolves to empty and breaks the
+  # image reference and `az acr login`.
+  ACR_LOGIN_SERVER: craihubdevuaen001.azurecr.io
+  IMAGE_REPO: "crs"
+  TAG_PREFIX: web-dev          # {COMPONENT}-dev
+  # Matches the port nginx listens on in Dockerfile.web (repointed from :80 to :8080), so the
+  # Container App FQDN maps straight to the served UI. CPX standard for web = 8080.
+  TARGET_PORT: "8080"
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, ci]
+    environment: dev
+    permissions:
+      contents: write
+      id-token: write          # job-scoped per AGT-CICD §8.4
+    steps:
+      - name: Azure login (OIDC — pipeline SP)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}          # TODO(cpx)
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}            # TODO(cpx)
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}  # TODO(cpx)
+      - name: Build image reference (from build commit)
+        id: img
+        run: |
+          SHA7=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+          echo "image=${ACR_LOGIN_SERVER}/${IMAGE_REPO}:${TAG_PREFIX}-${SHA7}" >> "$GITHUB_OUTPUT"
+      - name: Create or update the Container App
+        run: |
+          # Ingress = "Limited to VNet" on this internal / VNet-injected environment: use
+          # --ingress external (NOT --ingress internal). Because the environment has no public
+          # IP, external does NOT expose the app to the internet — it is VNet-only. --min-replicas 1
+          # keeps the app off scale-to-zero (no cold start). See AGT-CICD ingress note.
+          RG="${{ vars.RG_GENAIAPP }}"; IMAGE="${{ steps.img.outputs.image }}"
+          if az containerapp show -n "$APP_NAME" -g "$RG" >/dev/null 2>&1; then
+            az containerapp show -n "$APP_NAME" -g "$RG" \
+              --query "properties.latestReadyRevisionName" -o tsv > rollback-revision.txt || true
+            az containerapp update -n "$APP_NAME" -g "$RG" --image "$IMAGE"
+          else
+            az containerapp create -n "$APP_NAME" -g "$RG" \
+              --environment "${{ vars.CONTAINERAPP_ENV }}" --image "$IMAGE" \
+              --user-assigned "${{ vars.PULL_IDENTITY_RESOURCE_ID }}" \
+              --registry-server "$ACR_LOGIN_SERVER" \
+              --registry-identity "${{ vars.PULL_IDENTITY_RESOURCE_ID }}" \
+              --ingress external --target-port "$TARGET_PORT" \
+              --min-replicas 1
+          fi
+      - name: Create release manifest
+        run: |
+          DEPLOYED_IMAGE=$(az containerapp show -n "$APP_NAME" -g "${{ vars.RG_GENAIAPP }}" \
+            --query "properties.template.containers[0].image" -o tsv)
+          cat > release-manifest.json <<EOF
+          { "environment": "dev", "application": "${APP_NAME}",
+            "commitSha": "${{ github.event.workflow_run.head_sha }}",
+            "image": "${DEPLOYED_IMAGE}", "promotedAt": "$(date -u +%FT%TZ)" }
+          EOF
+      - name: Publish dev-approved (ORAS)
+        # Pins the exact dev-validated image so deploy-uat promotes the SAME image (no rebuild).
+        run: |
+          az acr login -n "$(echo "${ACR_LOGIN_SERVER}" | cut -d. -f1)"
+          export HOME="$(getent passwd "$(id -un)" | cut -d: -f6)"
+          oras push ${ACR_LOGIN_SERVER}/release-manifests-web:dev-approved release-manifest.json:application/json
+      - name: Post-deploy validation (app reachable)
+        run: |
+          FQDN=$(az containerapp show -n "$APP_NAME" -g "${{ vars.RG_GENAIAPP }}" \
+            --query "properties.configuration.ingress.fqdn" -o tsv)
+          # Frontend (nginx static) — probe the app root. The self-hosted runner is in the VNet, so
+          # it can reach the internal FQDN. TODO(vendor): adjust the path/expected code if the app
+          # serves a health/readiness route.
+          code=$(curl -sS -o /dev/null -w '%{http_code}' "https://$FQDN/" || echo 000)
+          test "$code" = "200" || { echo "app root returned HTTP $code"; exit 1; }
+      - name: Capture rollback revision evidence
+        run: |
+          az containerapp show -n "$APP_NAME" -g "${{ vars.RG_GENAIAPP }}" \
+            --query "{image:properties.template.containers[0].image, revision:properties.latestReadyRevisionName, fqdn:properties.configuration.ingress.fqdn, running:properties.runningStatus}" -o yaml

@@ -1,0 +1,9 @@
+# CPX-controlled paths — do not modify (AGT-CICD §6.2)
+# Web repo variant: no /agent/* lines (a pure frontend has no agent tree).
+/.github/workflows/      @cpx-ai-platform/devsecops-admins
+/infra/                  @cpx-ai-platform/platform-engineers
+/apim/                   @cpx-ai-platform/api-gateway-admins
+/security/               @cpx-ai-platform/security-reviewers
+/metadata.yaml           @cpx-ai-platform/devsecops-admins
+# Vendor-owned implementation paths
+/app/                    TODO(vendor)   # e.g. @cpx-ai-genaiprotos/<vendor-devs-team>

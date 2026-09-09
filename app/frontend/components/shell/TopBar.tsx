@@ -5,6 +5,7 @@ import { ROLE_LABELS, useConsoleUser } from "@/lib/role-context";
 import type { RoleKey } from "@/lib/types";
 import { NestorMarkReverse } from "./NestorMark";
 import { GlobalSearch } from "./GlobalSearch";
+import { publicEnv } from "@/lib/runtime-env";
 
 const ROLES: RoleKey[] = [
   "analyst",
@@ -17,7 +18,7 @@ const ROLES: RoleKey[] = [
 
 export function TopBar() {
   const { user, setRole } = useConsoleUser();
-  const switcherOn = process.env.NEXT_PUBLIC_ROLE_SWITCHER === "true";
+  const switcherOn = publicEnv().ROLE_SWITCHER === "true";
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-4 bg-cpx-purple px-4 text-white">

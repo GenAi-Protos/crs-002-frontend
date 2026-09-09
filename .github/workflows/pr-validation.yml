@@ -1,0 +1,67 @@
+name: pr-validation
+on:
+  pull_request:
+    branches: [dev, uat, main]
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  metadata:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate metadata.yaml present and complete
+        run: |
+          test -f metadata.yaml || { echo "metadata.yaml missing"; exit 1; }
+          # Keys must match the CPX metadata.yaml template (references/file-templates/metadata.yaml).
+          for k in application: businessUnit vendor environment dataClassification repository guardrailMode; do
+            grep -q "$k" metadata.yaml || { echo "metadata.yaml missing key: $k"; exit 1; }
+          done
+          ! grep -q "TODO(" metadata.yaml || { echo "metadata.yaml has unresolved TODO"; exit 1; }
+  secret-scan:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      # NOTE(cpx): GitHub Advanced Security Secret Scanning + Push Protection (AGT-CICD §7) are
+      # enabled at repo/org settings by CPX; this Gitleaks job is the CI-level complement.
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+  sast-codeql:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with: { languages: javascript-typescript }
+      - uses: github/codeql-action/analyze@v3
+  sca:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        if: github.event_name == 'pull_request'
+        with: { fail-on-severity: high }
+      - name: npm audit
+        run: |
+          cd app/frontend
+          npm ci
+          npm audit --audit-level=high
+  iac-scan:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+      # AGT-CICD §7 IaC scan. Trivy is already installed on the self-hosted runner — call the
+      # runner's binary directly. Do NOT pin a trivy-action version (that caused repeated
+      # "trivy version not found" failures on this runner).
+      - name: Trivy config scan (Dockerfile/IaC)
+        run: trivy config --exit-code 1 --severity CRITICAL,HIGH .
+  image-scan:
+    runs-on: [self-hosted, ci]
+    steps:
+      - uses: actions/checkout@v4
+      # Build the image and scan it at PR time (no push). --ignore-unfixed skips base-image OS
+      # CVEs with no available fix; anything fixable still blocks. See Dockerfile.web hardening.
+      - name: Build image for scan
+        run: docker build -t pr-${{ github.sha }} app/frontend
+      - name: Trivy image scan (High/Critical block)
+        run: trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 pr-${{ github.sha }}

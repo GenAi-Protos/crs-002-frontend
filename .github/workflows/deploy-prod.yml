@@ -1,0 +1,73 @@
+name: deploy-prod
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+env:
+  APP_NAME: "crs-threatintel-web"                        # ALL-LOWERCASE Container App name
+  ACR_NAME: ${{ vars.ACR_NAME }}                  # PROD hub registry (kept as vars.* — prod uses a
+  ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}  # SEPARATE registry from dev/uat, provisioned by CPX)
+  IMAGE_REPO: "crs"
+  COMPONENT: web                                  # api | web
+  TARGET_PORT: "8080"                             # must match the container's listen port
+jobs:
+  deploy:
+    runs-on: [self-hosted, ci]
+    environment: prod            # required reviewers gate: CPX Platform + BU owner (TODO(cpx))
+    permissions:
+      contents: read
+      id-token: write            # prod federated cred scoped to environment:prod ONLY
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure login (OIDC — PROD SP)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}          # TODO(cpx): prod identity, env:prod scoped
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}            # TODO(cpx)
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}  # TODO(cpx)
+      # NOTE: prod BUILDS FRESH from `main` and pushes to the PROD registry. This is a DECIDED
+      # deviation from AGT-CICD §10.2 ("promote the validated digest; do not rebuild for prod"),
+      # made necessary because the prod registry is isolated from the dev registry so
+      # promotion-by-reference is not available. Logged as EX-002 in security/exception-register.md;
+      # requires CPX approval. Fallback if declined: `az acr import` the dev-approved digest into the
+      # prod registry and deploy that digest instead of building here.
+      - name: Build from main
+        id: img
+        run: |
+          IMAGE="${ACR_LOGIN_SERVER}/${IMAGE_REPO}:${COMPONENT}-prod-${GITHUB_SHA::7}"
+          docker build -t "$IMAGE" app/frontend
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+      - name: Test
+        run: |
+          echo "TODO(vendor): run unit/e2e/smoke tests"
+      - name: Scan (Trivy — block High/Critical)
+        # Runner's preinstalled trivy (no pinned action). --ignore-unfixed per Dockerfile hardening.
+        run: trivy image --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 "${{ steps.img.outputs.image }}"
+      - name: Sign certificate into Key Vault
+        run: |
+          # TODO(cpx): sign image/release and store+verify the signing cert in the app Key Vault
+          # (AGT-CICD §9). Prod SP needs Key Vault Certificates Officer on the app KV. Signing is
+          # not yet fully wired — this is the start of it. e.g. notation sign / az keyvault certificate.
+          echo "TODO(cpx): image signing not yet provisioned"
+      - name: Push
+        run: |
+          az acr login -n "${ACR_NAME}"
+          docker push "${{ steps.img.outputs.image }}"
+      - name: Deploy
+        run: |
+          # Same ingress/min-replicas settings as dev/uat (VNet-limited via --ingress external).
+          RG="${{ vars.RG_GENAIAPP }}"; IMAGE="${{ steps.img.outputs.image }}"
+          if az containerapp show -n "$APP_NAME" -g "$RG" >/dev/null 2>&1; then
+            az containerapp show -n "$APP_NAME" -g "$RG" \
+              --query "properties.latestReadyRevisionName" -o tsv > rollback-revision.txt || true
+            az containerapp update -n "$APP_NAME" -g "$RG" --image "$IMAGE"
+          else
+            az containerapp create -n "$APP_NAME" -g "$RG" \
+              --environment "${{ vars.CONTAINERAPP_ENV }}" --image "$IMAGE" \
+              --user-assigned "${{ vars.PULL_IDENTITY_RESOURCE_ID }}" \
+              --registry-server "$ACR_LOGIN_SERVER" \
+              --registry-identity "${{ vars.PULL_IDENTITY_RESOURCE_ID }}" \
+              --ingress external --target-port "$TARGET_PORT" \
+              --min-replicas 1
+          fi

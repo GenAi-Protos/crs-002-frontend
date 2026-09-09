@@ -1,0 +1,6 @@
+# Dependencies
+/app/frontend/node_modules/
+
+# Next.js build output
+/app/frontend/.next/
+*.tsbuildinfo

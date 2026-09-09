@@ -1,0 +1,7 @@
+# Exception Register (AGT-CICD §7.1, §9)
+
+| ID | Date | Description | Risk | Status | CPX Approver |
+|----|------|-------------|------|--------|--------------|
+| EX-001 | TODO(vendor) | Split-repo model: this agent is delivered as separate `{agent}-api` and `{agent}-web` repos rather than CPX's single-repo skeleton (AGT-CICD §5). Deviation submitted for CPX approval per §9. | Low | PENDING-CPX | TODO(cpx) |
+| EX-002 | TODO(vendor) | Prod builds fresh from `main` (`deploy-prod.yml` build + push to the prod registry) instead of promoting the validated dev digest — deviates from AGT-CICD §10.2 ("production builds are not permitted; promote the validated digest"). Reason: the prod hub registry is isolated from the dev hub registry, so promotion-by-reference across registries is not available. Fallback if CPX declines: `az acr import` the `dev-approved` digest into the prod registry and deploy that digest (no rebuild). | Medium | PENDING-CPX | TODO(cpx) |
+| EX-003 | TODO(vendor) | Web image is a Node runtime (Next.js standalone server on :8080), not the CPX nginx-static `Dockerfile.web`, because the UI is Next.js (`next build` emits `.next/`, not `dist/`; the app needs the Node server for runtime configuration via `lib/runtime-env.ts`). Fallback if CPX requires nginx-static: set `output: "export"` in `next.config.ts` and serve `out/`, which loses runtime configuration and requires one build per environment. | Low | PENDING-CPX | TODO(cpx) |

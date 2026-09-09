@@ -1,0 +1,66 @@
+name: build-publish
+on:
+  push:
+    branches: [dev]
+permissions:
+  contents: read
+env:
+  # Hardcoded to the fixed DEV hub registry (AGT-CICD platform constant). build-publish only
+  # runs on the `dev` branch, so the registry never varies. Do NOT use ${{ vars.ACR_NAME }} here —
+  # when that env var is not provisioned it resolves to an empty string and the image ref /
+  # `az acr login` fail. login server = craihubdevuaen001.azurecr.io.
+  ACR_NAME: craihubdevuaen001
+  AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}   # TODO(cpx): pipeline SP app id for dev
+  AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}   # TODO(cpx)
+  AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}  # TODO(cpx)
+  BU: "crs"
+  IMAGE_REPO: "crs"          # ACR repository (usually {BU})
+  COMPONENT: web               # tag token: api | web
+jobs:
+  build:
+    runs-on: [self-hosted, ci]
+    environment: dev
+    permissions:
+      contents: read
+      id-token: write        # job-scoped per AGT-CICD §8.4 (not workflow scope)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+      - name: Set image ref
+        id: img
+        run: echo "ref=${ACR_NAME}.azurecr.io/${IMAGE_REPO}:${COMPONENT}-dev-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+      - name: Build (node:22-alpine -> nginx:alpine)
+        run: docker build -t "${{ steps.img.outputs.ref }}" app/frontend
+      - name: SBOM (Microsoft SBOM Tool)
+        run: |
+          curl -L -o sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
+          chmod +x sbom-tool
+          ./sbom-tool generate -b . -bc app/frontend -pn ThreatIntel -pv ${GITHUB_SHA::7} -ps Evanssion
+      - name: Scan (Trivy — block High/Critical)
+        # Trivy is preinstalled on the runner — call the binary directly, do NOT pin a
+        # trivy-action version. --ignore-unfixed skips unfixed base-image OS CVEs (no patch
+        # available); fixable vulns still block. Also harden the Dockerfile (Dockerfile.web:
+        # apk upgrade in both stages) so no *fixable* HIGH/CRITICAL remain.
+        run: trivy image --severity CRITICAL,HIGH --ignore-unfixed --exit-code 1 "${{ steps.img.outputs.ref }}"
+      - name: Push
+        run: az acr login -n "${ACR_NAME}" && docker push "${{ steps.img.outputs.ref }}"
+      # - name: Sign (Notation + notation-azure-kv)          # AGT-CICD §9 — signing is NOT yet
+      #   run: notation sign "${{ steps.img.outputs.ref }}" \  # provisioned by CPX in dev/uat.
+      #     --plugin azure-kv --id "${{ vars.SIGNING_CERT_ID }}"  # Uncomment once provisioned.
+      # - name: Verify signature (Notation)
+      #   run: notation verify "${{ steps.img.outputs.ref }}"
+      - name: Attach SBOM (ORAS)
+        run: |
+          export HOME="$(getent passwd "$(id -un)" | cut -d: -f6)"
+          oras attach --artifact-type application/spdx+json "${{ steps.img.outputs.ref }}" _manifest/spdx_2.2/manifest.spdx.json
+      - name: Capture digest evidence
+        run: docker inspect --format='{{index .RepoDigests 0}}' "${{ steps.img.outputs.ref }}" > image-digest.txt
+      # Pinned to @v3 — @v4 errors on this GitHub Enterprise Server + self-hosted runner setup
+      # (the v4 artifact backend is not available on GHES here). Do not bump to v4.
+      - uses: actions/upload-artifact@v3
+        with: { name: release-evidence, path: "image-digest.txt" }

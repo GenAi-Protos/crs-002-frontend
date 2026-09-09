@@ -1,0 +1,17 @@
+# CPX metadata.yaml — AGT-CICD §5.3. Fill {{...}}; resolve every TODO before go-live.
+application:
+  name: crs-ThreatIntel-web        # e.g. csd-CyberSecAssess-api
+businessUnit: CRS                # e.g. CSD
+vendor: Evanssion
+owner: TODO(vendor)                       # business owner
+technicalOwner: cpx-platform
+environment: dev
+dataClassification: confidential
+costCenter: cpx-costcenter
+criticality: high
+repository: TODO(cpx)/crs-ThreatIntel-web   # CPX assigns the org
+foundryProject: TODO(cpx)                 # e.g. proj-crs-ThreatIntel
+apimProduct: api-crs
+guardrailMode: block
+useCases:                                 # the use cases this agent covers
+  - Threat Intelligence: PIR-driven collection, cited intelligence answers and advisory reporting (AGT-CRS-002, Nestor)

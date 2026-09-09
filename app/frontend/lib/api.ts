@@ -1,16 +1,20 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+import { publicEnv } from "./runtime-env";
 
 import type { AskOptions } from "./ask-options";
 import type { Advisory, Client, Connector, Delivery, DrpItem, Investigation, KeywordWatch, Pir, PirCategory, PirHit, RelevanceMatch, Rhythm, Source, SourceRequest, Turn } from "./types";
+
+// Read at call time, never at module init: the value comes from the container env
+// (server) or window.__ENV (browser) and must not be baked into the bundle.
+const apiBase = () => publicEnv().API_BASE_URL;
 
 // A read falls back to fixtures when the backend is down. A write cannot, so it
 // has to be able to say what went wrong. Browsers surface an unreachable server
 // as a bare "Failed to fetch" TypeError, which tells an analyst nothing and
 // reads like a bug in the console rather than a server that is not running.
-const UNREACHABLE =
+const unreachable = () =>
   "The backend is not reachable. Check that it is running on " +
-  API_BASE +
-  ", or set NEXT_PUBLIC_API_BASE.";
+  apiBase() +
+  ", or set API_BASE_URL.";
 
 async function request(input: string, init?: RequestInit): Promise<Response> {
   try {
@@ -18,13 +22,13 @@ async function request(input: string, init?: RequestInit): Promise<Response> {
   } catch {
     // Only a network-level failure lands here. An HTTP error is a response and
     // each caller reads the backend's own reason from it.
-    throw new Error(UNREACHABLE);
+    throw new Error(unreachable());
   }
 }
 
 
 async function send<T>(userId: string, path: string, method: "POST" | "PATCH", body: unknown): Promise<T> {
-  const response = await request(`${API_BASE}${path}`, {
+  const response = await request(`${apiBase()}${path}`, {
     method,
     headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -46,13 +50,13 @@ export type Health = {
 };
 
 export async function getHealth(): Promise<Health> {
-  const response = await request(`${API_BASE}/health`, { cache: "no-store" });
+  const response = await request(`${apiBase()}/health`, { cache: "no-store" });
   if (!response.ok) throw new Error(`Backend returned ${response.status}`);
   return response.json() as Promise<Health>;
 }
 
 export async function getReports(userId: string): Promise<Advisory[]> {
-  const response = await request(`${API_BASE}/reports`, {
+  const response = await request(`${apiBase()}/reports`, {
     cache: "no-store",
     headers: { "X-Nestor-User": userId },
   });
@@ -70,7 +74,7 @@ export type DashboardData = {
 };
 
 export async function getDashboardData(userId: string): Promise<DashboardData> {
-  const response = await request(`${API_BASE}/dashboard`, {
+  const response = await request(`${apiBase()}/dashboard`, {
     cache: "no-store",
     headers: { "X-Nestor-User": userId },
   });
@@ -86,7 +90,7 @@ export async function getReport(
   userId: string,
   ref: string,
 ): Promise<{ advisory: Advisory; deliveries: Delivery[] }> {
-  const response = await request(`${API_BASE}/reports/${encodeURIComponent(ref)}`, {
+  const response = await request(`${apiBase()}/reports/${encodeURIComponent(ref)}`, {
     cache: "no-store",
     headers: { "X-Nestor-User": userId },
   });
@@ -96,7 +100,7 @@ export async function getReport(
 }
 
 export async function changeReport(userId: string, ref: string, action: "submit" | "approve", reason?: string) {
-  const response = await request(`${API_BASE}/reports/${encodeURIComponent(ref)}/${action}`, {
+  const response = await request(`${apiBase()}/reports/${encodeURIComponent(ref)}/${action}`, {
     method: "POST",
     headers: {
       "X-Nestor-User": userId,
@@ -118,7 +122,7 @@ export async function createReport(
     template?: Advisory["template"];
   },
 ): Promise<Advisory> {
-  const response = await request(`${API_BASE}/reports/draft`, {
+  const response = await request(`${apiBase()}/reports/draft`, {
     method: "POST",
     headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -132,7 +136,7 @@ export async function createReport(
 
 export async function archiveReport(userId: string, ref: string) {
   const response = await request(
-    `${API_BASE}/reports/${encodeURIComponent(ref)}/archive`,
+    `${apiBase()}/reports/${encodeURIComponent(ref)}/archive`,
     { method: "POST", headers: { "X-Nestor-User": userId } },
   );
   if (!response.ok) {
@@ -142,7 +146,7 @@ export async function archiveReport(userId: string, ref: string) {
 }
 
 export async function sendBackReport(userId: string, ref: string, reason: string) {
-  const response = await request(`${API_BASE}/reports/${encodeURIComponent(ref)}/send-back`, {
+  const response = await request(`${apiBase()}/reports/${encodeURIComponent(ref)}/send-back`, {
     method: "POST",
     headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
     body: JSON.stringify({ reason }),
@@ -151,7 +155,7 @@ export async function sendBackReport(userId: string, ref: string, reason: string
 }
 
 async function listApi<T>(userId: string, path: string, key: string): Promise<T[]> {
-  const response = await request(`${API_BASE}${path}`, {
+  const response = await request(`${apiBase()}${path}`, {
     cache: "no-store",
     headers: { "X-Nestor-User": userId },
   });
@@ -167,7 +171,7 @@ export const getWatches = (userId: string) => listApi<KeywordWatch>(userId, "/co
 export const getRequests = (userId: string) => listApi<SourceRequest>(userId, "/collection/requests", "items");
 export const getInvestigation = (userId: string, id: string) => listApi<Turn>(userId, `/intelligence/${id}`, "turns");
 export async function getSource(userId: string, id: string): Promise<Source> {
-  const response = await request(`${API_BASE}/collection/sources/${encodeURIComponent(id)}`, { cache: "no-store", headers: { "X-Nestor-User": userId } });
+  const response = await request(`${apiBase()}/collection/sources/${encodeURIComponent(id)}`, { cache: "no-store", headers: { "X-Nestor-User": userId } });
   if (!response.ok) throw new Error(`Backend returned ${response.status}`);
   return (await response.json() as { source: Source }).source;
 }
@@ -175,7 +179,7 @@ export const getInvestigations = (userId: string) => listApi<Investigation>(user
 export const getPirs = (userId: string) => listApi<Pir>(userId, "/pirs", "items");
 
 export async function askIntelligence(userId: string, question: string, investigationId?: string, options?: AskOptions): Promise<{ investigationId: string; turn: Turn }> {
-  const response = await request(`${API_BASE}/intelligence/ask`, {
+  const response = await request(`${apiBase()}/intelligence/ask`, {
     method: "POST",
     headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
     body: JSON.stringify({ question, investigationId, options }),
@@ -185,7 +189,7 @@ export async function askIntelligence(userId: string, question: string, investig
 }
 
 export async function reputationLookup(userId: string, observable: string) {
-  const response = await request(`${API_BASE}/intelligence/reputation`, {
+  const response = await request(`${apiBase()}/intelligence/reputation`, {
     method: "POST",
     headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
     body: JSON.stringify({ observable }),
@@ -207,7 +211,7 @@ export type ClientDetail = {
 };
 
 export async function getClient(userId: string, id: string): Promise<ClientDetail> {
-  const response = await request(`${API_BASE}/clients/${encodeURIComponent(id)}`, {
+  const response = await request(`${apiBase()}/clients/${encodeURIComponent(id)}`, {
     cache: "no-store",
     headers: { "X-Nestor-User": userId },
   });
@@ -271,7 +275,7 @@ export const patchWatch = (userId: string, id: string, patch: Partial<WatchCreat
   send<KeywordWatch>(userId, `/collection/watches/${encodeURIComponent(id)}`, "PATCH", patch);
 
 export async function deleteWatch(userId: string, id: string): Promise<void> {
-  const response = await request(`${API_BASE}/collection/watches/${encodeURIComponent(id)}`, {
+  const response = await request(`${apiBase()}/collection/watches/${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: { "X-Nestor-User": userId },
   });

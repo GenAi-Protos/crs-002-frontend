@@ -1,0 +1,24 @@
+{
+  "tags": {
+    "Environment": "PROD",
+    "BusinessUnit": "CRS",
+    "Vendor": "Evanssion",
+    "UseCase": "ThreatIntel",
+    "Application": "agentic-ai",
+    "Owner": "TODO(vendor)",
+    "TechnicalOwner": "TODO(vendor)",
+    "CostCenter": "cpx-costcenter",
+    "DataClassification": "TODO(vendor)",
+    "Criticality": "TODO(vendor)",
+    "ManagedBy": "Pipeline",
+    "Repository": "TODO(cpx)/crs-ThreatIntel-web",
+    "CommitHash": "TODO(pipeline)",
+    "GuardrailMode": "Block"
+  },
+  "containerApp": {
+    "_note": "name MUST be all lowercase — Azure Container Apps rejects uppercase. Lowercase the camelCase agent slug (e.g. csd-CyberSecAssess -> csd-cybersecassess-api).",
+    "name": "crs-threatintel-web",
+    "image": "TODO(pipeline): set by build-publish",
+    "resourceGroup": "TODO(cpx): rg-crs-genaiapp"
+  }
+}

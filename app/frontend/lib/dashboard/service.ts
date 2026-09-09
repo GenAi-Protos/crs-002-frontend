@@ -16,7 +16,9 @@
 import mock from "@/fixtures/analyst-dashboard.json";
 import type { AnalystDashboard, DashboardResult } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://localhost:8000";
+import { publicEnv } from "@/lib/runtime-env";
+
+const apiBase = () => publicEnv().API_BASE_URL;
 
 /** The mock payload, typed against the same contract the API will satisfy. */
 export const MOCK_ANALYST_DASHBOARD = mock as unknown as AnalystDashboard;
@@ -32,7 +34,7 @@ function isEmpty(d: AnalystDashboard): boolean {
 
 export async function getAnalystDashboard(userId: string): Promise<DashboardResult> {
   try {
-    const response = await fetch(`${API_BASE}/dashboard/analyst`, {
+    const response = await fetch(`${apiBase()}/dashboard/analyst`, {
       cache: "no-store",
       headers: { "X-Nestor-User": userId },
     });
@@ -95,7 +97,7 @@ export async function getRoleDashboard(
     "Demonstration data. No intelligence feed is connected yet.";
 
   try {
-    const response = await fetch(`${API_BASE}/dashboard/intelligence`, {
+    const response = await fetch(`${apiBase()}/dashboard/intelligence`, {
       cache: "no-store",
       headers: { "X-Nestor-User": userId },
     });
