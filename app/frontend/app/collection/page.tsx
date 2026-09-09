@@ -8,7 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { REQUESTS, SOURCES, WATCHES } from "@/lib/fixtures";
-import { getConnectors, getHealth, getRequests, getSources, getWatches } from "@/lib/api";
+import { getConnectors, getHealth, getRequests, getSources, getWatches, isUnreachable } from "@/lib/api";
 import type { Connector, KeywordWatch, Source, SourceRequest } from "@/lib/types";
 import { PageHeader, Tabs, OfflineNote } from "@/components/ui";
 import { ConnectorsTab } from "@/components/collection/ConnectorsTab";
@@ -37,10 +37,15 @@ function CollectionInner() {
   const [schedulerOn, setSchedulerOn] = useState(false);
   const [offline, setOffline] = useState(false);
   useEffect(() => {
-    getSources(user.id).then(setSources).catch(() => setOffline(true));
-    getRequests(user.id).then(setRequests).catch(() => setOffline(true));
-    getWatches(user.id).then(setWatches).catch(() => setOffline(true));
-    getConnectors(user.id).then(setConnectors).catch(() => setOffline(true));
+    getSources(user.id)
+      .then((rows) => {
+        setSources(rows);
+        setOffline(false);
+      })
+      .catch((e) => setOffline(isUnreachable(e)));
+    getRequests(user.id).then(setRequests).catch((e) => setOffline(isUnreachable(e)));
+    getWatches(user.id).then(setWatches).catch((e) => setOffline(isUnreachable(e)));
+    getConnectors(user.id).then(setConnectors).catch((e) => setOffline(isUnreachable(e)));
     getHealth().then((h) => setSchedulerOn(h.scheduler)).catch(() => setSchedulerOn(false));
   }, [user.id]);
 

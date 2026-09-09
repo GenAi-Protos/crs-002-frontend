@@ -21,7 +21,7 @@ import {
   T_TH,
 } from "@/components/table";
 import { gstDate } from "@/lib/format";
-import { archiveReport, createReport, createRfi, getDashboardData, getReports } from "@/lib/api";
+import { archiveReport, createReport, createRfi, getDashboardData, getReports, isUnreachable } from "@/lib/api";
 import { NewReportDialog } from "@/components/reports/NewReportDialog";
 import { RowActions } from "@/components/reports/RowActions";
 import { ReportPreview } from "@/components/reports/ReportPreview";
@@ -82,10 +82,13 @@ export default function ReportsPage() {
   // destination and an analyst reading Reports would be refused there.
   useEffect(() => {
     getReports(user.id)
-      .then(setApiRows)
-      .catch(() => {
+      .then((rows) => {
+        setApiRows(rows);
+        setOffline(false);
+      })
+      .catch((e) => {
         setApiRows(ADVISORIES);
-        setOffline(true);
+        setOffline(isUnreachable(e));
       })
       .finally(() => setLoading(false));
     getDashboardData(user.id).then((d) => setClients(d.clients)).catch(() => setClients([]));

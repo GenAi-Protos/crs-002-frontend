@@ -13,7 +13,7 @@ import { useSearchParams } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { AGENTS, PIRS, WORKFLOWS } from "@/lib/fixtures";
-import { getPirs } from "@/lib/api";
+import { getPirs, isUnreachable } from "@/lib/api";
 import type { Agent, Pir, Workflow } from "@/lib/types";
 import { PageHeader, Tabs, OfflineNote } from "@/components/ui";
 import { AgentsTab } from "@/components/manage/AgentsTab";
@@ -46,10 +46,13 @@ function ManageInner() {
     // PIRs are live already. The fixture stands in only when the backend is
     // down, the same fallback every other screen uses.
     getPirs(user.id)
-      .then((rows) => setPirs(rows.length > 0 ? rows : PIRS))
-      .catch(() => {
+      .then((rows) => {
+        setPirs(rows.length > 0 ? rows : PIRS);
+        setOffline(false);
+      })
+      .catch((e) => {
         setPirs(PIRS);
-        setOffline(true);
+        setOffline(isUnreachable(e));
       });
   }, [user.id]);
 

@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useConsoleUser } from "@/lib/role-context";
 import { assembleAdvisory, canApprove, canSee, canWriteReports } from "@/lib/access";
 import { advisoryByRef } from "@/lib/fixtures";
-import { changeReport, getDashboardData, getReport, sendBackReport } from "@/lib/api";
+import { changeReport, getDashboardData, getReport, sendBackReport, isUnreachable } from "@/lib/api";
 import type { Advisory, Client, Delivery, SendBackReason } from "@/lib/types";
 import { resolveTechnique, TACTICS } from "@/lib/mitre";
 import { gstDate, gstDateTime, recordCount } from "@/lib/format";
@@ -81,10 +81,11 @@ export default function ReportPage({
       .then(({ advisory, deliveries }) => {
         setBase(advisory);
         setSent(deliveries);
+        setOffline(false);
       })
-      .catch(() => {
+      .catch((e) => {
         setBase(advisoryByRef(decoded) ?? null);
-        setOffline(true);
+        setOffline(isUnreachable(e));
       })
       .finally(() => setLoading(false));
     getDashboardData(user.id).then((d) => setClients(d.clients)).catch(() => setClients([]));

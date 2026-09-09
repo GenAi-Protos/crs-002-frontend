@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { CLIENTS } from "@/lib/fixtures";
-import { createClient, getClient, getClients, getPirs, patchClient, type ClientDetail, type ClientPatch } from "@/lib/api";
+import { createClient, getClient, getClients, getPirs, patchClient, type ClientDetail, type ClientPatch, isUnreachable } from "@/lib/api";
 import type { Client, Delivery, DrpItem, Pir } from "@/lib/types";
 import { gstDate, gstDateTime } from "@/lib/format";
 import { TypeBadge, T_HEAD, T_NUM, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
@@ -48,10 +48,13 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   useEffect(() => {
     // Fixtures stand in when the backend is down, labelled as such (hard rule 1).
     getClients(user.id)
-      .then(setApiClients)
-      .catch(() => {
+      .then((cs) => {
+        setApiClients(cs);
+        setOffline(false);
+      })
+      .catch((e) => {
         setApiClients(CLIENTS);
-        setOffline(true);
+        setOffline(isUnreachable(e));
       });
     getPirs(user.id).then(setPirs).catch(() => setPirs([]));
   }, [user.id]);

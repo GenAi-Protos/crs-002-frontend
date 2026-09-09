@@ -8,7 +8,7 @@ import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
-import { getPirs, getSource, patchSource } from "@/lib/api";
+import { getPirs, getSource, patchSource, isUnreachable } from "@/lib/api";
 import { SOURCES } from "@/lib/fixtures";
 import type { Pir, Rhythm, Source } from "@/lib/types";
 import { pollLog } from "@/lib/source-log";
@@ -47,7 +47,12 @@ export default function SourcePage({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
   useEffect(() => {
-    getSource(user.id, id).then(setApiBase).catch(() => setOffline(true));
+    getSource(user.id, id)
+      .then((s) => {
+        setApiBase(s);
+        setOffline(false);
+      })
+      .catch((e) => setOffline(isUnreachable(e)));
     getPirs(user.id).then(setPirs).catch(() => setPirs([]));
   }, [user.id, id]);
 

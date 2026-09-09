@@ -6,7 +6,7 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { investigationById } from "@/lib/fixtures";
-import { getDashboardData, getInvestigation, getReports } from "@/lib/api";
+import { getDashboardData, getInvestigation, getReports, isUnreachable } from "@/lib/api";
 import type { Advisory, PirHit, Turn } from "@/lib/types";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
@@ -33,8 +33,8 @@ export default function InvestigationPage({
   const [advisories, setAdvisories] = useState<Advisory[]>([]);
   useEffect(() => {
     getInvestigation(user.id, id)
-      .then((next) => { setTurns(next); setFound(true); })
-      .catch(() => setOffline(true))
+      .then((next) => { setTurns(next); setFound(true); setOffline(false); })
+      .catch((e) => setOffline(isUnreachable(e)))
       .finally(() => setLoading(false));
     getDashboardData(user.id).then((d) => setHits(d.hits)).catch(() => setHits([]));
     getReports(user.id).then(setAdvisories).catch(() => setAdvisories([]));

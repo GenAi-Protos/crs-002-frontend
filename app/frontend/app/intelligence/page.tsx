@@ -15,7 +15,7 @@ import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { makeTurn, STARTER_PROMPTS } from "@/lib/ask";
 import type { Advisory, Client, Investigation, PirHit, Turn, Workflow } from "@/lib/types";
-import { askIntelligence, getDashboardData, getInvestigations, getReports } from "@/lib/api";
+import { askIntelligence, getDashboardData, getInvestigations, getReports, isUnreachable } from "@/lib/api";
 import { TurnView } from "@/components/intelligence/AnswerCard";
 import { EntityDrawer } from "@/components/intelligence/EntityDrawer";
 import { INVESTIGATIONS as FALLBACK_INVESTIGATIONS, WORKFLOWS } from "@/lib/fixtures";
@@ -77,8 +77,8 @@ function IntelligenceInner() {
   useEffect(() => {
     setSessions(readSessions());
     Promise.all([getInvestigations(user.id), getDashboardData(user.id), getReports(user.id)])
-      .then(([items, data, reports]) => { setInvestigations(items); setHits(data.hits); setAdvisories(reports); setClients(data.clients); })
-      .catch(() => { setInvestigations(FALLBACK_INVESTIGATIONS); setOffline(true); });
+      .then(([items, data, reports]) => { setInvestigations(items); setHits(data.hits); setAdvisories(reports); setClients(data.clients); setOffline(false); })
+      .catch((e) => { setInvestigations(FALLBACK_INVESTIGATIONS); setOffline(isUnreachable(e)); });
   }, [user.id]);
 
   // The dashboard's Draft advisory action and the top bar search land here.

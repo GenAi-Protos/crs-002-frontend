@@ -16,13 +16,19 @@ const unreachable = () =>
   apiBase() +
   ", or set API_BASE_URL.";
 
+// Thrown only when the backend cannot be reached at all. An HTTP error (403, 404,
+// 500) is a response from a live backend and is never this.
+export class BackendUnreachable extends Error {}
+
+export const isUnreachable = (e: unknown): boolean => e instanceof BackendUnreachable;
+
 async function request(input: string, init?: RequestInit): Promise<Response> {
   try {
     return await fetch(input, init);
   } catch {
     // Only a network-level failure lands here. An HTTP error is a response and
     // each caller reads the backend's own reason from it.
-    throw new Error(unreachable());
+    throw new BackendUnreachable(unreachable());
   }
 }
 
