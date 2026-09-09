@@ -12,8 +12,7 @@ import { changeReport, getDashboardData, getReport, sendBackReport } from "@/lib
 import type { Advisory, Client, Delivery, SendBackReason } from "@/lib/types";
 import { resolveTechnique, TACTICS } from "@/lib/mitre";
 import { gstDate, gstDateTime, recordCount } from "@/lib/format";
-import { defang } from "@/lib/defang";
-import { IndicatorChip, TlpBadge } from "@/components/ui";
+import { IndicatorChip, TlpBadge, Button, Dialog, buttonClass, OfflineNote, SkeletonRows } from "@/components/ui";
 import { Menu } from "@/components/reports/ExportMenu";
 import { ReportPreview } from "@/components/reports/ReportPreview";
 import { DiamondPanel } from "@/components/reports/DiamondPanel";
@@ -24,7 +23,7 @@ import {
   type ReportFormat,
 } from "@/lib/report-export";
 import { templateFor } from "@/lib/report-templates";
-import { IconCheck, IconExport, IconWarn } from "@/components/icons";
+import { IconCheck, IconWarn } from "@/components/icons";
 import {
   T_FLUSH,
   T_HEAD,
@@ -66,6 +65,8 @@ export default function ReportPage({
   const { user } = useConsoleUser();
   const decoded = decodeURIComponent(ref);
   const [base, setBase] = useState<Advisory | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
   const [local, setLocal] = useState<Advisory | null>(null);
   const [showSendBack, setShowSendBack] = useState(false);
   // Preview is not a view of its own any more: it is the markup a PDF export
@@ -81,7 +82,11 @@ export default function ReportPage({
         setBase(advisory);
         setSent(deliveries);
       })
-      .catch(() => setBase(advisoryByRef(decoded) ?? null));
+      .catch(() => {
+        setBase(advisoryByRef(decoded) ?? null);
+        setOffline(true);
+      })
+      .finally(() => setLoading(false));
     getDashboardData(user.id).then((d) => setClients(d.clients)).catch(() => setClients([]));
   }, [user.id, decoded]);
 
@@ -94,19 +99,27 @@ export default function ReportPage({
   if (!canSee(user.role, "reports")) {
     return (
       <Center>
-        <p className="text-[14px] font-light">Not permitted at this access level.</p>
-        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">Not permitted at this access level.</p>
+        <Link href="/" className="text-sm text-link underline underline-offset-2">
           Dashboard
         </Link>
       </Center>
     );
   }
 
+  if (loading && !base) {
+    return (
+      <div className="mx-auto max-w-[720px] px-6 py-8">
+        <SkeletonRows rows={8} />
+      </div>
+    );
+  }
+
   if (!base || !assembled) {
     return (
       <Center>
-        <p className="text-[14px] font-light">No report with this reference.</p>
-        <Link href="/reports" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">No report with this reference.</p>
+        <Link href="/reports" className="text-sm text-link underline underline-offset-2">
           Reports
         </Link>
       </Center>
@@ -155,7 +168,7 @@ export default function ReportPage({
           without that a flex child compresses below its text and wraps inside
           itself, which is what turned this bar into six stacked fragments. */}
       <div className="sticky top-14 z-20 flex h-14 items-center gap-2 border-b border-black/10 bg-white px-6">
-        <span className="shrink-0 whitespace-nowrap font-mono text-[13px] font-medium">
+        <span className="shrink-0 whitespace-nowrap font-mono text-sm font-medium">
           {a.ref}
         </span>
         <span className="shrink-0">
@@ -164,35 +177,40 @@ export default function ReportPage({
         {/* Report type, stated. Which format a document follows is the first
             thing a reviewer needs and it was only implicit in the reference. */}
         <span
-          className="shrink-0 bg-black/5 px-1.5 py-0.5 text-[11px]"
+          className="shrink-0 bg-black/5 px-1.5 py-0.5 text-2xs"
           title={template?.name}
         >
           {a.type}
         </span>
-        <span className="shrink-0 whitespace-nowrap text-[12px] font-light text-cpx-grey">
+        <span className="shrink-0 whitespace-nowrap text-xs text-cpx-grey">
           v{a.version}
         </span>
-        <span className="shrink-0 whitespace-nowrap text-[12px] font-light">
+        <span className="shrink-0 whitespace-nowrap text-xs">
           {STATE_LABEL[a.status]}
         </span>
+        {offline && (
+          <span className="shrink-0">
+            <OfflineNote />
+          </span>
+        )}
 
         {/* Everything from here is context rather than identity, so it gives way
             first. The full value stays on the title attribute. */}
         <span className="hidden min-w-0 items-center gap-2 xl:flex">
           {a.pirRefs.map((p) => (
-            <span key={p} className="shrink-0 bg-black/5 px-1.5 py-0.5 text-[11px]">
+            <span key={p} className="shrink-0 bg-black/5 px-1.5 py-0.5 text-2xs">
               {p}
             </span>
           ))}
         </span>
         <span
-          className="hidden shrink-0 truncate whitespace-nowrap text-[12px] font-light text-cpx-grey lg:inline"
+          className="hidden shrink-0 truncate whitespace-nowrap text-xs text-cpx-grey lg:inline"
           title={`Owner: ${a.owner ?? "unassigned"}`}
         >
           {a.owner ?? "-"}
         </span>
         <span
-          className="hidden shrink-0 whitespace-nowrap text-[12px] font-light text-cpx-grey 2xl:inline"
+          className="hidden shrink-0 whitespace-nowrap text-xs text-cpx-grey 2xl:inline"
           title={`Last updated ${gstDateTime(lastUpdated)}`}
         >
           {gstDate(lastUpdated)}
@@ -220,7 +238,7 @@ export default function ReportPage({
         />
       )}
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-black/10 bg-white px-6 py-1.5 text-[11.5px] font-light text-cpx-grey">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-black/10 bg-white px-6 py-1.5 text-2xs text-cpx-grey">
         <span>
           Report type <span className="text-cpx-black">{a.type}</span>
           {template && <> · {template.name}</>}
@@ -245,15 +263,15 @@ export default function ReportPage({
 
       {publishedState && (
         <div className="mx-auto mt-4 max-w-[720px] space-y-1 px-6">
-          <div className="flex items-center gap-2 bg-cpx-purple px-3 py-2 text-[12px] text-white">
+          <div className="flex items-center gap-2 bg-cpx-purple px-3 py-2 text-xs text-white">
             <span className="font-medium">Version {a.version}</span>
-            <span className="font-light text-white/70">
+            <span className="text-white/70">
               Published {a.publishedAt ? gstDateTime(a.publishedAt) : ""}
             </span>
             {a.status === "retracted" && <span className="bg-cpx-red px-1.5">Retracted</span>}
           </div>
           {a.supersededBy && (
-            <p className="bg-status-warn-fill px-3 py-1.5 text-[12px] text-status-warn-ink">
+            <p className="bg-status-warn-fill px-3 py-1.5 text-xs text-status-warn-ink">
               Superseded by{" "}
               <Link
                 href={`/reports/${encodeURIComponent(a.supersededBy)}`}
@@ -269,40 +287,40 @@ export default function ReportPage({
 
       {a.status === "did-not-run" && (
         <div className="mx-auto mt-4 max-w-[720px] px-6">
-          <p className="bg-cpx-red px-3 py-2 text-[12px] text-white">Did not run.</p>
+          <p className="bg-cpx-red px-3 py-2 text-xs text-white">Did not run.</p>
         </div>
       )}
 
       <article className="mx-auto max-w-[720px] px-6 py-8">
-        <h1 className="text-[24px] font-medium leading-snug tracking-tightish">
+        <h1 className="text-xl font-medium leading-snug tracking-tightish">
           {a.title}
         </h1>
 
         <div className="mt-6 space-y-7">
           {a.sections.map((s) => (
             <section key={s.id} id={s.id} className="scroll-mt-32">
-              <h2 className="border-b border-black/10 pb-1 text-[15px] font-medium tracking-tightish">
+              <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
                 {s.heading}
               </h2>
               {s.heading === "TTPs Mapping" || s.heading === "MITRE ATT&CK Mapping" ? (
                 <>
-                  <p className="mt-2 text-[13.5px] font-light leading-relaxed">{s.body}</p>
+                  <p className="mt-2 text-sm leading-relaxed">{s.body}</p>
                   <TechniquesTable a={a} editable={editable} update={update} />
                 </>
               ) : s.heading === "Diamond Model Analysis" ? (
                 <>
-                  <p className="mt-2 text-[13.5px] font-light leading-relaxed">{s.body}</p>
+                  <p className="mt-2 text-sm leading-relaxed">{s.body}</p>
                   <DiamondPanel advisory={a} editable={editable} update={update} />
                 </>
               ) : s.heading === "CVSS v3 Base Score" ? (
                 <>
-                  <p className="mt-2 text-[13.5px] font-light leading-relaxed">{s.body}</p>
+                  <p className="mt-2 text-sm leading-relaxed">{s.body}</p>
                   <CvssTable a={a} editable={editable} update={update} />
                 </>
               ) : s.heading === "Indicators" ? (
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {s.body.includes("withheld at this access level") ? (
-                    <p className="text-[13.5px] font-light">{s.body}</p>
+                    <p className="text-sm">{s.body}</p>
                   ) : (
                     s.body
                       .split("\n")
@@ -322,15 +340,15 @@ export default function ReportPage({
                     }))
                   }
                   rows={Math.max(2, Math.ceil(s.body.length / 90))}
-                  className="mt-2 w-full resize-y border border-transparent bg-transparent text-[13.5px] font-light leading-relaxed hover:border-black/10 focus:border-black/15 focus:bg-white focus:outline-none"
+                  className="mt-2 w-full resize-y border border-transparent bg-transparent text-sm leading-relaxed hover:border-black/10 focus:border-black/15 focus:bg-white focus:outline-none"
                 />
               ) : (
-                <p className="mt-2 whitespace-pre-line text-[13.5px] font-light leading-relaxed">
+                <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">
                   {s.body}
                 </p>
               )}
               {s.citations.length > 0 && (
-                <p className="mt-1.5 text-[11.5px] font-light text-cpx-grey">
+                <p className="mt-1.5 text-2xs text-cpx-grey">
                   {s.citations
                     .map((c) => `[${c.ref}] ${c.label}, ${recordCount(c.recordCount)}`)
                     .join(" · ")}
@@ -344,15 +362,15 @@ export default function ReportPage({
 
         {publishedState && (
           <section className="mt-10">
-            <h2 className="border-b border-black/10 pb-1 text-[15px] font-medium tracking-tightish">
+            <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
               Delivery
             </h2>
-            <p className="mt-2 text-[12.5px] font-light">
+            <p className="mt-2 text-xs">
               <span className="font-medium">{deliveries.length} deliveries</span>
             </p>
             <ul className="mt-1 space-y-1">
               {deliveries.map((d, i) => (
-                <li key={i} className="text-[12.5px] font-light">
+                <li key={i} className="text-xs">
                   {clients.find((c) => c.id === d.clientId)?.name ?? d.clientId} · v
                   {d.advisoryVersion} · {d.channel} · {d.format.toUpperCase()} ·{" "}
                   {gstDateTime(d.sentAt)}
@@ -364,13 +382,13 @@ export default function ReportPage({
       </article>
 
       {!isDigest && (lead || (publishedState && editable === false && canWriteReports(user.role))) && (
-        <footer className="fixed bottom-0 left-16 right-0 z-20 flex h-14 items-center gap-2 border-t border-black/10 bg-white px-6 min-[1100px]:left-60">
+        <footer className="fixed bottom-0 left-16 right-0 z-20 flex h-14 items-center gap-2 border-t border-black/10 bg-white px-6 rail:left-60">
           {publishedState ? (
             <button
                 onClick={() =>
                 update((d) => ({ ...d, status: "draft", version: d.version + 1 }))
               }
-              className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+              className={buttonClass()}
             >
               Issue an update
             </button>
@@ -388,13 +406,13 @@ export default function ReportPage({
                   }), "approve")
                 }
                 title={blockingFailed.map((c) => c.label).join("; ")}
-                className="h-8 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black disabled:bg-black/10 disabled:text-black/40"
+                className={buttonClass("primary")}
               >
                 Approve & publish
               </button>
               <button
                 onClick={() => setShowSendBack(true)}
-                className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+                className={buttonClass()}
               >
                 Send back
               </button>
@@ -409,7 +427,7 @@ export default function ReportPage({
                     approvedBy: user.name,
                   }))
                 }
-                className="h-8 border border-status-warn-ink px-3 text-[13px] font-light text-status-warn-ink disabled:border-black/10 disabled:text-black/30"
+                className={buttonClass("danger")}
               >
                 Override
               </button>
@@ -419,10 +437,8 @@ export default function ReportPage({
       )}
 
       {showSendBack && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-sm border border-black/10 bg-white p-5">
-            <h2 className="text-[15px] font-medium tracking-tightish">Send back</h2>
-            <ul className="mt-3 space-y-1">
+        <Dialog title="Send back" onClose={() => setShowSendBack(false)} className="max-w-sm">
+            <ul className="space-y-1">
               {SEND_BACK_REASONS.map((r) => (
                 <li key={r.key}>
                   <button
@@ -437,21 +453,17 @@ export default function ReportPage({
                       })));
                       setShowSendBack(false);
                     }}
-                    className="w-full border border-black/10 px-3 py-2 text-left text-[13px] font-light hover:border-cpx-purple"
+                    className="w-full border border-black/10 px-3 py-2 text-left text-sm hover:border-cpx-purple"
                   >
                     {r.label}
                   </button>
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => setShowSendBack(false)}
-              className="mt-3 h-8 w-full border border-black/15 text-[13px] font-light hover:bg-black/5"
-            >
+            <Button onClick={() => setShowSendBack(false)} className="mt-3 w-full">
               Cancel
-            </button>
-          </div>
-        </div>
+            </Button>
+        </Dialog>
       )}
     </div>
   );
@@ -487,15 +499,15 @@ function SourcesSection({ a }: { a: Advisory }) {
 
   return (
     <section className="mt-10">
-      <h2 className="border-b border-black/10 pb-1 text-[15px] font-medium tracking-tightish">
+      <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
         Sources
       </h2>
-      <p className="mt-2 text-[12.5px] font-light">
+      <p className="mt-2 text-xs">
         <span className="font-medium">{rows.length} sources</span>
       </p>
       {rows.length > 0 && (
         <div className="mt-2 overflow-x-auto">
-          <table className={`${T_TABLE} min-w-[32rem] text-[12.5px]`}>
+          <table className={`${T_TABLE} min-w-[32rem] text-xs`}>
             <colgroup>
               <col className="w-56" />
               <col className="w-28" />
@@ -515,14 +527,14 @@ function SourcesSection({ a }: { a: Advisory }) {
             <tbody>
               {rows.map(([label, e]) => (
                 <tr key={label} className={T_ROW}>
-                  <td className={`${T_TD} ${T_FLUSH} font-normal`}>{label}</td>
+                  <td className={`${T_TD} ${T_FLUSH} font-medium`}>{label}</td>
                   <td className={`${T_TD} ${T_FLUSH} ${T_NUM} font-medium`}>
                     {e.records}
                   </td>
-                  <td className={`${T_TD} ${T_FLUSH} font-light`}>
+                  <td className={`${T_TD} ${T_FLUSH}`}>
                     {e.sections.join(", ")}
                   </td>
-                  <td className={`${T_TD} ${T_FLUSH} whitespace-nowrap font-light`}>
+                  <td className={`${T_TD} ${T_FLUSH} whitespace-nowrap`}>
                     {e.snapshotAt ? gstDateTime(e.snapshotAt) : "-"}
                   </td>
                 </tr>
@@ -534,9 +546,9 @@ function SourcesSection({ a }: { a: Advisory }) {
       {derived.length > 0 && (
         <ul className="mt-3 space-y-1">
           {derived.map((s) => (
-            <li key={s.id} className="text-[12.5px] font-light">
+            <li key={s.id} className="text-xs">
               {s.heading} ·{" "}
-              <span className="font-normal">
+              <span className="font-medium">
                 {DERIVED_LABEL[s.derivedFrom ?? ""] ?? s.derivedFrom}
               </span>
             </li>
@@ -561,7 +573,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
   if (a.checks.length === 0) return null;
   if (failed.length === 0) {
     return (
-      <div className="flex items-center gap-2 border-b border-black/10 bg-white px-6 py-2 text-[12.5px] font-light">
+      <div className="flex items-center gap-2 border-b border-black/10 bg-white px-6 py-2 text-xs">
         <IconCheck className="text-green-contrast" />
         All checks passed.
       </div>
@@ -572,7 +584,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
     // One line, not one line per check. Every check is unpassed on a new draft,
     // and three stacked red rows read as a fault rather than as the ordinary
     // starting state of a document nobody has written yet.
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-black/10 bg-white px-6 py-2 text-[12.5px] font-light">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-black/10 bg-white px-6 py-2 text-xs">
       <IconWarn className={blocking > 0 ? "text-cpx-red" : "text-status-warn-ink"} />
       <span className="whitespace-nowrap">
         <span className="font-medium">
@@ -613,7 +625,7 @@ function TechniquesTable({
   const resolved = resolveTechnique(newId);
   return (
     <div className="mt-3">
-      <table className="w-full border-collapse text-[12.5px]">
+      <table className="w-full border-collapse text-xs">
         <thead>
           <tr className="border-b border-black/15 text-left">
             <th className="py-1.5 pr-3 font-medium">Tactic</th>
@@ -625,17 +637,17 @@ function TechniquesTable({
         <tbody>
           {a.techniques.map((t) => (
             <tr key={t.techniqueId} className="border-b border-black/5">
-              <td className="py-1.5 pr-3 font-light">
+              <td className="py-1.5 pr-3">
                 {t.tacticId} {TACTICS[t.tacticId]}
               </td>
-              <td className="py-1.5 pr-3 font-mono text-[12px]">{t.techniqueId}</td>
-              <td className="py-1.5 pr-3 font-light">{t.techniqueName}</td>
-              <td className="py-1.5 font-light">{t.observedActivity}</td>
+              <td className="py-1.5 pr-3 font-mono text-xs">{t.techniqueId}</td>
+              <td className="py-1.5 pr-3">{t.techniqueName}</td>
+              <td className="py-1.5">{t.observedActivity}</td>
             </tr>
           ))}
           {a.techniques.length === 0 && (
             <tr>
-              <td colSpan={4} className="py-2 font-light">
+              <td colSpan={4} className="py-2">
                 <span className="font-medium">0 techniques</span>
               </td>
             </tr>
@@ -648,9 +660,9 @@ function TechniquesTable({
             value={newId}
             onChange={(e) => setNewId(e.target.value)}
             placeholder="Technique ID"
-            className="h-8 w-36 border border-black/15 px-2 font-mono text-[12px] focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-36 border border-black/15 px-2 font-mono text-xs focus:border-cpx-purple focus:outline-none"
           />
-          <span className="text-[12px] font-light text-cpx-grey">
+          <span className="text-xs text-cpx-grey">
             {newId.trim() === ""
               ? ""
               : resolved
@@ -681,7 +693,7 @@ function TechniquesTable({
               }));
               setNewId("");
             }}
-            className="h-8 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5 disabled:text-black/30"
+            className={buttonClass("secondary", "sm")}
           >
             Add
           </button>
@@ -711,7 +723,7 @@ function CvssTable({
     source.trim() !== "";
   return (
     <div className="mt-3">
-      <table className="w-full border-collapse text-[12.5px]">
+      <table className="w-full border-collapse text-xs">
         <thead>
           <tr className="border-b border-black/15 text-left">
             <th className="py-1.5 pr-3 font-medium">CVE</th>
@@ -723,15 +735,15 @@ function CvssTable({
         <tbody>
           {a.cvss.map((c, i) => (
             <tr key={i} className="border-b border-black/5">
-              <td className="py-1.5 pr-3 font-mono text-[12px]">{c.cveId}</td>
+              <td className="py-1.5 pr-3 font-mono text-xs">{c.cveId}</td>
               <td className="py-1.5 pr-3 font-medium">{c.value.toFixed(1)}</td>
-              <td className="py-1.5 pr-3 font-light">{c.source}</td>
-              <td className="py-1.5 font-light uppercase">{c.authorityClass}</td>
+              <td className="py-1.5 pr-3">{c.source}</td>
+              <td className="py-1.5 uppercase">{c.authorityClass}</td>
             </tr>
           ))}
           {a.cvss.length === 0 && (
             <tr>
-              <td colSpan={4} className="py-2 font-light">
+              <td colSpan={4} className="py-2">
                 <span className="font-medium">0 scores</span>
               </td>
             </tr>
@@ -744,19 +756,19 @@ function CvssTable({
             value={cve}
             onChange={(e) => setCve(e.target.value)}
             placeholder="CVE ID"
-            className="h-8 w-40 border border-black/15 px-2 font-mono text-[12px] focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-40 border border-black/15 px-2 font-mono text-xs focus:border-cpx-purple focus:outline-none"
           />
           <input
             value={score}
             onChange={(e) => setScore(e.target.value)}
             placeholder="Score"
-            className="h-8 w-20 border border-black/15 px-2 text-[12px] focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-20 border border-black/15 px-2 text-xs focus:border-cpx-purple focus:outline-none"
           />
           <input
             value={source}
             onChange={(e) => setSource(e.target.value)}
             placeholder="Authority"
-            className="h-8 w-36 border border-black/15 px-2 text-[12px] focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-36 border border-black/15 px-2 text-xs focus:border-cpx-purple focus:outline-none"
           />
           <button
             disabled={!valid}
@@ -778,7 +790,7 @@ function CvssTable({
               setScore("");
               setSource("");
             }}
-            className="h-8 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5 disabled:text-black/30"
+            className={buttonClass("secondary", "sm")}
           >
             Add
           </button>
@@ -793,29 +805,29 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
   return (
     <article className="mx-auto max-w-[720px] px-6 py-8">
       <div className="flex items-center gap-3">
-        <span className="font-mono text-[13px] font-medium">{a.ref}</span>
-        <span className="bg-black/5 px-1.5 py-0.5 text-[11px]">RFI</span>
+        <span className="font-mono text-sm font-medium">{a.ref}</span>
+        <span className="bg-black/5 px-1.5 py-0.5 text-2xs">RFI</span>
       </div>
-      <h1 className="mt-3 text-[22px] font-medium leading-snug tracking-tightish">
+      <h1 className="mt-3 text-xl font-medium leading-snug tracking-tightish">
         {a.rfi.question}
       </h1>
-      <p className="mt-2 text-[12.5px] font-light text-cpx-grey">
+      <p className="mt-2 text-xs text-cpx-grey">
         {a.rfi.requester} · due {gstDateTime(a.rfi.dueAt)} ·{" "}
         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
       </p>
       <ul className="mt-6 space-y-2">
         {a.rfi.steps.map((s) => (
-          <li key={s.label} className="flex items-center gap-2.5 text-[13.5px]">
+          <li key={s.label} className="flex items-center gap-2.5 text-sm">
             <span
-              className={`flex h-5 w-5 items-center justify-center text-[11px] ${s.done ? "bg-green-contrast text-white" : "border border-black/20"}`}
+              className={`flex h-5 w-5 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-black/20"}`}
             >
               {s.done ? "✓" : ""}
             </span>
-            <span className="font-light">{s.label}</span>
+            <span className="">{s.label}</span>
             {s.investigationId && (
               <Link
                 href={`/intelligence/${s.investigationId}`}
-                className="text-[12.5px] text-cat-4 underline underline-offset-2"
+                className="text-xs text-link underline underline-offset-2"
               >
                 Conversation
               </Link>

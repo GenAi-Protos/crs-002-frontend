@@ -114,7 +114,7 @@ export function AskOptionsBar({
         </Field>
       </div>
 
-      <p className="mt-2 text-[11px] font-light text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey">
         {options.tlpCeiling
           ? `Evidence above TLP:${options.tlpCeiling} is excluded and counted. The ceiling does not mark the answer.`
           : `${depthHint} ${outputHint}`}
@@ -133,8 +133,8 @@ export function AskOptionsBar({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex min-w-0 flex-col gap-0.5">
-      <span className="text-[11px] font-light text-cpx-grey">{label}</span>
-      <span className="[&>select]:h-8 [&>select]:w-full [&>select]:min-w-0 [&>select]:border [&>select]:border-black/15 [&>select]:bg-white [&>select]:px-2 [&>select]:text-[12.5px] [&>select]:font-light [&>select:disabled]:text-black/30 [&>select:focus]:outline-none [&>select:focus]:border-cpx-purple">
+      <span className="text-2xs text-cpx-grey">{label}</span>
+      <span className="[&>select]:h-8 [&>select]:w-full [&>select]:min-w-0 [&>select]:border [&>select]:border-black/15 [&>select]:bg-white [&>select]:px-2 [&>select]:text-xs [&>select:disabled]:text-black/30 [&>select:focus]:outline-none [&>select:focus]:border-cpx-purple">
         {children}
       </span>
     </label>

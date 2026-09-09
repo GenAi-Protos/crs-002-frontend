@@ -28,6 +28,8 @@ const NAV: {
   { key: "manage", label: "Manage", href: "/manage", icon: <IconManage /> },
 ];
 
+// Dark Purple chrome, like the top bar. The rail collapses to icons below the
+// `rail` breakpoint (docs/01); the label survives as a title for the tooltip.
 export function NavRail() {
   const { user } = useConsoleUser();
   const pathname = usePathname();
@@ -35,7 +37,10 @@ export function NavRail() {
   const items = NAV.filter((n) => allowed.has(n.key));
 
   return (
-    <nav className="fixed bottom-0 left-0 top-14 z-30 w-16 border-r border-black/10 bg-white min-[1100px]:w-60">
+    <nav
+      aria-label="Primary"
+      className="fixed bottom-0 left-0 top-14 z-30 w-16 bg-cpx-purple rail:w-60"
+    >
       <ul className="flex flex-col gap-1 p-2">
         {items.map((n) => {
           const active =
@@ -45,15 +50,18 @@ export function NavRail() {
               <Link
                 href={n.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex h-10 items-center justify-center gap-3 px-0 text-[14px] min-[1100px]:justify-start min-[1100px]:px-3 ${
+                className={`relative flex h-10 items-center justify-center gap-3 px-0 text-base focus-visible:outline-cpx-green rail:justify-start rail:px-3 ${
                   active
-                    ? "bg-cpx-purple font-medium text-white"
-                    : "font-light text-cpx-grey hover:bg-black/5"
+                    ? "bg-white/10 font-medium text-white"
+                    : "text-white/70 hover:bg-white/5 hover:text-white"
                 }`}
                 title={n.label}
               >
+                {active && (
+                  <span aria-hidden className="absolute inset-y-0 left-0 w-0.5 bg-cpx-green" />
+                )}
                 {n.icon}
-                <span className="hidden min-[1100px]:inline">{n.label}</span>
+                <span className="hidden rail:inline">{n.label}</span>
               </Link>
             </li>
           );

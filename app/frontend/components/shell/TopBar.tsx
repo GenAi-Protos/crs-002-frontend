@@ -27,16 +27,16 @@ export function TopBar() {
         alt="CPX"
         width={172}
         height={80}
-        className="h-10 w-auto py-0.5"
+        className="h-7 w-auto"
         priority
       />
       <span className="h-6 w-px bg-white/20" aria-hidden />
       <span className="flex items-center gap-2">
         <NestorMarkReverse size={24} />
-        <span className="font-medium tracking-tightish text-[15px] uppercase">
+        <span className="font-display text-md font-bold uppercase tracking-tightish">
           Nestor
         </span>
-        <span className="ml-1 flex items-center gap-1.5 text-[11px] text-white/70">
+        <span className="ml-1 flex items-center gap-1.5 text-2xs text-white/70">
           <span className="inline-block h-2 w-2 bg-cpx-green ring-1 ring-cpx-purple" aria-hidden />
           Live
         </span>
@@ -53,7 +53,7 @@ export function TopBar() {
           value={user.role}
           onChange={(e) => setRole(e.target.value as RoleKey)}
           aria-label="Role"
-          className="h-8 border border-white/20 bg-cpx-purple px-2 text-[12px] font-light text-white focus:border-cpx-green focus:outline-none"
+          className="h-8 border border-white/20 bg-cpx-purple px-2 text-xs text-white focus:border-cpx-green focus:outline-none focus-visible:outline-cpx-green"
         >
           {ROLES.map((r) => (
             <option key={r} value={r}>
@@ -63,7 +63,7 @@ export function TopBar() {
         </select>
       )}
 
-      <span className="flex h-8 w-8 items-center justify-center bg-cpx-bright text-[12px] font-medium">
+      <span className="flex h-8 w-8 items-center justify-center bg-cpx-bright text-xs font-medium">
         {user.name
           .split(" ")
           .map((p) => p[0])

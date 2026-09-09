@@ -14,14 +14,7 @@ import type { Pir, Rhythm, Source } from "@/lib/types";
 import { pollLog } from "@/lib/source-log";
 import { agoFromNow, gstDate, gstDateTime } from "@/lib/format";
 import { captureModeLabel } from "@/lib/derive";
-import {
-  downloadCsv,
-  InertUrl,
-  ListMeta,
-  SearchBox,
-  StatusPill,
-  type StatusTone,
-} from "@/components/ui";
+import { downloadCsv, InertUrl, ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass, OfflineNote } from "@/components/ui";
 import { DailyBars } from "@/components/chart/DailyBars";
 import { IconEgress } from "@/components/icons";
 import { T_HEAD, T_NUM, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
@@ -52,8 +45,9 @@ export default function SourcePage({
   const [pirs, setPirs] = useState<Pir[]>([]);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
   useEffect(() => {
-    getSource(user.id, id).then(setApiBase).catch(() => {});
+    getSource(user.id, id).then(setApiBase).catch(() => setOffline(true));
     getPirs(user.id).then(setPirs).catch(() => setPirs([]));
   }, [user.id, id]);
 
@@ -86,8 +80,8 @@ export default function SourcePage({
   if (!canSee(user.role, "collection")) {
     return (
       <Center>
-        <p className="text-[14px] font-light">Not permitted at this access level.</p>
-        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">Not permitted at this access level.</p>
+        <Link href="/" className="text-sm text-link underline underline-offset-2">
           Dashboard
         </Link>
       </Center>
@@ -97,10 +91,10 @@ export default function SourcePage({
   if (!s) {
     return (
       <Center>
-        <p className="text-[14px] font-light">No source with this reference.</p>
+        <p className="text-base">No source with this reference.</p>
         <Link
           href="/collection?tab=sources"
-          className="text-[13px] text-cat-4 underline underline-offset-2"
+          className="text-sm text-link underline underline-offset-2"
         >
           Sources
         </Link>
@@ -125,16 +119,17 @@ export default function SourcePage({
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/collection?tab=sources"
-          className="text-[12px] font-light text-cpx-grey underline underline-offset-2"
+          className="text-xs text-cpx-grey underline underline-offset-2"
         >
           Sources
         </Link>
         <span className="text-black/30">/</span>
-        <h1 className="text-[22px] font-medium tracking-tightish">{s.name}</h1>
+        <h1 className="text-xl font-medium tracking-tightish">{s.name}</h1>
         <StatusPill {...st} />
+        {offline && <OfflineNote />}
         <div className="flex-1" />
         {saveError && (
-          <span className="text-[12px] font-light text-cat-1">Not saved: {saveError}</span>
+          <span className="text-xs text-status-warn-ink">Not saved: {saveError}</span>
         )}
         {dirty && (
           <>
@@ -159,13 +154,13 @@ export default function SourcePage({
                   setSaving(false);
                 }
               }}
-              className="h-8 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black hover:brightness-95 disabled:bg-black/10 disabled:text-black/40"
+              className={buttonClass("primary")}
             >
               {saving ? "Saving" : "Save"}
             </button>
             <button
               onClick={() => setDraft(savedSnap)}
-              className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+              className={buttonClass()}
             >
               Discard
             </button>
@@ -173,18 +168,14 @@ export default function SourcePage({
         )}
         <button
           onClick={() => update((x) => ({ ...x, enabled: !x.enabled }))}
-          className={`h-8 px-3 text-[13px] ${
-            s.enabled
-              ? "border border-black/15 font-light hover:bg-black/5"
-              : "bg-cpx-green font-medium text-cpx-black hover:brightness-95"
-          }`}
+          className={buttonClass(s.enabled ? "secondary" : "primary")}
         >
           {s.enabled ? "Disable" : "Enable"}
         </button>
         {(s.state === "blocked-needs-credential" || s.state === "failing") && (
           <Link
             href="/collection?tab=requests"
-            className="flex h-8 items-center border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+            className={buttonClass()}
           >
             Request queue
           </Link>
@@ -196,8 +187,8 @@ export default function SourcePage({
 
       <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="border border-black/10 bg-white p-4 xl:col-span-4">
-          <span className="text-[12px] font-light text-cpx-grey">Facts</span>
-          <dl className="mt-3 space-y-2.5 text-[13px]">
+          <span className="text-xs text-cpx-grey">Facts</span>
+          <dl className="mt-3 space-y-2.5 text-sm">
             <FactRow label="Sheet">{s.sheet}</FactRow>
             <FactRow label="Class">{s.collectorClass}</FactRow>
             <FactRow label="Capture">{captureModeLabel[s.captureMode]}</FactRow>
@@ -220,7 +211,7 @@ export default function SourcePage({
                   update((x) => ({ ...x, expectedRhythm: e.target.value as Rhythm }))
                 }
                 aria-label="Expected rhythm"
-                className="h-7 border border-black/10 bg-white px-1 text-[12px] font-light focus:outline-none"
+                className="h-7 border border-black/10 bg-white px-1 text-xs focus:outline-none"
               >
                 {RHYTHMS.map((r) => (
                   <option key={r}>{r}</option>
@@ -243,10 +234,10 @@ export default function SourcePage({
                             : [...x.pirRefs, p.ref],
                         }))
                       }
-                      className={`px-1.5 py-0.5 text-[11px] ${
+                      className={`px-1.5 py-0.5 text-2xs ${
                         on
                           ? "bg-cpx-purple font-medium text-white"
-                          : "border border-black/15 font-light text-cpx-grey"
+                          : "border border-black/15 text-cpx-grey"
                       }`}
                     >
                       {p.ref.replace("PIR", "")}
@@ -269,14 +260,14 @@ export default function SourcePage({
               accent={s.state === "silent-unexplained"}
             />
           </div>
-          <div className="mt-4 flex items-baseline gap-5 text-[13px]">
+          <div className="mt-4 flex items-baseline gap-5 text-sm">
             <span>
               <span className="font-medium">{s.itemsLast30d}</span>{" "}
-              <span className="font-light text-cpx-grey">items, 30 days</span>
+              <span className="text-cpx-grey">items, 30 days</span>
             </span>
             <span>
               <span className="font-medium">{s.consecutiveFailures}</span>{" "}
-              <span className="font-light text-cpx-grey">consecutive failures</span>
+              <span className="text-cpx-grey">consecutive failures</span>
             </span>
           </div>
           <div className="mt-3">
@@ -287,7 +278,7 @@ export default function SourcePage({
 
       <div className="mt-4 border border-black/10 bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-[12px] font-light text-cpx-grey">Poll log</span>
+          <span className="text-xs text-cpx-grey">Poll log</span>
           <SearchBox value={logQuery} onChange={setLogQuery} className="w-64" />
           <div className="flex-1" />
           <ListMeta
@@ -309,7 +300,7 @@ export default function SourcePage({
           />
         </div>
         <div className="mt-3 overflow-x-auto">
-          <table className={`${T_TABLE} min-w-[34rem] text-[13px]`}>
+          <table className={`${T_TABLE} min-w-[34rem] text-sm`}>
             <colgroup>
               <col className="w-36" />
               <col className="w-24" />
@@ -327,21 +318,21 @@ export default function SourcePage({
             <tbody>
               {filteredLog.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-3 py-6 text-center font-light">
+                  <td colSpan={4} className="px-3 py-6 text-center">
                     <span className="font-medium">0 entries</span> matched
                   </td>
                 </tr>
               )}
               {filteredLog.map((r) => (
                 <tr key={r.date} className={T_ROW}>
-                  <td className={`${T_TD} whitespace-nowrap font-mono text-[12px]`}>
+                  <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
                     {gstDate(`${r.date}T12:00:00Z`)}
                   </td>
-                  <td className={`${T_TD} ${T_NUM} font-light`}>{r.attempts}</td>
+                  <td className={`${T_TD} ${T_NUM}`}>{r.attempts}</td>
                   <td className={`${T_TD} ${T_NUM} font-medium`}>{r.items}</td>
                   <td
                     className={`${T_TD} ${
-                      r.failed ? "font-normal text-status-warn-ink" : "font-light"
+                      r.failed ? "font-medium text-status-warn-ink" : ""
                     }`}
                   >
                     {r.outcome}
@@ -367,10 +358,10 @@ function Center({ children }: { children: React.ReactNode }) {
 function FactRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3">
-      <dt className="w-24 shrink-0 pt-0.5 text-[12px] font-light text-cpx-grey">
+      <dt className="w-24 shrink-0 pt-0.5 text-xs text-cpx-grey">
         {label}
       </dt>
-      <dd className="min-w-0 flex-1 font-light">{children}</dd>
+      <dd className="min-w-0 flex-1">{children}</dd>
     </div>
   );
 }
@@ -388,13 +379,13 @@ function Stamp({
 }) {
   return (
     <div className={`border p-3 ${accent ? "border-status-warn-ink/30 bg-status-warn-fill" : "border-black/10"}`}>
-      <span className={`text-[11.5px] font-light ${accent ? "text-status-warn-ink" : "text-cpx-grey"}`}>
+      <span className={`text-2xs ${accent ? "text-status-warn-ink" : "text-cpx-grey"}`}>
         {label}
       </span>
-      <span className={`mt-1 block text-[20px] font-medium leading-none tracking-tightish ${accent ? "text-status-warn-ink" : ""}`}>
+      <span className={`mt-1 block text-lg font-display font-medium leading-none tracking-tightish ${accent ? "text-status-warn-ink" : ""}`}>
         {value}
       </span>
-      <span className={`mt-1 block text-[11px] font-light ${accent ? "text-status-warn-ink/80" : "text-cpx-grey"}`}>
+      <span className={`mt-1 block text-2xs ${accent ? "text-status-warn-ink/80" : "text-cpx-grey"}`}>
         {sub}
       </span>
     </div>

@@ -70,14 +70,14 @@ export function InvestigationView({
         <div className="min-w-0">
           <button
             onClick={onBack}
-            className="text-[12.5px] font-light text-cpx-grey hover:text-cpx-black"
+            className="text-xs text-cpx-grey hover:text-cpx-black"
           >
             Back to lookup
           </button>
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <h2 className="text-[20px] font-medium tracking-tightish">Investigation</h2>
+            <h2 className="text-lg font-medium tracking-tightish">Investigation</h2>
             <IndicatorChip value={record.observable} />
-            <span className="bg-black/5 px-1.5 text-[11px] font-light">
+            <span className="bg-black/5 px-1.5 text-2xs">
               {KIND_LABEL[record.kind]}
             </span>
           </div>
@@ -97,13 +97,13 @@ export function InvestigationView({
           <span key={s.key} className="flex items-center gap-1">
             <a
               href={`#stage-${s.key}`}
-              className={`flex items-baseline gap-1.5 px-1.5 py-0.5 text-[12px] hover:bg-black/5 ${
+              className={`flex items-baseline gap-1.5 px-1.5 py-0.5 text-xs hover:bg-black/5 ${
                 s.count === 0 ? "text-cpx-grey" : ""
               }`}
             >
               {s.label}
               <span
-                className={`px-1 text-[11px] ${
+                className={`px-1 text-2xs ${
                   s.count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-black/5"
                 }`}
               >
@@ -118,7 +118,7 @@ export function InvestigationView({
       </div>
 
       {broken && (
-        <p className="mt-2 text-[11.5px] font-light text-status-warn-ink">
+        <p className="mt-2 text-2xs text-status-warn-ink">
           The chain stops at {broken.label.toLowerCase()}: nothing is held. That is
           a gap in our coverage, not a statement that none exists.
         </p>
@@ -134,7 +134,7 @@ export function InvestigationView({
         >
           <div className="flex flex-wrap items-center gap-2">
             <IndicatorChip value={record.observable} />
-            <span className="text-[12px] font-light text-cpx-grey">
+            <span className="text-xs text-cpx-grey">
               risk {record.riskScore} of 100 · {record.recordCount} held records
             </span>
           </div>
@@ -151,10 +151,10 @@ export function InvestigationView({
             {g.infrastructure.map((i) => (
               <li key={i.value} className="flex flex-wrap items-baseline gap-2">
                 <IndicatorChip value={i.value} />
-                <span className="bg-black/5 px-1.5 text-[11px] font-light">
+                <span className="bg-black/5 px-1.5 text-2xs">
                   {KIND_LABEL[i.kind as ObservableKind]}
                 </span>
-                <span className="min-w-0 flex-1 text-[12.5px] font-light text-cpx-grey">
+                <span className="min-w-0 flex-1 text-xs text-cpx-grey">
                   {i.note}
                 </span>
               </li>
@@ -173,12 +173,12 @@ export function InvestigationView({
             {g.malware.map((m) => (
               <li key={m.name}>
                 <span className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-[13px] font-medium">{m.name}</span>
-                  <span className="bg-black/5 px-1.5 text-[11px] font-light">
+                  <span className="text-sm font-medium">{m.name}</span>
+                  <span className="bg-black/5 px-1.5 text-2xs">
                     {m.family}
                   </span>
                 </span>
-                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey">
                   {m.note}
                 </span>
               </li>
@@ -197,17 +197,17 @@ export function InvestigationView({
             {g.actors.map((a) => (
               <li key={a.name}>
                 <span className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-[13px] font-medium">{a.name}</span>
+                  <span className="text-sm font-medium">{a.name}</span>
                   {a.aliases.map((alias) => (
                     <span
                       key={alias}
-                      className="bg-black/5 px-1.5 text-[11px] font-light"
+                      className="bg-black/5 px-1.5 text-2xs"
                     >
                       {alias}
                     </span>
                   ))}
                 </span>
-                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey">
                   {a.note}
                 </span>
               </li>
@@ -226,15 +226,15 @@ export function InvestigationView({
             {g.campaigns.map((c) => (
               <li key={c.ref}>
                 <span className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-[13px] font-medium">{c.name}</span>
+                  <span className="text-sm font-medium">{c.name}</span>
                   <Link
                     href={`/reports/${c.ref}`}
-                    className="font-mono text-[11.5px] text-cat-4 underline underline-offset-2"
+                    className="font-mono text-2xs text-link underline underline-offset-2"
                   >
                     {c.ref}
                   </Link>
                 </span>
-                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey">
                   {c.note}
                 </span>
               </li>
@@ -250,7 +250,7 @@ export function InvestigationView({
           note="Enter the id, the name derives. An id that does not resolve is marked, never named."
         >
           <div className="overflow-x-auto">
-            <table className={`${T_TABLE} min-w-[34rem] text-[12.5px]`}>
+            <table className={`${T_TABLE} min-w-[34rem] text-xs`}>
               <colgroup>
                 <col className="w-56" />
                 <col className="w-56" />
@@ -280,12 +280,12 @@ export function InvestigationView({
                           )}
                         </span>
                       </td>
-                      <td className={`${T_TD} ${T_FLUSH} font-light text-cpx-grey`}>
+                      <td className={`${T_TD} ${T_FLUSH} text-cpx-grey`}>
                         {resolved
                           ? resolved.tactics.map((id) => TACTICS[id] ?? id).join(", ")
                           : "-"}
                       </td>
-                      <td className={`${T_TD} ${T_FLUSH} font-light`}>{t.observed}</td>
+                      <td className={`${T_TD} ${T_FLUSH}`}>{t.observed}</td>
                     </tr>
                   );
                 })}
@@ -306,13 +306,13 @@ export function InvestigationView({
             {g.detections.map((d) => (
               <li key={d.ref}>
                 <span className="flex flex-wrap items-baseline gap-2">
-                  <span className="bg-black/5 px-1.5 text-[11px] font-light">
+                  <span className="bg-black/5 px-1.5 text-2xs">
                     {DETECTION_LABEL[d.kind]}
                   </span>
-                  <span className="text-[13px] font-medium">{d.name}</span>
-                  <span className="font-mono text-[11.5px] text-cpx-grey">{d.ref}</span>
+                  <span className="text-sm font-medium">{d.name}</span>
+                  <span className="font-mono text-2xs text-cpx-grey">{d.ref}</span>
                 </span>
-                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey">
                   {d.note}
                 </span>
               </li>
@@ -321,7 +321,7 @@ export function InvestigationView({
         </Stage>
       </div>
 
-      <p className="mt-4 text-[11.5px] font-light text-cpx-grey">
+      <p className="mt-4 text-2xs text-cpx-grey">
         Every relationship above comes from a held record. Nothing here is
         inferred from the observable alone.
       </p>
@@ -347,22 +347,22 @@ function Stage({
   return (
     <section id={id} className="scroll-mt-4 border border-black/10 bg-white">
       <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-black/10 px-4 py-2.5">
-        <h3 className="flex items-baseline gap-2 text-[13px] font-medium tracking-tightish">
+        <h3 className="flex items-baseline gap-2 text-sm font-medium tracking-tightish">
           <span className="text-cpx-grey">{index}</span>
           {title}
           <span
-            className={`px-1 text-[11px] font-light ${
+            className={`px-1 text-2xs ${
               count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-black/5"
             }`}
           >
             {count}
           </span>
         </h3>
-        <span className="text-[11.5px] font-light text-cpx-grey">{note}</span>
+        <span className="text-2xs text-cpx-grey">{note}</span>
       </div>
       <div className="px-4 py-3">
         {count === 0 ? (
-          <p className="text-[12.5px] font-light">
+          <p className="text-xs">
             <span className="font-medium">0 held</span>. The chain stops here.
           </p>
         ) : (

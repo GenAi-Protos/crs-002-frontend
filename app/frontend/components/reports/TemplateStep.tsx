@@ -16,6 +16,7 @@ import { useState } from "react";
 import { TEMPLATES, type ReportType, type TemplateSection } from "@/lib/report-templates";
 import { ACCEPTED, importTemplate, type ImportedTemplate } from "@/lib/template-import";
 import type { TemplateChoice } from "./NewReportDialog";
+import { buttonClass } from "@/components/ui";
 
 export function TemplateStep({
   type,
@@ -103,12 +104,12 @@ export function TemplateStep({
 
   return (
     <>
-      <p className="mt-3 flex items-baseline gap-2 text-[12px] font-light text-cpx-grey">
-        <span className="bg-black/5 px-1.5 text-[11px] text-cpx-black">{type}</span>
+      <p className="mt-3 flex items-baseline gap-2 text-xs text-cpx-grey">
+        <span className="bg-black/5 px-1.5 text-2xs text-cpx-black">{type}</span>
         {standard.name}
       </p>
 
-      <h3 className="mt-4 text-[13px] font-medium tracking-tightish">
+      <h3 className="mt-4 text-sm font-medium tracking-tightish">
         Template selection
       </h3>
 
@@ -134,7 +135,7 @@ export function TemplateStep({
           />
           {kind === "custom" && (
             <div className="px-3 pb-3 pl-9">
-              <label className="inline-flex h-8 cursor-pointer items-center border border-black/15 px-3 text-[12.5px] font-light hover:bg-black/5">
+              <label className={buttonClass("secondary", "md", "cursor-pointer")}>
                 {reading ? "Reading" : "Choose file"}
                 <input
                   type="file"
@@ -151,7 +152,7 @@ export function TemplateStep({
               {imported?.warnings.map((w) => (
                 <p
                   key={w}
-                  className="mt-2 border border-black/10 bg-status-warn-fill px-2.5 py-1.5 text-[12px] font-light text-status-warn-ink"
+                  className="mt-2 border border-black/10 bg-status-warn-fill px-2.5 py-1.5 text-xs text-status-warn-ink"
                 >
                   {w}
                 </p>
@@ -159,11 +160,11 @@ export function TemplateStep({
 
               {imported && imported.sections.length > 0 && (
                 <div className="mt-2 border border-black/10 bg-black/[0.02] px-2.5 py-2">
-                  <p className="text-[12px] font-medium">Custom template</p>
-                  <p className="mt-0.5 break-all text-[12px] font-light text-cpx-grey">
+                  <p className="text-xs font-medium">Custom template</p>
+                  <p className="mt-0.5 break-all text-xs text-cpx-grey">
                     {imported.name}
                   </p>
-                  <p className="mt-1 text-[12px] font-light">
+                  <p className="mt-1 text-xs">
                     <span className="font-medium">{sections.length}</span>{" "}
                     {sections.length === 1 ? "section" : "sections"} detected
                   </p>
@@ -190,14 +191,14 @@ export function TemplateStep({
         <button
           onClick={onBack}
           disabled={editing}
-          className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5 disabled:border-black/10 disabled:text-black/30"
+          className={buttonClass()}
         >
           Back
         </button>
         <button
           onClick={() => setShowPreview(!showPreview)}
           disabled={sections.length === 0 || editing}
-          className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5 disabled:border-black/10 disabled:text-black/30"
+          className={buttonClass()}
         >
           {showPreview ? "Hide template" : "Preview template"}
         </button>
@@ -205,14 +206,14 @@ export function TemplateStep({
         <button
           disabled={!usable}
           onClick={() => onContinue(choice())}
-          className="h-8 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black disabled:bg-black/10 disabled:text-black/40"
+          className={buttonClass("primary")}
         >
           Continue
         </button>
       </div>
 
       {!usable && (
-        <p className="mt-2 text-right text-[11px] font-light text-cpx-grey">
+        <p className="mt-2 text-right text-2xs text-cpx-grey">
           {editing
             ? "Save or cancel your changes to continue."
             : kind === "custom" && imported
@@ -251,25 +252,25 @@ function TemplatePreview({
   return (
     <div className="mt-3 border border-black/10">
       <div className="flex items-center gap-2 border-b border-black/10 px-3 py-1.5">
-        <span className="text-[11.5px] font-light text-cpx-grey">
+        <span className="text-2xs text-cpx-grey">
           Template preview <span className="text-cpx-black">{sections.length}</span>
         </span>
         {edited && !editing && (
-          <span className="bg-black/5 px-1.5 text-[11px] font-light">Edited</span>
+          <span className="bg-black/5 px-1.5 text-2xs">Edited</span>
         )}
         <div className="flex-1" />
         {editing ? (
           <>
             <button
               onClick={onCancel}
-              className="h-7 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5"
+              className={buttonClass("secondary", "sm")}
             >
               Cancel
             </button>
             <button
               onClick={onSave}
               disabled={sections.every((s) => s.heading.trim() === "")}
-              className="h-7 bg-cpx-green px-2.5 text-[12px] font-medium text-cpx-black disabled:bg-black/10 disabled:text-black/40"
+              className={buttonClass("primary", "sm")}
             >
               Save changes
             </button>
@@ -277,7 +278,7 @@ function TemplatePreview({
         ) : (
           <button
             onClick={onEdit}
-            className="h-7 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5"
+            className={buttonClass("secondary", "sm")}
           >
             Edit template
           </button>
@@ -290,14 +291,14 @@ function TemplatePreview({
             {editing ? (
               <>
                 <span className="flex items-center gap-2">
-                  <span className="w-4 shrink-0 text-[12px] text-cpx-grey">
+                  <span className="w-4 shrink-0 text-xs text-cpx-grey">
                     {i + 1}.
                   </span>
                   <input
                     value={s.heading}
                     onChange={(e) => set(i, { heading: e.target.value })}
                     placeholder="Section title"
-                    className="h-8 min-w-0 flex-1 border border-black/15 px-2 text-[12.5px] font-medium focus:border-cpx-purple focus:outline-none"
+                    className="h-8 min-w-0 flex-1 border border-black/15 px-2 text-xs font-medium focus:border-cpx-purple focus:outline-none"
                   />
                   <button
                     onClick={() => remove(i)}
@@ -312,19 +313,19 @@ function TemplatePreview({
                   onChange={(e) => set(i, { guidance: e.target.value })}
                   rows={2}
                   placeholder="What belongs in this section"
-                  className="ml-6 mt-1.5 w-[calc(100%-3.5rem)] resize-y border border-black/15 px-2 py-1 text-[12px] font-light focus:border-cpx-purple focus:outline-none"
+                  className="ml-6 mt-1.5 w-[calc(100%-3.5rem)] resize-y border border-black/15 px-2 py-1 text-xs focus:border-cpx-purple focus:outline-none"
                 />
               </>
             ) : (
               <>
-                <span className="flex gap-2 text-[12.5px]">
+                <span className="flex gap-2 text-xs">
                   {/* One number, this list's own: a heading arrives stripped of
                       whatever numbering its source document carried. */}
                   <span className="text-cpx-grey">{i + 1}.</span>
                   <span className="font-medium">{s.heading}</span>
                 </span>
                 {s.guidance && (
-                  <span className="mt-0.5 block pl-5 text-[11.5px] font-light text-cpx-grey">
+                  <span className="mt-0.5 block pl-5 text-2xs text-cpx-grey">
                     {s.guidance}
                   </span>
                 )}
@@ -338,7 +339,7 @@ function TemplatePreview({
         <div className="border-t border-black/10 px-3 py-2">
           <button
             onClick={add}
-            className="h-7 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5"
+            className={buttonClass("secondary", "sm")}
           >
             Add section
           </button>
@@ -374,8 +375,8 @@ function Option({
         {checked && <span className="h-1.5 w-1.5 rounded-full bg-cpx-purple" />}
       </span>
       <span className="min-w-0">
-        <span className="block text-[13px] font-medium">{label}</span>
-        <span className="mt-0.5 block text-[12px] font-light text-cpx-grey">{note}</span>
+        <span className="block text-sm font-medium">{label}</span>
+        <span className="mt-0.5 block text-xs text-cpx-grey">{note}</span>
       </span>
     </button>
   );

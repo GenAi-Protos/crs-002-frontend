@@ -15,7 +15,7 @@ import { useConsoleUser } from "@/lib/role-context";
 import { canAdminister } from "@/lib/access";
 import type { Agent, Workflow } from "@/lib/types";
 import { gstDateTime } from "@/lib/format";
-import { ListMeta, SearchBox, StatusPill, type StatusTone } from "@/components/ui";
+import { ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
 import { IconEgress } from "@/components/icons";
 import { CATEGORY_DEFINITIONS } from "@/lib/collection-workflows";
 
@@ -82,7 +82,7 @@ export function AgentsTab({
 
   if (agents.length === 0) {
     return (
-      <p className="mt-4 text-[13px] font-light">
+      <p className="mt-4 text-sm">
         <span className="font-medium">0 agents</span>
       </p>
     );
@@ -100,7 +100,7 @@ export function AgentsTab({
         />
       </div>
 
-      <p className="mt-2 text-[12px] font-light text-cpx-grey">
+      <p className="mt-2 text-xs text-cpx-grey">
         <span className="font-medium text-cpx-black">{built}</span> of{" "}
         <span className="font-medium text-cpx-black">{agents.length}</span> built ·{" "}
         {admin ? "You may edit" : "Read only at this access level"}
@@ -119,14 +119,14 @@ export function AgentsTab({
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <span className="text-[13px] font-medium">{a.name}</span>
+                  <span className="text-sm font-medium">{a.name}</span>
                   {a.kind === "supervisor" && (
-                    <span className="bg-black/5 px-1 text-[10px] font-light">
+                    <span className="bg-black/5 px-1 text-2xs">
                       Supervisor
                     </span>
                   )}
                 </span>
-                <span className="mt-1 block text-[11.5px] font-light text-cpx-grey">
+                <span className="mt-1 block text-2xs text-cpx-grey">
                   {STATUS[a.status].label}
                 </span>
               </button>
@@ -168,13 +168,13 @@ function AgentDetail({
     <section className="min-w-0">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-[20px] font-medium tracking-tightish">{agent.name}</h2>
-          <p className="mt-1 text-[13px] font-light leading-relaxed">{agent.purpose}</p>
+          <h2 className="text-lg font-medium tracking-tightish">{agent.name}</h2>
+          <p className="mt-1 text-sm leading-relaxed">{agent.purpose}</p>
         </div>
         <span className="flex shrink-0 items-center gap-2">
           <StatusPill {...STATUS[agent.status]} />
           {admin && (
-            <button className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5">
+            <button className={buttonClass()}>
               Edit
             </button>
           )}
@@ -182,7 +182,7 @@ function AgentDetail({
       </div>
 
       {agent.status === "specified" && (
-        <p className="mt-3 border border-black/10 bg-black/[0.02] px-3 py-2 text-[12.5px] font-light">
+        <p className="mt-3 border border-black/10 bg-black/[0.02] px-3 py-2 text-xs">
           Specified in the BRD and not built yet. What follows is the
           specification, not a running configuration, and nothing has run, so
           there is no success rate to show.
@@ -190,10 +190,10 @@ function AgentDetail({
       )}
 
       <Row label="Instruction">
-        <p className="whitespace-pre-wrap text-[13px] font-light leading-relaxed">
+        <p className="whitespace-pre-wrap text-sm leading-relaxed">
           {agent.instruction.text}
         </p>
-        <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+        <p className="mt-2 text-2xs text-cpx-grey">
           Version {agent.instruction.version} · {agent.updateCount}{" "}
           {agent.updateCount === 1 ? "change" : "changes"} · {agent.instruction.updatedBy}{" "}
           · {gstDateTime(agent.instruction.updatedAt)}
@@ -207,8 +207,8 @@ function AgentDetail({
           <ul className="space-y-2">
             {agent.skills.map((s) => (
               <li key={s.name}>
-                <span className="text-[13px] font-medium">{s.name}</span>
-                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                <span className="text-sm font-medium">{s.name}</span>
+                <span className="mt-0.5 block text-xs text-cpx-grey">
                   {s.description}
                 </span>
               </li>
@@ -225,22 +225,22 @@ function AgentDetail({
             <ul className="space-y-1.5">
               {agent.tools.map((t) => (
                 <li key={t.name} className="flex items-baseline gap-2">
-                  <span className="font-mono text-[12px]">{t.name}</span>
+                  <span className="font-mono text-xs">{t.name}</span>
                   {/* The one thing an analyst must be able to see at a glance:
                       which tool leaves the region. NFR-SEC-04 and NFR-SEC-06. */}
                   {t.egress && (
-                    <span className="inline-flex items-center gap-1 bg-status-warn-fill px-1 text-[10.5px] text-status-warn-ink">
+                    <span className="inline-flex items-center gap-1 bg-status-warn-fill px-1 text-2xs text-status-warn-ink">
                       <IconEgress />
                       Leaves region
                     </span>
                   )}
-                  <span className="text-[12.5px] font-light text-cpx-grey">
+                  <span className="text-xs text-cpx-grey">
                     {t.purpose}
                   </span>
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+            <p className="mt-2 text-2xs text-cpx-grey">
               <span className="font-medium text-cpx-black">{egressTools.length}</span>{" "}
               of {agent.tools.length} leave the UAE region
             </p>
@@ -250,7 +250,7 @@ function AgentDetail({
 
       {agent.dispatches.length > 0 && (
         <Row label="Dispatches" count={agent.dispatches.length}>
-          <p className="text-[13px] font-light">
+          <p className="text-sm">
             {agent.dispatches.map(nameOf).join(", ")}
           </p>
         </Row>
@@ -260,7 +260,7 @@ function AgentDetail({
         {agent.sourceRefs.length === 0 ? (
           <Zero what="sources" />
         ) : (
-          <p className="text-[13px] font-light">
+          <p className="text-sm">
             {agent.sourceRefs.map(sourceLabel).join(", ")}
           </p>
         )}
@@ -275,7 +275,7 @@ function AgentDetail({
               <button
                 key={ref}
                 onClick={() => onOpenWorkflow(ref)}
-                className="bg-black/5 px-1.5 text-[12px] font-light hover:bg-black/10"
+                className="bg-black/5 px-1.5 text-xs hover:bg-black/10"
               >
                 {workflowName(ref)}
               </button>
@@ -287,18 +287,18 @@ function AgentDetail({
       <Row label="Permissions" count={agent.permissions.length}>
         <ul className="space-y-1">
           {agent.permissions.map((p) => (
-            <li key={p} className="text-[13px] font-light">
+            <li key={p} className="text-sm">
               {p}
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+        <p className="mt-2 text-2xs text-cpx-grey">
           No agent may release a client-facing artefact. A lead analyst approves.
         </p>
       </Row>
 
       <Row label="Basis">
-        <p className="text-[12.5px] font-light text-cpx-grey">{agent.basis}</p>
+        <p className="text-xs text-cpx-grey">{agent.basis}</p>
       </Row>
     </section>
   );
@@ -315,10 +315,10 @@ function Row({
 }) {
   return (
     <div className="mt-5 border-t border-black/10 pt-4">
-      <span className="flex items-baseline gap-2 text-[12px] font-light text-cpx-grey">
+      <span className="flex items-baseline gap-2 text-xs text-cpx-grey">
         {label}
         {count !== undefined && (
-          <span className="bg-black/5 px-1 text-[11px] text-cpx-black">{count}</span>
+          <span className="bg-black/5 px-1 text-2xs text-cpx-black">{count}</span>
         )}
       </span>
       <div className="mt-2">{children}</div>
@@ -329,7 +329,7 @@ function Row({
 // Counts render including zero, and a zero says what it is a zero of.
 function Zero({ what }: { what: string }) {
   return (
-    <p className="text-[13px] font-light">
+    <p className="text-sm">
       <span className="font-medium">0 {what}</span>
     </p>
   );

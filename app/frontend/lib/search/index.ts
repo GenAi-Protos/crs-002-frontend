@@ -16,7 +16,6 @@ import { defang } from "../defang";
 import type {
   Advisory,
   Investigation,
-  LookupRecord,
   Pir,
   RoleKey,
 } from "../types";

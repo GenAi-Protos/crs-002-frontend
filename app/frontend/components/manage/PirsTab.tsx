@@ -20,7 +20,7 @@ import { canAdminister } from "@/lib/access";
 import { createPir, patchPir } from "@/lib/api";
 import { useConsoleUser } from "@/lib/role-context";
 import type { ParameterKey, Pir, PirCategory } from "@/lib/types";
-import { downloadCsv, ListMeta, SearchBox } from "@/components/ui";
+import { downloadCsv, ListMeta, SearchBox, buttonClass } from "@/components/ui";
 import { IconPlus } from "@/components/icons";
 import {
   TypeBadge,
@@ -177,7 +177,7 @@ export function PirsTab({
               setAdding((a) => !a);
               setEditingRef(null);
             }}
-            className="ml-auto flex h-8 shrink-0 items-center gap-1.5 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black hover:brightness-95"
+            className={buttonClass("primary", "md", "ml-auto")}
           >
             <IconPlus />
             Add PIR
@@ -212,7 +212,7 @@ export function PirsTab({
       )}
 
       <div className={`mt-3 ${T_SCROLL}`}>
-        <table className={`${T_TABLE} min-w-[56rem] bg-white text-[13px]`}>
+        <table className={`${T_TABLE} min-w-[56rem] bg-white text-sm`}>
           <colgroup>
             <col className="w-56" />
             <col className="w-20" />
@@ -238,7 +238,7 @@ export function PirsTab({
               <tr>
                 <td
                   colSpan={editable ? 5 : 4}
-                  className="px-3 py-8 text-center font-light"
+                  className="px-3 py-8 text-center"
                 >
                   <span className="font-medium">0 PIRs</span> matched
                 </td>
@@ -249,13 +249,13 @@ export function PirsTab({
               return (
                 <RowGroup key={p.ref}>
                   <tr className={T_ROW}>
-                    <td className={`${T_TD} font-light`}>{p.category}</td>
-                    <td className={`${T_TD} whitespace-nowrap font-mono text-[12px]`}>
+                    <td className={`${T_TD}`}>{p.category}</td>
+                    <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
                       {p.ref}
                     </td>
                     {/* The question wraps in full. A PIR that is cut off is a
                         PIR nobody can answer. */}
-                    <td className={`${T_TD} font-light leading-relaxed`}>
+                    <td className={`${T_TD} leading-relaxed`}>
                       {p.question}
                     </td>
                     <td className={T_TD}>
@@ -268,7 +268,7 @@ export function PirsTab({
                             setEditingRef(editing ? null : p.ref);
                             setAdding(false);
                           }}
-                          className="border border-black/15 px-2 py-0.5 text-[12px] font-light hover:bg-black/5"
+                          className={buttonClass("secondary", "sm")}
                         >
                           {editing ? "Close" : "Edit"}
                         </button>
@@ -314,12 +314,12 @@ function Filter({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="flex items-center gap-1.5 text-[12px] font-light text-cpx-grey">
+    <label className="flex items-center gap-1.5 text-xs text-cpx-grey">
       {label}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-8 max-w-[15rem] border border-black/15 bg-white px-2 text-[13px] font-light text-cpx-black focus:border-cpx-purple focus:outline-none"
+        className="h-8 max-w-[15rem] border border-black/15 bg-white px-2 text-sm text-cpx-black focus:border-cpx-purple focus:outline-none"
       >
         <option value={ALL}>{ALL}</option>
         {options.map((o) => (
@@ -365,17 +365,17 @@ function PirForm({
 
   return (
     <div>
-      <h3 className="text-[13px] font-medium tracking-tightish">{heading}</h3>
+      <h3 className="text-sm font-medium tracking-tightish">{heading}</h3>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <span className="text-[11.5px] font-light text-cpx-grey">Category</span>
+          <span className="text-2xs text-cpx-grey">Category</span>
           <select
             value={draft.category}
             onChange={(e) =>
               setDraft({ ...draft, category: e.target.value as PirCategory })
             }
-            className="mt-1 h-8 w-full border border-black/15 bg-white px-2 text-[13px] font-light focus:border-cpx-purple focus:outline-none"
+            className="mt-1 h-8 w-full border border-black/15 bg-white px-2 text-sm focus:border-cpx-purple focus:outline-none"
           >
             {CATEGORIES.map((c) => (
               <option key={c}>{c}</option>
@@ -384,13 +384,13 @@ function PirForm({
         </label>
 
         <label className="block">
-          <span className="text-[11.5px] font-light text-cpx-grey">Coverage</span>
+          <span className="text-2xs text-cpx-grey">Coverage</span>
           <input
             value={draft.coverage}
             onChange={(e) => setDraft({ ...draft, coverage: e.target.value })}
             list="pir-coverage-values"
             placeholder="Threat Actors"
-            className="mt-1 h-8 w-full border border-black/15 bg-white px-2 text-[13px] font-light focus:border-cpx-purple focus:outline-none"
+            className="mt-1 h-8 w-full border border-black/15 bg-white px-2 text-sm focus:border-cpx-purple focus:outline-none"
           />
           <datalist id="pir-coverage-values">
             {[
@@ -412,18 +412,18 @@ function PirForm({
       </div>
 
       <label className="mt-3 block">
-        <span className="text-[11.5px] font-light text-cpx-grey">PIR</span>
+        <span className="text-2xs text-cpx-grey">PIR</span>
         <textarea
           value={draft.question}
           onChange={(e) => setDraft({ ...draft, question: e.target.value })}
           rows={3}
           placeholder="What threat actors are actively targeting [Client]'s industry?"
-          className="mt-1 w-full border border-black/15 bg-white px-2 py-1.5 text-[13px] font-light leading-relaxed focus:border-cpx-purple focus:outline-none"
+          className="mt-1 w-full border border-black/15 bg-white px-2 py-1.5 text-sm leading-relaxed focus:border-cpx-purple focus:outline-none"
         />
       </label>
 
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <label className="flex items-center gap-1.5 text-[12px] font-light">
+        <label className="flex items-center gap-1.5 text-xs">
           <input
             type="checkbox"
             checked={draft.stixNative}
@@ -434,7 +434,7 @@ function PirForm({
         </label>
         {/* Derived from the text, never typed: the parameters and the question
             cannot disagree. Per-client lists sit at open item B2. */}
-        <span className="text-[11.5px] font-light text-cpx-grey">
+        <span className="text-2xs text-cpx-grey">
           Parameters{" "}
           {parameters.length === 0 ? (
             <span className="text-cpx-black">none</span>
@@ -449,7 +449,7 @@ function PirForm({
       </div>
 
       {error && (
-        <p className="mt-3 border border-cpx-red/40 bg-status-warn-fill px-3 py-2 text-[12.5px] font-light text-status-warn-ink">
+        <p className="mt-3 border border-cpx-red/40 bg-status-warn-fill px-3 py-2 text-xs text-status-warn-ink">
           {error}
         </p>
       )}
@@ -458,13 +458,13 @@ function PirForm({
         <button
           onClick={submit}
           disabled={!valid || saving}
-          className="h-8 bg-cpx-purple px-3 text-[13px] font-medium text-white hover:brightness-110 disabled:opacity-40"
+          className="h-8 bg-cpx-purple px-3 text-sm font-medium text-white hover:brightness-110 disabled:opacity-40"
         >
           {saving ? "Saving" : "Save"}
         </button>
         <button
           onClick={onCancel}
-          className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+          className={buttonClass()}
         >
           Cancel
         </button>

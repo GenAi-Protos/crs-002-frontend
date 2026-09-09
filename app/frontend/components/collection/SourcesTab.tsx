@@ -3,24 +3,17 @@
 // The 185-row table plus the health heatmap. `Last item` is lastNewItemAt,
 // not lastSuccess: a 200-with-no-items source looks healthy on every other field.
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { SOURCES } from "@/lib/fixtures";
 import { patchSource } from "@/lib/api";
 import { SourcesDashboard, type CategoryFilter } from "./SourcesDashboard";
-import { CATEGORY_DEFINITIONS, unitsFor } from "@/lib/collection-workflows";
+import { CATEGORY_DEFINITIONS } from "@/lib/collection-workflows";
 import { useConsoleUser } from "@/lib/role-context";
 import type { Connector, Rhythm, Source } from "@/lib/types";
 import { agoFromNow } from "@/lib/format";
 import { redactUrlForExport } from "@/lib/defang";
-import {
-  downloadCsv,
-  InertUrl,
-  ListMeta,
-  SearchBox,
-  StatusPill,
-  type StatusTone,
-} from "@/components/ui";
+import { downloadCsv, InertUrl, ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
 import { IconChevronDown } from "@/components/icons";
 import { T_HEAD, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
 
@@ -96,7 +89,7 @@ export function SourcesTab({
 
       <button
         onClick={() => setHeatOpen(!heatOpen)}
-        className="mt-4 flex items-center gap-2 text-[12.5px] font-light text-cpx-grey"
+        className="mt-4 flex items-center gap-2 text-xs text-cpx-grey"
       >
         <IconChevronDown className={heatOpen ? "rotate-180" : ""} />
         30 days by class
@@ -109,7 +102,7 @@ export function SourcesTab({
           value={sheet}
           onChange={(e) => setSheet(e.target.value)}
           aria-label="Sheet"
-          className="h-8 border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+          className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
         >
           {sheets.map((s) => (
             <option key={s}>{s}</option>
@@ -119,7 +112,7 @@ export function SourcesTab({
           value={state}
           onChange={(e) => setState(e.target.value)}
           aria-label="State"
-          className="h-8 border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+          className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
         >
           {states.map((s) => (
             <option key={s} value={s}>
@@ -131,13 +124,13 @@ export function SourcesTab({
         {onRequestSource && (
           <button
             onClick={onRequestSource}
-            className="h-8 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5"
+            className={buttonClass("secondary", "sm")}
           >
             Request a source
           </button>
         )}
         {rhythmError && (
-          <span className="text-[12px] font-light text-cat-1">Not saved: {rhythmError}</span>
+          <span className="text-xs text-status-warn-ink">Not saved: {rhythmError}</span>
         )}
         <ListMeta
           shown={visible.length}
@@ -162,7 +155,7 @@ export function SourcesTab({
       </div>
 
       <div className="mt-3 overflow-x-auto xl:overflow-x-visible">
-      <table className={`${T_TABLE} min-w-[56rem] bg-white text-[13px]`}>
+      <table className={`${T_TABLE} min-w-[56rem] bg-white text-sm`}>
         <colgroup>
           <col className="w-[22rem]" />
           <col />
@@ -187,7 +180,7 @@ export function SourcesTab({
         <tbody>
           {visible.length === 0 && (
             <tr>
-              <td colSpan={6} className="px-3 py-8 text-center font-light">
+              <td colSpan={6} className="px-3 py-8 text-center">
                 <span className="font-medium">0 sources</span> matched
               </td>
             </tr>
@@ -197,7 +190,7 @@ export function SourcesTab({
               <td className={T_TD}>
                 <Link
                   href={`/collection/sources/${s.id}`}
-                  className="font-normal text-cat-4 underline underline-offset-2"
+                  className="text-link underline underline-offset-2"
                 >
                   {s.name}
                 </Link>
@@ -205,8 +198,8 @@ export function SourcesTab({
                   <InertUrl url={s.url} />
                 </span>
               </td>
-              <td className={`${T_TD} font-light`}>{s.sheet}</td>
-              <td className={`${T_TD} font-light`}>{s.collectorClass}</td>
+              <td className={`${T_TD}`}>{s.sheet}</td>
+              <td className={`${T_TD}`}>{s.collectorClass}</td>
               <td className={T_TD}>
                 <select
                   value={rhythms[s.id] ?? s.expectedRhythm}
@@ -223,14 +216,14 @@ export function SourcesTab({
                     });
                   }}
                   aria-label="Expected rhythm"
-                  className="h-7 border border-black/10 bg-white px-1 text-[12px] font-light focus:outline-none"
+                  className="h-7 border border-black/10 bg-white px-1 text-xs focus:outline-none"
                 >
                   {RHYTHMS.map((r) => (
                     <option key={r}>{r}</option>
                   ))}
                 </select>
               </td>
-              <td className={`${T_TD} whitespace-nowrap font-light`}>
+              <td className={`${T_TD} whitespace-nowrap`}>
                 {s.itemsLast30d === 0 && !s.enabled
                   ? "-"
                   : agoFromNow(s.lastNewItemAt)}
@@ -246,7 +239,7 @@ export function SourcesTab({
       {rows.length > shown && (
         <button
           onClick={() => setShown(shown + 50)}
-          className="mt-3 border border-black/15 px-3 py-1.5 text-[12px] font-light hover:bg-black/5"
+          className={buttonClass("secondary", "sm", "mt-3")}
         >
           Show more
         </button>
@@ -267,34 +260,35 @@ function Heatmap({ sources }: { sources: Source[] }) {
   })).filter((g) => g.rows.length > 0);
 
   const cellColour = (attempted: number, items: number) => {
-    if (attempted === 0) return "#F2F2F2";
+    // The sequential ramp from globals.css, so a palette change reaches the heatmap.
+    if (attempted === 0) return "var(--color-inset)";
     if (items === 0) return "hatch";
-    if (items <= 2) return "#D5D1EE";
-    if (items <= 8) return "#B8B2E2";
-    if (items <= 30) return "#9A92D5";
-    if (items <= 90) return "#7C72C8";
-    if (items <= 200) return "#5C5CC0";
-    return "#46409B";
+    if (items <= 2) return "var(--color-seq-2)";
+    if (items <= 8) return "var(--color-seq-3)";
+    if (items <= 30) return "var(--color-seq-4)";
+    if (items <= 90) return "var(--color-seq-5)";
+    if (items <= 200) return "var(--color-seq-6)";
+    return "var(--color-seq-7)";
   };
 
   return (
     <div className="mt-2 border border-black/10 bg-white p-4">
-      <div className="flex items-center gap-4 text-[11px] font-light text-cpx-grey">
+      <div className="flex items-center gap-4 text-2xs text-cpx-grey">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 bg-[#9A92D5]" /> items held
+          <span className="inline-block h-3 w-3 bg-seq-4" /> items held
         </span>
         <span className="flex items-center gap-1.5">
           <span
             className="inline-block h-3 w-3"
             style={{
               background:
-                "repeating-linear-gradient(45deg,#DFDFDF 0,#DFDFDF 2px,#fff 2px,#fff 4px)",
+                "repeating-linear-gradient(45deg,var(--color-rule) 0,var(--color-rule) 2px,white 2px,white 4px)",
             }}
           />
           attempted, zero items
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 bg-[#F2F2F2]" /> no attempt
+          <span className="inline-block h-3 w-3 bg-inset" /> no attempt
         </span>
       </div>
       <div className="mt-3 space-y-2 xl:columns-2 xl:gap-10 xl:space-y-0">
@@ -309,11 +303,11 @@ function Heatmap({ sources }: { sources: Source[] }) {
                   else next.add(g.cls);
                   setOpenClasses(next);
                 }}
-                className="flex items-center gap-1.5 text-[12px] font-medium"
+                className="flex items-center gap-1.5 text-xs font-medium"
               >
                 <IconChevronDown className={open ? "rotate-180" : ""} />
                 {g.cls}
-                <span className="bg-black/5 px-1 text-[11px] font-light">
+                <span className="bg-black/5 px-1 text-2xs">
                   {g.rows.length}
                 </span>
               </button>
@@ -326,7 +320,7 @@ function Heatmap({ sources }: { sources: Source[] }) {
                       style={{ breakInside: "avoid" }}
                     >
                       <span
-                        className="w-44 shrink-0 truncate text-[10.5px] font-light text-cpx-grey"
+                        className="w-44 shrink-0 truncate text-2xs text-cpx-grey"
                         title={s.name}
                       >
                         {s.name}
@@ -343,7 +337,7 @@ function Heatmap({ sources }: { sources: Source[] }) {
                                 c === "hatch"
                                   ? {
                                       background:
-                                        "repeating-linear-gradient(45deg,#DFDFDF 0,#DFDFDF 2px,#fff 2px,#fff 4px)",
+                                        "repeating-linear-gradient(45deg,var(--color-rule) 0,var(--color-rule) 2px,white 2px,white 4px)",
                                     }
                                   : { background: c }
                               }

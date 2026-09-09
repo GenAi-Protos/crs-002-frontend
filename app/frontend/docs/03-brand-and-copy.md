@@ -41,6 +41,9 @@ The last build was rejected partly for text volume. These are limits, not guidan
 | Bright Purple | `#5C5CC0` | Secondary, and the agent's colour |
 | Just Grey | `#333333` | Secondary text |
 | Accent Red | `#FF3666` | Critical only |
+| Accent Blue | `#3AC2FF` | Info and links on dark chrome only. 1.9:1 on white, never body text. |
+| Link | `#5C5CC0` | Links in content (`text-link`). Bright Purple, 5.6:1 on white. Never a chart slot. |
+| Canvas, Band, Rule, Inset | `#FAFAFA` `#F6F6F7` `#DFDFDF` `#F2F2F2` | The only greys: page canvas, table header band, hairlines, empty heatmap cells. No screen carries a grey hex of its own. |
 
 **Banned outright: `#FDB913`, `#EA661F`, `#FFC72C`, `#F59E0B`.** The first three are the retired CPX yellow identity. The fourth is the Tailwind default amber, which sits **under 5 degrees of hue from `#FDB913` at effectively the same saturation and value**. It reads as the old identity, and status colour ships in persistent chrome on every screen.
 
@@ -58,7 +61,7 @@ The last build was rejected partly for text volume. These are limits, not guidan
 | State | Fill | Icon and label |
 |---|---|---|
 | good, live | `#4CEE76` + 1px `#1E1847` ring | check, label |
-| warning | `#FFD9E2` | `#C41E45` triangle, label |
+| warning | `#FFD9E2` | `#B4173D` triangle, label |
 | critical | `#FF3666` | white octagon, label |
 | idle, unknown | `#9F9F9F` | dash, label |
 
@@ -78,9 +81,30 @@ Sequential ramp, one hue on Dark Purple: `#EDEBF7` `#D5D1EE` `#B8B2E2` `#9A92D5`
 
 ## 3 · Type
 
-**CPX Unbounded** for Latin, **IBM Plex Sans Arabic** for Arabic. Load via `next/font/google`.
+Three families, self-hosted from `app/fonts/` through `next/font/local` (the CPX build runner has no egress to font CDNs; see `app/fonts/README.md`).
 
-Headings 500 Medium, `tracking-tightish` at `-0.01em`. Body 300 Light. No italics. **Never Arial on the web** - it is approved for Word and PowerPoint only.
+| Family | Token | Use |
+|---|---|---|
+| CPX Unbounded | `font-display` | Display only: `h1`, `h2`, the wordmark, KPI numbers. Never body copy. A small eyebrow `h2` opts out with `font-sans`. |
+| Inter | `font-sans` (default) | Every other line of UI text, weight 400. `font-medium` carries emphasis. |
+| IBM Plex Sans Arabic | `font-arabic` | Arabic content, headings and body alike. |
+
+Headings 500 Medium, `tracking-tightish` at `-0.01em`. The wordmark is Unbounded 700. No italics. **Never Arial on the web** - it is approved for Word and PowerPoint only.
+
+**Eight sizes, nothing else.** The Tailwind default scale is wiped in `app/globals.css`; `text-[Npx]` is banned.
+
+| Class | Size / line | Use |
+|---|---|---|
+| `text-2xs` | 11 / 16 | badges, pills, captions, table headers |
+| `text-xs` | 12 / 16 | secondary meta |
+| `text-sm` | 13 / 20 | body, table cells, buttons |
+| `text-base` | 14 / 20 | nav, empty states, emphasis body (14px, not the Tailwind 16px) |
+| `text-md` | 16 / 24 | dialog and section titles |
+| `text-lg` | 18 / 24 | panel titles |
+| `text-xl` | 22 / 28 | page `h1`, document titles |
+| `text-2xl` | 28 / 32 | KPI numbers |
+
+Buttons go through `Button` / `buttonClass` in `components/ui.tsx`: primary (CPX Green, near-black text), secondary, ghost, danger (warn ink, because Accent Red text fails AA on white). Modals go through `Dialog` / `Drawer` on the native `<dialog>`, which gives the focus trap, Escape and focus return for free.
 
 ---
 
@@ -102,7 +126,7 @@ Four SVGs are supplied in `brand/mark/`. **Do not redraw them.** `brand/mark/pre
 | `mark-primary.svg` | Light surfaces. 32×32, the mark on a Dark Purple square tile. **The tile is a contrast fix, not decoration** - `#4CEE76` is 1.52:1 on white and 10.81:1 on `#1E1847`. The green must sit on purple. |
 | `mark-reverse.svg` | The Dark Purple top bar. 24×24, no tile. **Never apply a CSS invert filter** - it destroys the green. |
 | `mark-mono.svg` | One-bit, print, or any cluster where green already carries a CTA. Uses `currentColor`. |
-| `mark-16.svg` | `app/icon.svg` and any use at 16px. Two courses instead of three. Three courses do not hold at that size. |
+| `mark-16.svg` | Any use at 16px. Two courses instead of three. Three courses do not hold at that size. The browser favicon is the CPX logo (`public/cpx-logo-primary.svg`), the same across every CPX console; the mark identifies Nestor inside the lockup. |
 
 **The mark is "the Cairn":** six near-black blocks in three graduated courses, one then two then three, with a mitred CPX Green chevron as the apex. A marker built up out of many separate records, course by course, resolving to a single point that shows the way. Zero corner radius anywhere, all joins mitred, matching the CPX brandmark. It is none of shield, padlock, eye, binary or hooded figure.
 

@@ -1,17 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  /* CPX 2026 core */
+  /* CPX 2026 core (brand/colors.json) */
   --color-cpx-purple: #1e1847;
   --color-cpx-green: #4cee76;
   --color-cpx-black: #040405;
   --color-cpx-bright: #5c5cc0;
   --color-cpx-grey: #333333;
   --color-cpx-red: #ff3666;
+  /* Accent Blue: info and links on dark chrome only. 1.9:1 on white, never body text. */
+  --color-cpx-blue: #3ac2ff;
+
+  /* Links in content: Bright Purple, the brand secondary, 5.6:1 on white. Never a chart slot. */
+  --color-link: #5c5cc0;
+
+  /* Neutral surfaces. Named so no screen carries a grey hex of its own. */
+  --color-canvas: #fafafa;
+  --color-band: #f6f6f7;
+  --color-rule: #dfdfdf;
+  --color-inset: #f2f2f2;
 
   /* Status: no amber exists in this palette */
   --color-status-warn-fill: #ffd9e2;
-  --color-status-warn-ink: #c41e45;
+  --color-status-warn-ink: #b4173d; /* 5.2:1 on the warn fill, 6.7:1 on white */
   --color-status-idle: #9f9f9f;
   --color-green-contrast: #00873d;
 
@@ -34,31 +45,68 @@
   --color-seq-8: #2f2b72;
   --color-seq-9: #1e1847;
 
+  --shadow-pop: 0 6px 20px rgb(0 0 0 / 0.14);
   --tracking-tightish: -0.01em;
+
+  /* The rail collapses to icons below this width (docs/01). */
+  --breakpoint-rail: 1100px;
+
+  /* Type scale: eight steps, the only sizes the console uses. Note text-base is 14px. */
+  --text-*: initial;
+  --text-2xs: 11px;
+  --text-2xs--line-height: 16px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+  --text-base: 14px;
+  --text-base--line-height: 20px;
+  --text-md: 16px;
+  --text-md--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 24px;
+  --text-xl: 22px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 28px;
+  --text-2xl--line-height: 32px;
 }
 
+/* CPX brand type. Inter carries every line of UI text; CPX Unbounded is the display
+   face for page and section titles, the wordmark and KPI numbers; IBM Plex Sans Arabic
+   is declared for Arabic content. Files are self-hosted in app/fonts (app/layout.tsx). */
 @theme inline {
-  --font-sans: var(--font-unbounded), sans-serif;
-  --font-arabic: var(--font-plex-arabic), sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-unbounded), var(--font-inter), sans-serif;
+  --font-arabic: var(--font-plex-arabic), var(--font-inter), sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
-}
-
-html {
-  font-size: 15px;
 }
 
 body {
   color: var(--color-cpx-black);
-  background: #fafafa;
-  font-weight: 300;
+  background: var(--color-canvas);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
 }
 
-h1,
-h2,
-h3,
-h4 {
-  font-weight: 500;
-  letter-spacing: -0.01em;
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* Display face on page and section titles only. A small eyebrow h2 opts out with
+     `font-sans`; body copy is never set in CPX Unbounded. */
+  h1,
+  h2 {
+    font-family: var(--font-display);
+  }
+
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.3);
+  }
 }
 
 ::selection {
@@ -72,7 +120,6 @@ h4 {
   outline: 2px solid var(--color-cpx-bright);
   outline-offset: 2px;
 }
-
 
 /* Preview is the PDF path: the browser writes the file from the previewed
    markup, so what is checked and what is exported cannot drift apart. */
@@ -92,6 +139,23 @@ h4 {
   }
   .no-print {
     display: none !important;
+  }
+  /* The preview opens in a native dialog, which is a fixed, height-capped, scrolling
+     box centred in the viewport. In print it must sit at the page origin and flow as
+     a document, or the PDF starts with a blank band and stops at page one. Top-layer
+     elements are always absolutely positioned, so pin it rather than make it static. */
+  dialog[open] {
+    position: absolute;
+    inset: 0 auto auto 0;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+  }
+  dialog::backdrop {
+    display: none;
   }
 }
 

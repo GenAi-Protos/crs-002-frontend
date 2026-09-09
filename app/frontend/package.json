@@ -6,20 +6,27 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "fixtures": "node scripts/generate-fixtures.mjs"
+    "lint": "eslint .",
+    "fixtures": "node scripts/generate-fixtures.mjs",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "15.4.5",
+    "next": "^15.5.25",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
     "@tailwindcss/postcss": "^4.1.11",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.25",
     "tailwindcss": "^4.1.11",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "^8.5.23"
   }
 }

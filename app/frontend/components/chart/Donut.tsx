@@ -94,7 +94,7 @@ export function Donut({
           y={radius + 14}
           textAnchor="middle"
           className="fill-cpx-grey"
-          style={{ fontSize: 10, fontWeight: 300 }}
+          style={{ fontSize: 10, fontWeight: 400 }}
         >
           {totalLabel}
         </text>
@@ -102,15 +102,15 @@ export function Donut({
 
       <ul className="min-w-[10rem] flex-1 space-y-1.5">
         {slices.map((s, i) => (
-          <li key={s.label} className="flex items-center gap-2 text-[12px]">
+          <li key={s.label} className="flex items-center gap-2 text-xs">
             <span
               aria-hidden
               className="h-2.5 w-2.5 shrink-0"
               style={{ background: colors[i % colors.length] }}
             />
-            <span className="font-light">{s.label}</span>
+            <span className="">{s.label}</span>
             <span className="ml-auto font-medium">{s.value}</span>
-            <span className="w-10 text-right font-light text-cpx-grey">
+            <span className="w-10 text-right text-cpx-grey">
               {total === 0 ? "0%" : `${Math.round((s.value / total) * 100)}%`}
             </span>
           </li>

@@ -15,7 +15,7 @@ import { canSee } from "@/lib/access";
 import { AGENTS, PIRS, WORKFLOWS } from "@/lib/fixtures";
 import { getPirs } from "@/lib/api";
 import type { Agent, Pir, Workflow } from "@/lib/types";
-import { PageHeader, Tabs } from "@/components/ui";
+import { PageHeader, Tabs, OfflineNote } from "@/components/ui";
 import { AgentsTab } from "@/components/manage/AgentsTab";
 import { PirsTab } from "@/components/manage/PirsTab";
 import { WorkflowsTab } from "@/components/manage/WorkflowsTab";
@@ -36,6 +36,7 @@ function ManageInner() {
   const [pirs, setPirs] = useState<Pir[]>(PIRS);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [highlightWorkflow, setHighlightWorkflow] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
     // Both rosters come from the backend once /agents and /workflows exist.
@@ -46,14 +47,17 @@ function ManageInner() {
     // down, the same fallback every other screen uses.
     getPirs(user.id)
       .then((rows) => setPirs(rows.length > 0 ? rows : PIRS))
-      .catch(() => setPirs(PIRS));
+      .catch(() => {
+        setPirs(PIRS);
+        setOffline(true);
+      });
   }, [user.id]);
 
   if (!canSee(user.role, "manage")) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-[14px] font-light">Not permitted at this access level.</p>
-        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">Not permitted at this access level.</p>
+        <Link href="/" className="text-sm text-link underline underline-offset-2">
           Dashboard
         </Link>
       </div>
@@ -72,7 +76,7 @@ function ManageInner() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-8 py-6">
-      <PageHeader title="Manage" />
+      <PageHeader title="Manage" meta={offline ? <OfflineNote /> : undefined} />
       <Tabs<TabKey>
         tabs={[
           { key: "agents", label: "Agents", count: agents.length },
@@ -127,8 +131,8 @@ function NotBuiltYet({ tab }: { tab: "audit" }) {
   const p = PENDING[tab];
   return (
     <div className="mt-6 max-w-2xl border border-black/10 bg-black/[0.02] p-4">
-      <p className="text-[13px] font-light">{p.what}</p>
-      <p className="mt-2 text-[11.5px] font-light text-cpx-grey">{p.basis}</p>
+      <p className="text-sm">{p.what}</p>
+      <p className="mt-2 text-2xs text-cpx-grey">{p.basis}</p>
     </div>
   );
 }

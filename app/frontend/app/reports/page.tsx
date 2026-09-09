@@ -6,18 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
-import { assembleAdvisories, canSee, canWriteReports } from "@/lib/access";
+import { assembleAdvisories, canSee, canWriteReports, publishedOnly } from "@/lib/access";
 import { ADVISORIES } from "@/lib/fixtures";
 import type { Advisory, Client } from "@/lib/types";
-import {
-  downloadCsv,
-  ListMeta,
-  PageHeader,
-  SearchBox,
-  StatusPill,
-  Tabs,
-  type StatusTone,
-} from "@/components/ui";
+import { downloadCsv, ListMeta, PageHeader, SearchBox, StatusPill, Tabs, type StatusTone, buttonClass, OfflineNote, SkeletonRows } from "@/components/ui";
 import { IconChevronDown, IconPlus } from "@/components/icons";
 import {
   Clipped,
@@ -64,6 +56,11 @@ export default function ReportsPage() {
   const { user } = useConsoleUser();
   const router = useRouter();
   const [tab, setTab] = useState<TabKey>("review");
+  // Published-only roles get one fixed tab; the payload is already filtered.
+  const readOnly = publishedOnly(user.role);
+  const effectiveTab: TabKey = readOnly ? "published" : tab;
+  const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
   const [q, setQ] = useState("");
   const [year, setYear] = useState("2026");
   const [types, setTypes] = useState<Set<string>>(
@@ -84,7 +81,13 @@ export default function ReportsPage() {
   // Client names come from /dashboard, not /clients: Clients is a lead-analyst
   // destination and an analyst reading Reports would be refused there.
   useEffect(() => {
-    getReports(user.id).then(setApiRows).catch(() => setApiRows(ADVISORIES));
+    getReports(user.id)
+      .then(setApiRows)
+      .catch(() => {
+        setApiRows(ADVISORIES);
+        setOffline(true);
+      })
+      .finally(() => setLoading(false));
     getDashboardData(user.id).then((d) => setClients(d.clients)).catch(() => setClients([]));
   }, [user.id]);
 
@@ -126,8 +129,8 @@ export default function ReportsPage() {
   if (!canSee(user.role, "reports")) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-[14px] font-light">Not permitted at this access level.</p>
-        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">Not permitted at this access level.</p>
+        <Link href="/" className="text-sm text-link underline underline-offset-2">
           Dashboard
         </Link>
       </div>
@@ -144,7 +147,7 @@ export default function ReportsPage() {
 
   const filtered = rows.filter(
     (a) =>
-      byTab[tab](a) &&
+      byTab[effectiveTab](a) &&
       String(yearOf(a)) === year &&
       types.has(a.type) &&
       (q === "" ||
@@ -166,7 +169,7 @@ export default function ReportsPage() {
           writable ? (
             <button
               onClick={() => setShowNew(true)}
-              className="flex h-8 items-center gap-1.5 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black hover:brightness-95"
+              className={buttonClass("primary")}
             >
               <IconPlus />
               New report
@@ -175,20 +178,21 @@ export default function ReportsPage() {
         }
       />
 
-      {!(user.role === "sales" || user.role === "leadership" || user.role === "incident-responder") ? (
-        <Tabs<TabKey>
-          tabs={[
-            { key: "review", label: "Needs review", count: tabCount("review") },
-            { key: "drafts", label: "Drafts", count: tabCount("drafts") },
-            { key: "published", label: "Published", count: tabCount("published") },
-            { key: "all", label: "All", count: tabCount("all") },
-          ]}
-          value={tab}
-          onChange={setTab}
-        />
-      ) : (
-        <PublishedOnlyTab onSelect={() => setTab("published")} />
-      )}
+      <Tabs<TabKey>
+        label="Report state"
+        tabs={
+          readOnly
+            ? [{ key: "published", label: "Published", count: tabCount("published") }]
+            : [
+                { key: "review", label: "Needs review", count: tabCount("review") },
+                { key: "drafts", label: "Drafts", count: tabCount("drafts") },
+                { key: "published", label: "Published", count: tabCount("published") },
+                { key: "all", label: "All", count: tabCount("all") },
+              ]
+        }
+        value={effectiveTab}
+        onChange={setTab}
+      />
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <SearchBox value={q} onChange={setQ} className="w-72" />
@@ -196,7 +200,7 @@ export default function ReportsPage() {
           value={year}
           onChange={(e) => setYear(e.target.value)}
           aria-label="Year"
-          className="h-8 border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+          className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
         >
           {years.map((y) => (
             <option key={y}>{y}</option>
@@ -212,10 +216,10 @@ export default function ReportsPage() {
                 else next.add(t);
                 setTypes(next);
               }}
-              className={`h-8 px-2.5 text-[12px] ${
+              className={`h-8 px-2.5 text-xs ${
                 types.has(t)
                   ? "bg-cpx-purple font-medium text-white"
-                  : "border border-black/15 font-light text-cpx-grey"
+                  : "border border-black/15 text-cpx-grey"
               }`}
             >
               {t}
@@ -224,6 +228,7 @@ export default function ReportsPage() {
         </div>
         <div className="flex-1" />
         <ListMeta
+          note={offline ? <OfflineNote /> : undefined}
           shown={visible.length}
           total={filtered.length}
           sort="Newest first"
@@ -244,8 +249,11 @@ export default function ReportsPage() {
         />
       </div>
 
+      {loading ? (
+        <SkeletonRows className="mt-4" />
+      ) : (
       <div className="mt-4 overflow-x-auto">
-      <table className={`${T_TABLE} min-w-[52rem] bg-white text-[13px]`}>
+      <table className={`${T_TABLE} min-w-[52rem] bg-white text-sm`}>
         <colgroup>
           <col className="w-52" />
           <col className="w-24" />
@@ -269,7 +277,7 @@ export default function ReportsPage() {
         <tbody>
           {visible.length === 0 && (
             <tr>
-              <td colSpan={6} className="px-3 py-8 text-center font-light">
+              <td colSpan={6} className="px-3 py-8 text-center">
                 <span className="font-medium">0 reports</span> matched
               </td>
             </tr>
@@ -288,7 +296,7 @@ export default function ReportsPage() {
                   }
                   className={`${T_ROW} cursor-pointer ${ghost ? "opacity-45" : ""}`}
                 >
-                  <td className={`${T_TD} whitespace-nowrap font-mono text-[12px]`}>
+                  <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
                     {a.type === "RFI" ? (
                       <button
                         onClick={() => setOpenRfi(rfiOpen ? null : a.ref)}
@@ -300,7 +308,7 @@ export default function ReportsPage() {
                     ) : (
                       <Link
                         href={`/reports/${encodeURIComponent(a.ref)}`}
-                        className="text-cat-4 underline underline-offset-2"
+                        className="text-link underline underline-offset-2"
                       >
                         {a.ref}
                       </Link>
@@ -310,7 +318,7 @@ export default function ReportsPage() {
                     <TypeBadge label={a.type} title={TYPE_TITLE[a.type] ?? a.type} />
                   </td>
                   {/* One line, with the whole title in the tooltip. */}
-                  <td className={`${T_TD} max-w-0 font-light`}>
+                  <td className={`${T_TD} max-w-0`}>
                     <Clipped
                       text={
                         ghost
@@ -319,12 +327,12 @@ export default function ReportsPage() {
                       }
                     />
                   </td>
-                  <td className={`${T_TD} font-light`}>
+                  <td className={`${T_TD}`}>
                     <Clipped text={a.owner ?? "-"} />
                   </td>
                   <td className={T_TD}>
                     {a.type === "RFI" && a.rfi && a.status !== "published" ? (
-                      <span className="font-light">
+                      <span className="">
                         In progress, {a.rfi.steps.filter((s) => s.done).length} of{" "}
                         {a.rfi.steps.length} done
                       </span>
@@ -356,24 +364,24 @@ export default function ReportsPage() {
                 {a.type === "RFI" && rfiOpen && a.rfi && (
                   <tr className="border-b border-black/5 bg-black/[0.02]">
                     <td colSpan={6} className="px-6 py-3">
-                      <p className="text-[12px] font-light text-cpx-grey">
+                      <p className="text-xs text-cpx-grey">
                         {a.rfi.requester} · due {gstDate(a.rfi.dueAt)} ·{" "}
                         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
                       </p>
-                      <p className="mt-1 text-[13px] font-light">{a.rfi.question}</p>
+                      <p className="mt-1 text-sm">{a.rfi.question}</p>
                       <ul className="mt-2 space-y-1">
                         {a.rfi.steps.map((s) => (
-                          <li key={s.label} className="flex items-center gap-2 text-[12.5px]">
+                          <li key={s.label} className="flex items-center gap-2 text-xs">
                             <span
-                              className={`flex h-4 w-4 items-center justify-center text-[10px] ${s.done ? "bg-green-contrast text-white" : "border border-black/20"}`}
+                              className={`flex h-4 w-4 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-black/20"}`}
                             >
                               {s.done ? "✓" : ""}
                             </span>
-                            <span className="font-light">{s.label}</span>
+                            <span className="">{s.label}</span>
                             {s.investigationId && (
                               <Link
                                 href={`/intelligence/${s.investigationId}`}
-                                className="text-cat-4 underline underline-offset-2"
+                                className="text-link underline underline-offset-2"
                               >
                                 Conversation
                               </Link>
@@ -390,10 +398,11 @@ export default function ReportsPage() {
         </tbody>
       </table>
       </div>
+      )}
       {filtered.length > shown && (
         <button
           onClick={() => setShown(shown + 50)}
-          className="mt-3 border border-black/15 px-3 py-1.5 text-[12px] font-light hover:bg-black/5"
+          className={buttonClass("secondary", "sm", "mt-3")}
         >
           Show more
         </button>
@@ -434,7 +443,7 @@ export default function ReportsPage() {
       )}
 
       {notice && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-black/10 bg-white px-4 py-2 text-[12.5px] font-light shadow-sm">
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-black/10 bg-white px-4 py-2 text-xs shadow-sm">
           {notice}
           <button
             onClick={() => setNotice(null)}
@@ -452,17 +461,3 @@ function RowGroup({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function PublishedOnlyTab({ onSelect }: { onSelect: () => void }) {
-  // Published-only roles get a single fixed tab; the payload is already filtered.
-  useEffect(() => {
-    onSelect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return (
-    <div className="flex items-end gap-1 border-b border-black/10">
-      <span className="-mb-px border-b-2 border-cpx-purple px-3 py-2 text-[13px] font-medium text-cpx-purple">
-        Published
-      </span>
-    </div>
-  );
-}

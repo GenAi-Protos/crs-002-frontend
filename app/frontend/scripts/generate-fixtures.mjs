@@ -960,11 +960,9 @@ write("source-requests.json", requests);
 
 const published = advisories.filter((a) => a.status === "published" && a.type !== "DG");
 const deliveries = [];
-let dSeq = 0;
 for (const a of published) {
   for (const c of a.clientIds) {
     if (deliveries.length >= 18) break;
-    dSeq += 1;
     deliveries.push({
       advisoryRef: a.ref, advisoryVersion: a.version, clientId: c,
       sentAt: iso(new Date(new Date(a.publishedAt).getTime() + between(20, 160) * 60000)),

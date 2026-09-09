@@ -48,10 +48,10 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
   if (result.state === "unavailable" || !result.data) {
     return (
       <Panel title="Dashboard">
-        <p className="text-[13px] font-light">
+        <p className="text-sm">
           {result.note ?? "The intelligence data could not be reached."}
         </p>
-        <p className="mt-1 text-[12px] font-light text-cpx-grey">
+        <p className="mt-1 text-xs text-cpx-grey">
           Nothing below is stale data: there is no data to show.
         </p>
       </Panel>
@@ -63,11 +63,11 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
   if (result.state === "empty") {
     return (
       <Panel title="Dashboard">
-        <p className="text-[13px] font-light">
+        <p className="text-sm">
           <span className="font-medium">0 findings</span> in the last{" "}
           {d.window.days} days.
         </p>
-        <p className="mt-1 text-[12px] font-light text-cpx-grey">
+        <p className="mt-1 text-xs text-cpx-grey">
           A zero here means nothing was collected or matched, never that there is
           nothing to find.
         </p>
@@ -77,7 +77,7 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
 
   return (
     <div className="mt-4 space-y-4">
-      <p className="flex flex-wrap items-center gap-2 text-[11.5px] font-light text-cpx-grey">
+      <p className="flex flex-wrap items-center gap-2 text-2xs text-cpx-grey">
         <span className="bg-black/5 px-1.5 text-cpx-black">{d.audience}</span>
         {result.source === "mock" && (
           <span className="bg-status-warn-fill px-1.5 text-status-warn-ink">
@@ -97,7 +97,7 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
       {/* Withheld data is stated with its count. Saying nothing would imply the
           dashboard is complete, which for these roles it deliberately is not. */}
       {d.withheld.length > 0 && (
-        <p className="text-[11.5px] font-light text-cpx-grey">
+        <p className="text-2xs text-cpx-grey">
           Withheld at this access level:{" "}
           {d.withheld
             .map((w) => `${w.count.toLocaleString("en-GB")} ${w.label}`)
@@ -132,19 +132,19 @@ function WidgetView({ widget: w }: { widget: Widget }) {
           }`}
         >
           <h2
-            className={`text-[15px] font-medium capitalize tracking-tightish ${
+            className={`text-md font-medium capitalize tracking-tightish ${
               w.tone === "neutral" ? "" : "text-status-warn-ink"
             }`}
           >
             {w.title}
           </h2>
-          <p className="mt-1.5 max-w-3xl text-[13px] font-light leading-relaxed">
+          <p className="mt-1.5 max-w-3xl text-sm leading-relaxed">
             {w.body}
           </p>
           {w.points && (
             <ul className="mt-2 space-y-0.5">
               {w.points.map((p) => (
-                <li key={p} className="text-[12px] font-light text-cpx-grey">
+                <li key={p} className="text-xs text-cpx-grey">
                   {p}
                 </li>
               ))}
@@ -185,7 +185,7 @@ function WidgetView({ widget: w }: { widget: Widget }) {
             yLabel={w.yLabel}
           />
           {w.explanation && (
-            <p className="mt-2 max-w-3xl text-[11.5px] font-light leading-relaxed text-cpx-grey">
+            <p className="mt-2 max-w-3xl text-2xs leading-relaxed text-cpx-grey">
               {w.explanation}
               {separateScales(w.series) && (
                 <>
@@ -204,7 +204,7 @@ function WidgetView({ widget: w }: { widget: Widget }) {
       return (
         <Panel title={w.title} note={w.note}>
           {w.rows.length === 0 ? (
-            <p className="text-[13px] font-light">{w.empty}</p>
+            <p className="text-sm">{w.empty}</p>
           ) : (
             <DataTable columns={w.columns} rows={w.rows} />
           )}
@@ -215,17 +215,17 @@ function WidgetView({ widget: w }: { widget: Widget }) {
       return (
         <Panel title={w.title} note={w.note}>
           {w.items.length === 0 ? (
-            <p className="text-[13px] font-light">{w.empty}</p>
+            <p className="text-sm">{w.empty}</p>
           ) : (
             <ul className="space-y-2.5">
               {w.items.map((it, i) => (
                 <li key={i}>
                   <span className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-[13px] font-medium">
+                    <span className="text-sm font-medium">
                       {it.href ? (
                         <Link
                           href={it.href}
-                          className="text-cat-4 underline underline-offset-2"
+                          className="text-link underline underline-offset-2"
                         >
                           {it.primary}
                         </Link>
@@ -234,13 +234,13 @@ function WidgetView({ widget: w }: { widget: Widget }) {
                       )}
                     </span>
                     {it.meta && (
-                      <span className="text-[11.5px] font-light text-cpx-grey">
+                      <span className="text-2xs text-cpx-grey">
                         {it.meta}
                       </span>
                     )}
                   </span>
                   {it.secondary && (
-                    <span className="mt-0.5 block text-[12px] font-light text-cpx-grey">
+                    <span className="mt-0.5 block text-xs text-cpx-grey">
                       {it.secondary}
                     </span>
                   )}
@@ -257,11 +257,11 @@ function WidgetView({ widget: w }: { widget: Widget }) {
           <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
             {w.stats.map((s) => (
               <span key={s.label} className="flex flex-col">
-                <span className="text-[11.5px] font-light text-cpx-grey">
+                <span className="text-2xs text-cpx-grey">
                   {s.label}
                 </span>
                 <span
-                  className={`text-[17px] font-medium ${
+                  className={`text-md font-medium ${
                     s.warn ? "text-status-warn-ink" : ""
                   }`}
                 >
@@ -284,7 +284,7 @@ function WidgetView({ widget: w }: { widget: Widget }) {
 function DataTable({ columns, rows }: { columns: Column[]; rows: Cell[][] }) {
   return (
     <div className={T_SCROLL}>
-      <table className={`${T_TABLE} min-w-[40rem] text-[12.5px]`}>
+      <table className={`${T_TABLE} min-w-[40rem] text-xs`}>
         <colgroup>
           {columns.map((c) => (
             <col key={c.label} className={c.width} />
@@ -351,7 +351,7 @@ function CellView({ cell }: { cell: Cell }) {
       : cell.tone === "warn"
         ? "text-status-warn-ink"
         : cell.tone === "muted"
-          ? "font-light text-cpx-grey"
+          ? "text-cpx-grey"
           : "";
 
   // Monospace values are identifiers: they break anywhere rather than push the
@@ -368,7 +368,7 @@ function CellView({ cell }: { cell: Cell }) {
 
   const text = (
     <span
-      className={`${cell.mono ? "break-all font-mono text-[11.5px]" : ""} ${tone}`}
+      className={`${cell.mono ? "break-all font-mono text-2xs" : ""} ${tone}`}
     >
       {cell.text}
     </span>
@@ -391,7 +391,7 @@ function CellView({ cell }: { cell: Cell }) {
         />
       )}
       {cell.href ? (
-        <Link href={cell.href} className="text-cat-4 underline underline-offset-2">
+        <Link href={cell.href} className="text-link underline underline-offset-2">
           {text}
         </Link>
       ) : (
@@ -413,17 +413,17 @@ export function KpiCard({ kpi }: { kpi: Kpi }) {
 
   const body = (
     <div className="flex h-full flex-col bg-white px-4 py-3">
-      <span className="text-[12px] font-light text-cpx-grey">{kpi.label}</span>
-      <span className="mt-1.5 text-[28px] font-medium leading-none tracking-tightish">
+      <span className="text-xs text-cpx-grey">{kpi.label}</span>
+      <span className="mt-1.5 text-2xl font-display font-medium leading-none tracking-tightish">
         {kpi.value.toLocaleString("en-GB")}
       </span>
-      <span className="mt-1.5 text-[11.5px] font-light text-cpx-grey">
+      <span className="mt-1.5 text-2xs text-cpx-grey">
         {kpi.unit}
         {kpi.window && <> · {kpi.window}</>}
       </span>
       {delta !== null && (
         <span
-          className={`mt-1.5 text-[11.5px] font-light ${
+          className={`mt-1.5 text-2xs ${
             worse ? "text-status-warn-ink" : "text-cpx-grey"
           }`}
         >
@@ -456,8 +456,8 @@ export function Panel({
   return (
     <section className="border border-black/10 bg-white p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-[13px] font-medium tracking-tightish">{title}</h2>
-        {note && <span className="text-[11.5px] font-light text-cpx-grey">{note}</span>}
+        <h2 className="font-sans text-sm font-medium tracking-tightish">{title}</h2>
+        {note && <span className="text-2xs text-cpx-grey">{note}</span>}
       </div>
       <div className="mt-3">{children}</div>
     </section>
@@ -466,7 +466,7 @@ export function Panel({
 
 function Zero({ what }: { what: string }) {
   return (
-    <p className="text-[13px] font-light">
+    <p className="text-sm">
       <span className="font-medium">0 {what}</span>
     </p>
   );

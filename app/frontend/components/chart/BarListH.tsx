@@ -17,7 +17,7 @@ export function BarListH({
         <li key={i.label} className="flex items-center gap-2.5">
           <span
             title={i.label}
-            className={`shrink-0 truncate text-[12.5px] font-light text-cpx-grey ${labelClass}`}
+            className={`shrink-0 truncate text-xs text-cpx-grey ${labelClass}`}
           >
             {i.label}
           </span>
@@ -27,7 +27,7 @@ export function BarListH({
               style={{ width: `${(i.value / max) * 100}%`, background: i.color ?? color }}
             />
           </span>
-          <span className="w-9 shrink-0 text-right text-[13.5px] font-medium">
+          <span className="w-9 shrink-0 text-right text-sm font-medium">
             {i.value}
           </span>
         </li>

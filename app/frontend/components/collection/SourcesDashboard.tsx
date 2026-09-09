@@ -147,15 +147,15 @@ function Tile({
 }) {
   return (
     <div className="bg-white px-4 py-3">
-      <span className="text-[11.5px] font-light text-cpx-grey">{label}</span>
+      <span className="text-2xs text-cpx-grey">{label}</span>
       <span
-        className={`mt-1 block text-[22px] font-medium leading-none tracking-tightish ${
+        className={`mt-1 block text-xl font-display font-medium leading-none tracking-tightish ${
           warn ? "text-status-warn-ink" : ""
         }`}
       >
         {value}
       </span>
-      {hint && <span className="mt-1.5 block text-[11px] font-light text-cpx-grey">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-2xs text-cpx-grey">{hint}</span>}
     </div>
   );
 }
@@ -174,14 +174,14 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`flex h-7 items-center gap-1.5 border px-2.5 text-[12.5px] ${
+      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs ${
         active
           ? "border-cpx-purple bg-cpx-purple font-medium text-white"
-          : `border-black/15 font-light hover:bg-black/5 ${count === 0 ? "text-cpx-grey" : ""}`
+          : `border-black/15 hover:bg-black/5 ${count === 0 ? "text-cpx-grey" : ""}`
       }`}
     >
       {label}
-      <span className={`px-1 text-[11px] ${active ? "bg-white/15" : "bg-black/5"}`}>
+      <span className={`px-1 text-2xs ${active ? "bg-white/15" : "bg-black/5"}`}>
         {count}
       </span>
     </button>

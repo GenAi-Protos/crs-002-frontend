@@ -23,7 +23,7 @@ export function Sparkline({
             y={height - h}
             width={w}
             height={h}
-            fill={v > 0 ? "var(--color-seq-4)" : "#DFDFDF"}
+            fill={v > 0 ? "var(--color-seq-4)" : "var(--color-rule)"}
           >
             <title>{String(v)}</title>
           </rect>

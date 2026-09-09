@@ -10,7 +10,7 @@ import { canSee } from "@/lib/access";
 import { REQUESTS, SOURCES, WATCHES } from "@/lib/fixtures";
 import { getConnectors, getHealth, getRequests, getSources, getWatches } from "@/lib/api";
 import type { Connector, KeywordWatch, Source, SourceRequest } from "@/lib/types";
-import { PageHeader, Tabs } from "@/components/ui";
+import { PageHeader, Tabs, OfflineNote } from "@/components/ui";
 import { ConnectorsTab } from "@/components/collection/ConnectorsTab";
 import { SourcesTab } from "@/components/collection/SourcesTab";
 import { WatchesTab } from "@/components/collection/WatchesTab";
@@ -35,19 +35,20 @@ function CollectionInner() {
   // assumption. False until /health says otherwise, so the card never
   // promises a collection that will not run.
   const [schedulerOn, setSchedulerOn] = useState(false);
+  const [offline, setOffline] = useState(false);
   useEffect(() => {
-    getSources(user.id).then(setSources).catch(() => {});
-    getRequests(user.id).then(setRequests).catch(() => {});
-    getWatches(user.id).then(setWatches).catch(() => {});
-    getConnectors(user.id).then(setConnectors).catch(() => {});
+    getSources(user.id).then(setSources).catch(() => setOffline(true));
+    getRequests(user.id).then(setRequests).catch(() => setOffline(true));
+    getWatches(user.id).then(setWatches).catch(() => setOffline(true));
+    getConnectors(user.id).then(setConnectors).catch(() => setOffline(true));
     getHealth().then((h) => setSchedulerOn(h.scheduler)).catch(() => setSchedulerOn(false));
   }, [user.id]);
 
   if (!canSee(user.role, "collection")) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-[14px] font-light">Not permitted at this access level.</p>
-        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">Not permitted at this access level.</p>
+        <Link href="/" className="text-sm text-link underline underline-offset-2">
           Dashboard
         </Link>
       </div>
@@ -56,7 +57,7 @@ function CollectionInner() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-8 py-6">
-      <PageHeader title="Collection" />
+      <PageHeader title="Collection" meta={offline ? <OfflineNote /> : undefined} />
       <Tabs<TabKey>
         tabs={[
           { key: "connectors", label: "Connectors" },

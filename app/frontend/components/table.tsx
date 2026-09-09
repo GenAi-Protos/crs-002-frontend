@@ -37,7 +37,7 @@ export const T_HEAD = "border-b border-black/10 text-left";
  * The header band sits on the cell rather than the row, so a sticky header
  * stays opaque as rows scroll under it.
  */
-export const T_TH = `${PAD} bg-[#f6f6f7] py-2 text-[11.5px] font-medium whitespace-nowrap text-cpx-grey`;
+export const T_TH = `${PAD} bg-band py-2 text-2xs font-medium whitespace-nowrap text-cpx-grey`;
 
 export const T_ROW =
   "border-b border-black/[0.06] align-top transition-colors hover:bg-black/[0.02]";
@@ -71,7 +71,7 @@ export function TypeBadge({
   return (
     <span
       title={title}
-      className={`inline-flex h-[18px] max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-[2px] px-1.5 text-[11px] font-normal ${
+      className={`inline-flex h-[18px] max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-[2px] px-1.5 text-2xs ${
         tone === "warn"
           ? "bg-status-warn-fill text-status-warn-ink"
           : "bg-black/[0.06] text-cpx-grey"
@@ -157,7 +157,7 @@ export function MonoValue({
     <span className="flex items-start gap-1.5">
       <span
         title={title}
-        className={`min-w-0 break-all font-mono text-[11.5px] leading-[1.5] ${className}`}
+        className={`min-w-0 break-all font-mono text-2xs leading-[1.5] ${className}`}
       >
         {value}
       </span>
@@ -178,7 +178,7 @@ export function ConfidenceValue({ value }: { value: number }) {
       className="inline-flex items-center gap-2 whitespace-nowrap"
       title={`Confidence ${pct}%`}
     >
-      <span className="w-9 shrink-0 text-right text-[12px] tabular-nums">
+      <span className="w-9 shrink-0 text-right text-xs tabular-nums">
         {pct}%
       </span>
       <span
@@ -252,12 +252,12 @@ export function ColumnInfo({
         <span
           role="dialog"
           aria-label={heading}
-          className="absolute left-0 top-6 z-30 block w-[22rem] border border-black/15 bg-white p-3 text-left shadow-[0_6px_20px_rgba(0,0,0,0.14)]"
+          className="absolute left-0 top-6 z-30 block w-[22rem] border border-black/15 bg-white p-3 text-left shadow-pop"
         >
-          <span className="block text-[12px] font-medium tracking-tightish">
+          <span className="block text-xs font-medium tracking-tightish">
             {heading}
           </span>
-          <span className="mt-1 block text-[11.5px] font-light leading-relaxed text-cpx-grey">
+          <span className="mt-1 block text-2xs leading-relaxed text-cpx-grey">
             {body}
           </span>
           {rows.length > 0 && (
@@ -265,9 +265,9 @@ export function ColumnInfo({
               {rows.map((r) => (
                 <span
                   key={r.label + r.value}
-                  className="flex items-baseline justify-between gap-3 py-0.5 text-[11.5px]"
+                  className="flex items-baseline justify-between gap-3 py-0.5 text-2xs"
                 >
-                  <span className="min-w-0 truncate font-light" title={r.label}>
+                  <span className="min-w-0 truncate" title={r.label}>
                     {r.label}
                   </span>
                   <span className="shrink-0 whitespace-nowrap tabular-nums">

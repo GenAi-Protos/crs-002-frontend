@@ -24,6 +24,7 @@ import {
   type TemplateSection,
 } from "@/lib/report-templates";
 import { TemplateStep } from "./TemplateStep";
+import { Dialog, buttonClass } from "@/components/ui";
 
 export interface TemplateChoice {
   kind: "standard" | "custom";
@@ -64,12 +65,8 @@ export function NewReportDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/30 p-4">
-      <div className="mt-10 w-full max-w-lg border border-black/10 bg-white p-5">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-[16px] font-medium tracking-tightish">New report</h2>
-          <Steps current={step} hasTemplate={type !== "RFI"} />
-        </div>
+    <Dialog title="New report" onClose={onClose} className="mb-auto mt-10 max-w-lg">
+      <Steps current={step} hasTemplate={type !== "RFI"} />
 
         {step === "type" && <TypePicker onPick={pickType} onClose={onClose} />}
 
@@ -100,8 +97,7 @@ export function NewReportDialog({
             onCreate={(title) => onCreateReport(type, title, choice)}
           />
         )}
-      </div>
-    </div>
+    </Dialog>
   );
 }
 
@@ -112,7 +108,7 @@ function Steps({ current, hasTemplate }: { current: Step; hasTemplate: boolean }
     { key: "details", label: "Create" },
   ];
   return (
-    <span className="flex items-center gap-1.5 text-[11px] font-light text-cpx-grey">
+    <span className="flex items-center gap-1.5 text-2xs text-cpx-grey">
       {steps.map((s, i) => (
         <span key={s.key} className="flex items-center gap-1.5">
           <span className={current === s.key ? "font-medium text-cpx-black" : ""}>
@@ -136,7 +132,7 @@ function TypePicker({
 }) {
   return (
     <>
-      <p className="mt-3 text-[12px] font-light text-cpx-grey">Report type</p>
+      <p className="mt-3 text-xs text-cpx-grey">Report type</p>
       <ul className="mt-2 border border-black/10">
         {REPORT_TYPES.map((t) => {
           const template = TEMPLATES[t];
@@ -147,15 +143,15 @@ function TypePicker({
                 className="block w-full px-3 py-2.5 text-left hover:bg-black/[0.03]"
               >
                 <span className="flex items-baseline gap-2">
-                  <span className="font-mono text-[11.5px] text-cpx-grey">{t}</span>
-                  <span className="text-[13px] font-medium">{template.name}</span>
-                  <span className="ml-auto bg-black/5 px-1.5 text-[11px] font-light">
+                  <span className="font-mono text-2xs text-cpx-grey">{t}</span>
+                  <span className="text-sm font-medium">{template.name}</span>
+                  <span className="ml-auto bg-black/5 px-1.5 text-2xs">
                     {template.workOrder
                       ? "Work order"
                       : `${template.sections.length} sections`}
                   </span>
                 </span>
-                <span className="mt-0.5 block text-[12px] font-light text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey">
                   {template.purpose}
                 </span>
               </button>
@@ -166,7 +162,7 @@ function TypePicker({
       <div className="mt-4 flex justify-end">
         <button
           onClick={onClose}
-          className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+          className={buttonClass()}
         >
           Cancel
         </button>
@@ -195,29 +191,29 @@ function TitleForm({
 
   return (
     <>
-      <p className="mt-3 flex flex-wrap items-baseline gap-2 text-[12px] font-light text-cpx-grey">
-        <span className="bg-black/5 px-1.5 text-[11px] text-cpx-black">{type}</span>
+      <p className="mt-3 flex flex-wrap items-baseline gap-2 text-xs text-cpx-grey">
+        <span className="bg-black/5 px-1.5 text-2xs text-cpx-black">{type}</span>
         {template.name}
       </p>
 
       <div className="mt-3 border border-black/10 px-3 py-2">
-        <span className="text-[11.5px] font-light text-cpx-grey">Template</span>
-        <span className="mt-0.5 block break-all text-[13px] font-medium">
+        <span className="text-2xs text-cpx-grey">Template</span>
+        <span className="mt-0.5 block break-all text-sm font-medium">
           {choice.kind === "standard" ? "Standard template" : choice.name}
         </span>
-        <span className="mt-0.5 block text-[12px] font-light text-cpx-grey">
+        <span className="mt-0.5 block text-xs text-cpx-grey">
           {choice.sections.length}{" "}
           {choice.sections.length === 1 ? "section" : "sections"} detected
         </span>
       </div>
 
       <label className="mt-4 block">
-        <span className="text-[12px] font-light text-cpx-grey">Title</span>
+        <span className="text-xs text-cpx-grey">Title</span>
         <input
           autoFocus
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 h-9 w-full border border-black/15 px-3 text-[13px] font-light focus:border-cpx-purple focus:outline-none"
+          className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:border-cpx-purple focus:outline-none"
         />
       </label>
 
@@ -225,35 +221,35 @@ function TitleForm({
         {choice.sections.map((s, i) => (
           <li
             key={`${i}-${s.heading}`}
-            className="flex gap-2 border-b border-black/5 px-3 py-1.5 text-[12.5px] last:border-b-0"
+            className="flex gap-2 border-b border-black/5 px-3 py-1.5 text-xs last:border-b-0"
           >
             {/* One number, this list's own: the heading arrived stripped of
                 whatever numbering its source document carried. */}
             <span className="text-cpx-grey">{i + 1}.</span>
-            <span className="font-light">{s.heading}</span>
+            <span className="">{s.heading}</span>
           </li>
         ))}
       </ol>
       {/* The CPX structure and its requirement references describe the standard
           format. They say nothing about a template someone else wrote. */}
-      <p className="mt-2 text-[11px] font-light text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey">
         {choice.kind === "standard"
           ? template.basis
           : "Structure based on the uploaded custom template."}
       </p>
 
       {error && (
-        <p className="mt-3 text-[12px] font-light text-status-warn-ink">{error}</p>
+        <p className="mt-3 text-xs text-status-warn-ink">{error}</p>
       )}
 
       <div className="mt-5 flex items-center gap-2">
         <button
           onClick={onBack}
-          className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+          className={buttonClass()}
         >
           Back
         </button>
-        <span className="text-[11px] font-light text-cpx-grey">
+        <span className="text-2xs text-cpx-grey">
           Creates a draft. A lead analyst approves before it reaches a client.
         </span>
         <div className="flex-1" />
@@ -269,7 +265,7 @@ function TitleForm({
               setBusy(false);
             }
           }}
-          className="h-8 whitespace-nowrap bg-cpx-green px-3 text-[13px] font-medium text-cpx-black disabled:bg-black/10 disabled:text-black/40"
+          className={buttonClass("primary")}
         >
           {busy ? "Creating" : "Create report"}
         </button>
@@ -307,34 +303,34 @@ function RfiForm({
 
   return (
     <>
-      <p className="mt-3 flex items-baseline gap-2 text-[12px] font-light text-cpx-grey">
-        <span className="bg-black/5 px-1.5 text-[11px] text-cpx-black">RFI</span>
+      <p className="mt-3 flex items-baseline gap-2 text-xs text-cpx-grey">
+        <span className="bg-black/5 px-1.5 text-2xs text-cpx-black">RFI</span>
         Request for Information
       </p>
       <div className="mt-4 space-y-3">
         <label className="block">
-          <span className="text-[12px] font-light text-cpx-grey">Requester</span>
+          <span className="text-xs text-cpx-grey">Requester</span>
           <input
             value={requester}
             onChange={(e) => setRequester(e.target.value)}
-            className="mt-1 h-9 w-full border border-black/15 px-3 text-[13px] font-light focus:border-cpx-purple focus:outline-none"
+            className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:border-cpx-purple focus:outline-none"
           />
         </label>
         <label className="block">
-          <span className="text-[12px] font-light text-cpx-grey">Question</span>
+          <span className="text-xs text-cpx-grey">Question</span>
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             rows={3}
-            className="mt-1 w-full border border-black/15 px-3 py-2 text-[13px] font-light focus:border-cpx-purple focus:outline-none"
+            className="mt-1 w-full border border-black/15 px-3 py-2 text-sm focus:border-cpx-purple focus:outline-none"
           />
         </label>
         <label className="block">
-          <span className="text-[12px] font-light text-cpx-grey">Client</span>
+          <span className="text-xs text-cpx-grey">Client</span>
           <select
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
-            className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+            className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
           >
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
@@ -344,22 +340,22 @@ function RfiForm({
           </select>
         </label>
         <label className="block">
-          <span className="text-[12px] font-light text-cpx-grey">Due date</span>
+          <span className="text-xs text-cpx-grey">Due date</span>
           <input
             type="date"
             value={due}
             onChange={(e) => setDue(e.target.value)}
-            className="mt-1 h-9 w-full border border-black/15 px-3 text-[13px] font-light focus:outline-none"
+            className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:outline-none"
           />
         </label>
       </div>
       {error && (
-        <p className="mt-3 text-[12px] font-light text-status-warn-ink">{error}</p>
+        <p className="mt-3 text-xs text-status-warn-ink">{error}</p>
       )}
       <div className="mt-5 flex justify-end gap-2">
         <button
           onClick={onBack}
-          className="mr-auto h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+          className={buttonClass("secondary", "md", "mr-auto")}
         >
           Back
         </button>
@@ -380,7 +376,7 @@ function RfiForm({
               setBusy(false);
             }
           }}
-          className="h-8 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black disabled:bg-black/10 disabled:text-black/40"
+          className={buttonClass("primary")}
         >
           {busy ? "Filing" : "Create"}
         </button>

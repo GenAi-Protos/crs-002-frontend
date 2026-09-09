@@ -10,7 +10,6 @@
 // It is also the PDF path. The browser writes the file from this markup, so
 // what is previewed and what is exported cannot drift apart.
 
-import { useEffect } from "react";
 import type { Advisory } from "@/lib/types";
 import { templateFor } from "@/lib/report-templates";
 import { isPlaceholder } from "@/lib/report-templates";
@@ -18,7 +17,7 @@ import { structuredTables } from "@/lib/report-export";
 import { resolveTechnique, TACTICS } from "@/lib/mitre";
 import { gstDateTime, recordCount } from "@/lib/format";
 import { defang } from "@/lib/defang";
-import { IndicatorChip, TlpBadge } from "@/components/ui";
+import { IndicatorChip, TlpBadge, buttonClass, useModal, closeOnBackdrop } from "@/components/ui";
 import { DiamondPanel } from "./DiamondPanel";
 import { IconClose } from "@/components/icons";
 
@@ -31,37 +30,40 @@ export function ReportPreview({
   onClose: () => void;
   onPrint?: () => void;
 }) {
-  useEffect(() => {
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", esc);
-    return () => document.removeEventListener("keydown", esc);
-  }, [onClose]);
+  // Native modal: Escape, focus trap and focus return come from the platform.
+  const { ref, handleClose } = useModal(onClose);
 
   const template = templateFor(a.type);
   const unwritten = a.sections.filter((s) => isPlaceholder(s, template)).length;
   const tables = structuredTables(a);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/30 p-4">
-      <div className="mx-auto w-full max-w-[860px] bg-white">
+    <dialog
+      ref={ref}
+      aria-label="Preview"
+      onClose={handleClose}
+      onClick={closeOnBackdrop(onClose)}
+      className="m-auto w-full max-w-[860px] border-0 bg-white p-0 text-cpx-black"
+    >
+      <div>
         <div className="no-print sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-black/10 bg-white px-6 py-3">
-          <span className="text-[13px] font-medium tracking-tightish">Preview</span>
-          <span className="bg-black/5 px-1.5 text-[11px] font-light">
+          <span className="text-sm font-medium tracking-tightish">Preview</span>
+          <span className="bg-black/5 px-1.5 text-2xs">
             {template?.name ?? a.type}
           </span>
           {a.template?.kind === "custom" && (
-            <span className="bg-black/5 px-1.5 text-[11px] font-light text-cpx-grey">
+            <span className="bg-black/5 px-1.5 text-2xs text-cpx-grey">
               Custom template
             </span>
           )}
-          <span className="text-[12px] font-light text-cpx-grey">
+          <span className="text-xs text-cpx-grey">
             As the client receives it
           </span>
           <div className="flex-1" />
           {onPrint && (
             <button
               onClick={onPrint}
-              className="h-7 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5"
+              className={buttonClass("secondary", "sm")}
             >
               Print or save as PDF
             </button>
@@ -76,7 +78,7 @@ export function ReportPreview({
         </div>
 
         {unwritten > 0 && (
-          <p className="no-print border-b border-black/10 bg-status-warn-fill px-6 py-2 text-[12px] font-light text-status-warn-ink">
+          <p className="no-print border-b border-black/10 bg-status-warn-fill px-6 py-2 text-xs text-status-warn-ink">
             {unwritten} of {a.sections.length}{" "}
             {unwritten === 1 ? "section still holds" : "sections still hold"} only
             the template guidance. It renders below as it would be sent.
@@ -86,19 +88,19 @@ export function ReportPreview({
         <article className="print-root px-6 py-8">
           <header className="border-b border-black/10 pb-4">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[12px]">{a.ref}</span>
+              <span className="font-mono text-xs">{a.ref}</span>
               <TlpBadge tlp={a.tlp} />
-              <span className="text-[11.5px] font-light text-cpx-grey">
+              <span className="text-2xs text-cpx-grey">
                 v{a.version} ·{" "}
               {a.template?.kind === "custom"
                 ? a.template.name
                 : (template?.name ?? a.type)}
               </span>
             </div>
-            <h1 className="mt-2 text-[24px] font-medium leading-snug tracking-tightish">
+            <h1 className="mt-2 text-xl font-medium leading-snug tracking-tightish">
               {a.title}
             </h1>
-            <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+            <p className="mt-2 text-2xs text-cpx-grey">
               {a.owner ?? "Unassigned"} ·{" "}
               {a.publishedAt
                 ? `Published ${gstDateTime(a.publishedAt)}`
@@ -109,12 +111,12 @@ export function ReportPreview({
           <div className="mt-6 space-y-7">
             {a.sections.map((s) => (
               <section key={s.id}>
-                <h2 className="border-b border-black/10 pb-1 text-[15px] font-medium tracking-tightish">
+                <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
                   {s.heading}
                 </h2>
                 {s.heading === "Diamond Model Analysis" ? (
                   <>
-                    <p className="mt-2 whitespace-pre-line text-[13.5px] font-light leading-relaxed">
+                    <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">
                       {s.body}
                     </p>
                     {/* The same panel the editor renders, read-only. A preview
@@ -134,17 +136,17 @@ export function ReportPreview({
                   </div>
                 ) : (
                   <p
-                    className={`mt-2 whitespace-pre-line text-[13.5px] leading-relaxed ${
+                    className={`mt-2 whitespace-pre-line text-sm leading-relaxed ${
                       isPlaceholder(s, template)
-                        ? "font-light italic text-cpx-grey"
-                        : "font-light"
+                        ? "italic text-cpx-grey"
+                        : ""
                     }`}
                   >
                     {s.body}
                   </p>
                 )}
                 {s.citations.length > 0 && (
-                  <p className="mt-1.5 text-[11.5px] font-light text-cpx-grey">
+                  <p className="mt-1.5 text-2xs text-cpx-grey">
                     {s.citations
                       .map(
                         (c) =>
@@ -161,15 +163,15 @@ export function ReportPreview({
 
           {a.techniques.length > 0 && (
             <section className="mt-8">
-              <h2 className="border-b border-black/10 pb-1 text-[15px] font-medium tracking-tightish">
+              <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
                 Techniques
               </h2>
-              <table className="mt-2 w-full border-collapse text-[12.5px]">
+              <table className="mt-2 w-full border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-black/10 text-left font-light text-cpx-grey">
-                    <th className="py-1.5 pr-4 font-light">Technique</th>
-                    <th className="py-1.5 pr-4 font-light">Tactic</th>
-                    <th className="py-1.5 font-light">Observed</th>
+                  <tr className="border-b border-black/10 text-left text-cpx-grey">
+                    <th className="py-1.5 pr-4">Technique</th>
+                    <th className="py-1.5 pr-4">Tactic</th>
+                    <th className="py-1.5">Observed</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -181,7 +183,7 @@ export function ReportPreview({
                         className="border-b border-black/5 align-top"
                       >
                         <td className="py-1.5 pr-4">
-                          <span className="font-mono text-[11.5px]">
+                          <span className="font-mono text-2xs">
                             {t.techniqueId}
                           </span>{" "}
                           {resolved?.name ?? (
@@ -190,10 +192,10 @@ export function ReportPreview({
                             </span>
                           )}
                         </td>
-                        <td className="py-1.5 pr-4 font-light">
+                        <td className="py-1.5 pr-4">
                           {TACTICS[t.tacticId] ?? t.tacticId}
                         </td>
-                        <td className="py-1.5 font-light">{t.observedActivity}</td>
+                        <td className="py-1.5">{t.observedActivity}</td>
                       </tr>
                     );
                   })}
@@ -204,25 +206,25 @@ export function ReportPreview({
 
           {a.cvss.length > 0 && (
             <section className="mt-8">
-              <h2 className="border-b border-black/10 pb-1 text-[15px] font-medium tracking-tightish">
+              <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
                 CVSS
               </h2>
-              <table className="mt-2 w-full border-collapse text-[12.5px]">
+              <table className="mt-2 w-full border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-black/10 text-left font-light text-cpx-grey">
-                    <th className="py-1.5 pr-4 font-light">CVE</th>
-                    <th className="py-1.5 pr-4 font-light">Score</th>
-                    <th className="py-1.5 font-light">Authority</th>
+                  <tr className="border-b border-black/10 text-left text-cpx-grey">
+                    <th className="py-1.5 pr-4">CVE</th>
+                    <th className="py-1.5 pr-4">Score</th>
+                    <th className="py-1.5">Authority</th>
                   </tr>
                 </thead>
                 <tbody>
                   {a.cvss.map((c, i) => (
                     <tr key={`${c.cveId}-${i}`} className="border-b border-black/5">
-                      <td className="py-1.5 pr-4 font-mono text-[11.5px]">
+                      <td className="py-1.5 pr-4 font-mono text-2xs">
                         {c.cveId}
                       </td>
                       <td className="py-1.5 pr-4 font-medium">{c.value}</td>
-                      <td className="py-1.5 font-light">
+                      <td className="py-1.5">
                         {c.source} · {c.authorityClass.toUpperCase()}
                       </td>
                     </tr>
@@ -232,7 +234,7 @@ export function ReportPreview({
             </section>
           )}
 
-          <footer className="mt-10 border-t border-black/10 pt-3 text-[11px] font-light text-cpx-grey">
+          <footer className="mt-10 border-t border-black/10 pt-3 text-2xs text-cpx-grey">
             {a.ref} · v{a.version} · TLP:{a.tlp} · CPX Threat Intelligence Center
             {tables.length > 0 && (
               <> · {tables.length} structured {tables.length === 1 ? "table" : "tables"}</>
@@ -240,6 +242,6 @@ export function ReportPreview({
           </footer>
         </article>
       </div>
-    </div>
+    </dialog>
   );
 }

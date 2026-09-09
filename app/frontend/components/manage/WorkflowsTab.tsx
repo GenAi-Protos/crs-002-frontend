@@ -21,7 +21,7 @@ import { useConsoleUser } from "@/lib/role-context";
 import { canAdminister } from "@/lib/access";
 import type { Agent, Workflow, WorkflowStatus, WorkflowTrigger } from "@/lib/types";
 import { agoFromNow, gstDateTime } from "@/lib/format";
-import { ListMeta, SearchBox, StatusPill, type StatusTone } from "@/components/ui";
+import { ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
 import { IconChevronDown } from "@/components/icons";
 
 const STATUS: Record<WorkflowStatus, { tone: StatusTone; label: string }> = {
@@ -112,7 +112,7 @@ export function WorkflowsTab({
 
   if (workflows.length === 0) {
     return (
-      <p className="mt-4 text-[13px] font-light">
+      <p className="mt-4 text-sm">
         <span className="font-medium">0 workflows</span>
       </p>
     );
@@ -140,7 +140,7 @@ export function WorkflowsTab({
           onClick={() =>
             setOpenRefs(allOpen ? new Set() : new Set(list.map((w) => w.ref)))
           }
-          className="h-7 border border-black/15 px-2.5 text-[12.5px] font-light hover:bg-black/5"
+          className={buttonClass("secondary", "sm")}
         >
           {allOpen ? "Collapse all" : "Expand all"}
         </button>
@@ -151,7 +151,7 @@ export function WorkflowsTab({
         />
       </div>
 
-      <p className="mt-2 text-[12px] font-light text-cpx-grey">
+      <p className="mt-2 text-xs text-cpx-grey">
         <span className="font-medium text-cpx-black">{counts.published}</span> published
         · <span className="font-medium text-cpx-black">{counts.draft}</span> draft ·{" "}
         {admin ? "You may edit" : "Read only at this access level"}
@@ -173,7 +173,7 @@ export function WorkflowsTab({
       </div>
 
       {list.length === 0 && (
-        <p className="mt-6 text-[13px] font-light">
+        <p className="mt-6 text-sm">
           <span className="font-medium">0 workflows</span> match this search
         </p>
       )}
@@ -214,20 +214,20 @@ function WorkflowCard({
     >
       <div className="flex items-start justify-between gap-3 px-4 pt-3">
         <div className="min-w-0">
-          <h3 className="text-[15px] font-medium leading-tight tracking-tightish">
+          <h3 className="text-md font-medium leading-tight tracking-tightish">
             {w.name}
           </h3>
-          <p className="mt-1 text-[12.5px] font-light leading-relaxed text-cpx-grey">
+          <p className="mt-1 text-xs leading-relaxed text-cpx-grey">
             {w.purpose}
           </p>
         </div>
         <span className="flex shrink-0 items-center gap-2">
-          <span className="font-mono text-[11.5px] text-cpx-grey">{w.version}</span>
+          <span className="font-mono text-2xs text-cpx-grey">{w.version}</span>
           <StatusPill {...STATUS[w.status]} />
         </span>
       </div>
 
-      <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 px-4 text-[12px] sm:grid-cols-4">
+      <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 px-4 text-xs sm:grid-cols-4">
         <Fact label="Trigger" value={TRIGGER[w.trigger]} title={w.triggerDetail} />
         <Fact
           label="Approval"
@@ -258,14 +258,14 @@ function WorkflowCard({
         />
       </div>
 
-      <p className="mt-3 px-4 text-[11.5px] font-light text-cpx-grey">
+      <p className="mt-3 px-4 text-2xs text-cpx-grey">
         <span className="font-medium text-cpx-black">{builtAgents}</span> of{" "}
         {w.agentRefs.length} agents built · {w.steps.length} steps ·{" "}
         {w.updateCount} {w.updateCount === 1 ? "change" : "changes"}
       </p>
 
       {w.gap && (
-        <p className="mx-4 mt-3 border border-black/10 bg-black/[0.02] px-3 py-2 text-[12px] font-light">
+        <p className="mx-4 mt-3 border border-black/10 bg-black/[0.02] px-3 py-2 text-xs">
           {w.gap}
         </p>
       )}
@@ -273,7 +273,7 @@ function WorkflowCard({
       <button
         onClick={onToggle}
         aria-expanded={open}
-        className="mt-3 flex items-center gap-1.5 border-t border-black/10 px-4 py-2 text-left text-[12.5px] font-light hover:bg-black/[0.02]"
+        className="mt-3 flex items-center gap-1.5 border-t border-black/10 px-4 py-2 text-left text-xs hover:bg-black/[0.02]"
       >
         <IconChevronDown className={open ? "rotate-180" : ""} />
         {open ? "Hide the run" : `Show the run · ${w.steps.length} steps`}
@@ -295,17 +295,17 @@ function WorkflowCard({
                   className={`min-w-0 flex-1 ${i === w.steps.length - 1 ? "" : "pb-4"}`}
                 >
                   <span className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-[13px] font-medium">
+                    <span className="text-sm font-medium">
                       {i + 1}. {s.label}
                     </span>
                     <button
                       onClick={() => onOpenAgent(s.agentRef)}
-                      className="bg-black/5 px-1 text-[11px] font-light hover:bg-black/10"
+                      className="bg-black/5 px-1 text-2xs hover:bg-black/10"
                     >
                       {nameOf(s.agentRef)}
                     </button>
                   </span>
-                  <span className="mt-0.5 block text-[12px] font-light text-cpx-grey">
+                  <span className="mt-0.5 block text-xs text-cpx-grey">
                     {s.detail}
                   </span>
                 </span>
@@ -316,7 +316,7 @@ function WorkflowCard({
           <Block label="Outputs" count={w.outputs.length}>
             <ul className="space-y-1">
               {w.outputs.map((o) => (
-                <li key={o} className="text-[12.5px] font-light">
+                <li key={o} className="text-xs">
                   {o}
                 </li>
               ))}
@@ -324,7 +324,7 @@ function WorkflowCard({
           </Block>
 
           <Block label="Version">
-            <p className="text-[12.5px] font-light">
+            <p className="text-xs">
               {w.version} · {w.updateCount}{" "}
               {w.updateCount === 1 ? "change" : "changes"} · updated{" "}
               {gstDateTime(w.updatedAt)}
@@ -332,7 +332,7 @@ function WorkflowCard({
           </Block>
 
           <Block label="Basis">
-            <p className="text-[12px] font-light text-cpx-grey">{w.basis}</p>
+            <p className="text-xs text-cpx-grey">{w.basis}</p>
           </Block>
 
           <Actions workflow={w} admin={admin} />
@@ -363,7 +363,7 @@ function Actions({ workflow: w, admin }: { workflow: Workflow; admin: boolean })
           </>
         )}
       </div>
-      <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey">
         {admin
           ? "Publishing a workflow does not publish its output. A lead analyst approves every client-facing artefact."
           : "Read only at this access level. The administrator changes a workflow."}
@@ -383,7 +383,7 @@ function Fact({
 }) {
   return (
     <div className="min-w-0" title={title}>
-      <dt className="font-light text-cpx-grey">{label}</dt>
+      <dt className="text-cpx-grey">{label}</dt>
       <dd className="truncate font-medium">{value}</dd>
     </div>
   );
@@ -402,7 +402,7 @@ function Chips({
 }) {
   return (
     <div className="flex flex-wrap items-baseline gap-1.5">
-      <span className="w-[3.75rem] shrink-0 text-[11.5px] font-light text-cpx-grey">
+      <span className="w-[3.75rem] shrink-0 text-2xs text-cpx-grey">
         {label}
         <span className="ml-1 text-cpx-black">{items.length}</span>
       </span>
@@ -411,15 +411,15 @@ function Chips({
           <button
             key={it.key}
             onClick={() => onSelect(it.key)}
-            className="bg-black/5 px-1.5 text-[11.5px] font-light hover:bg-black/10"
+            className="bg-black/5 px-1.5 text-2xs hover:bg-black/10"
           >
             {it.text}
           </button>
         ) : (
           <span
             key={it.key}
-            className={`bg-black/5 px-1.5 text-[11.5px] font-light ${
-              mono ? "font-mono text-[11px]" : ""
+            className={`bg-black/5 px-1.5 text-2xs ${
+              mono ? "font-mono text-2xs" : ""
             }`}
           >
             {it.text}
@@ -441,10 +441,10 @@ function Block({
 }) {
   return (
     <div className="mt-4 border-t border-black/10 pt-3">
-      <span className="flex items-baseline gap-2 text-[11.5px] font-light text-cpx-grey">
+      <span className="flex items-baseline gap-2 text-2xs text-cpx-grey">
         {label}
         {count !== undefined && (
-          <span className="bg-black/5 px-1 text-[11px] text-cpx-black">{count}</span>
+          <span className="bg-black/5 px-1 text-2xs text-cpx-black">{count}</span>
         )}
       </span>
       <div className="mt-1.5">{children}</div>
@@ -464,11 +464,7 @@ function Action({
   return (
     <button
       disabled={disabled}
-      className={`h-8 px-3 text-[12.5px] ${
-        primary
-          ? "bg-cpx-green font-medium text-cpx-black hover:brightness-95 disabled:bg-black/10 disabled:text-black/40"
-          : "border border-black/15 font-light hover:bg-black/5 disabled:border-black/10 disabled:text-black/30 disabled:hover:bg-transparent"
-      }`}
+      className={buttonClass(primary ? "primary" : "secondary")}
     >
       {label}
     </button>
@@ -489,14 +485,14 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`flex h-7 items-center gap-1.5 border px-2.5 text-[12.5px] ${
+      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs ${
         active
           ? "border-cpx-purple bg-cpx-purple font-medium text-white"
-          : "border-black/15 font-light hover:bg-black/5"
+          : "border-black/15 hover:bg-black/5"
       }`}
     >
       {label}
-      <span className={`px-1 text-[11px] ${active ? "bg-white/15" : "bg-black/5"}`}>
+      <span className={`px-1 text-2xs ${active ? "bg-white/15" : "bg-black/5"}`}>
         {count}
       </span>
     </button>

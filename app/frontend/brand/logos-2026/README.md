@@ -14,5 +14,4 @@ the green to ~#5CC46B and dark to ~#1F1F24 - these files use the exact #4CEE76 /
 | `cpx-logo-on-purple.svg` / `.png` | White + green on the Dark Purple `#1E1847` brand background |
 
 PNGs are ~2097×939 (600 dpi crop). SVGs are scalable (viewBox tight to the mark).
-The older `../svg/` and `../png/` logos are the PRE-2026 (yellow CP) mark - retained for
-history only; do not use on the new brand.
+The PRE-2026 (yellow CP) mark is not kept in this repository. Do not use it on the new brand.

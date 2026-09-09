@@ -8,35 +8,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
-import {
-  createClient,
-  getClient,
-  getClients,
-  getPirs,
-  patchClient,
-  type ClientDetail,
-  type ClientPatch,
-} from "@/lib/api";
+import { CLIENTS } from "@/lib/fixtures";
+import { createClient, getClient, getClients, getPirs, patchClient, type ClientDetail, type ClientPatch } from "@/lib/api";
 import type { Client, Delivery, DrpItem, Pir } from "@/lib/types";
 import { gstDate, gstDateTime } from "@/lib/format";
-import {
-  TypeBadge,
-  T_HEAD,
-  T_NUM,
-  T_ROW,
-  T_TABLE,
-  T_TD,
-  T_TH,
-} from "@/components/table";
+import { TypeBadge, T_HEAD, T_NUM, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
 import { defang } from "@/lib/defang";
-import {
-  downloadCsv,
-  ListMeta,
-  SearchBox,
-  StatusPill,
-  Tabs,
-  type StatusTone,
-} from "@/components/ui";
+import { downloadCsv, ListMeta, SearchBox, StatusPill, Tabs, type StatusTone, Dialog, buttonClass, OfflineNote } from "@/components/ui";
 import { IconPlus } from "@/components/icons";
 
 const DRP_KIND_LABEL: Record<DrpItem["kind"], string> = {
@@ -64,10 +42,17 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   const [detail, setDetail] = useState<ClientDetail | null>(null);
   const [pirs, setPirs] = useState<Pir[]>([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [offline, setOffline] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    getClients(user.id).then(setApiClients).catch(() => setApiClients([]));
+    // Fixtures stand in when the backend is down, labelled as such (hard rule 1).
+    getClients(user.id)
+      .then(setApiClients)
+      .catch(() => {
+        setApiClients(CLIENTS);
+        setOffline(true);
+      });
     getPirs(user.id).then(setPirs).catch(() => setPirs([]));
   }, [user.id]);
 
@@ -85,7 +70,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
           // profileComplete is derived server-side; take the server's answer.
           setApiClients((cs) => cs.map((c) => (c.id === saved.id ? saved : c)));
           setOverrides((o) => {
-            const { [id]: _dropped, ...rest } = o;
+            const rest = { ...o };
+            delete rest[id];
             return rest;
           });
         })
@@ -129,8 +115,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   if (!canSee(user.role, "clients")) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-[14px] font-light">Not permitted at this access level.</p>
-        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">Not permitted at this access level.</p>
+        <Link href="/" className="text-sm text-link underline underline-offset-2">
           Dashboard
         </Link>
       </div>
@@ -140,7 +126,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   if (allClients.length === 0) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-[14px] font-light">No clients yet.</p>
+        <p className="text-base">No clients yet.</p>
       </div>
     );
   }
@@ -148,10 +134,10 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   if (selectedId && !allClients.some((c) => c.id === selectedId)) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-[14px] font-light">No client with this reference.</p>
+        <p className="text-base">No client with this reference.</p>
         <Link
           href="/clients"
-          className="text-[13px] text-cat-4 underline underline-offset-2"
+          className="text-sm text-link underline underline-offset-2"
         >
           Clients
         </Link>
@@ -184,9 +170,9 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
     <div className="flex min-h-[calc(100vh-3.5rem)]">
       <aside className="w-80 shrink-0 border-r border-black/10 bg-white">
         <div className="flex items-center justify-between px-4 pb-2 pt-5">
-          <h1 className="text-[18px] font-medium tracking-tightish">Clients</h1>
+          <h1 className="text-xl font-medium tracking-tightish">Clients</h1>
           <span className="flex items-center gap-2">
-            <span className="text-[12px] font-light text-cpx-grey">
+            <span className="text-xs text-cpx-grey">
               {allClients.length}
             </span>
             <button
@@ -198,12 +184,17 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
             </button>
           </span>
         </div>
+        {offline && (
+          <div className="px-4 pb-2">
+            <OfflineNote />
+          </div>
+        )}
         <div className="px-4 pb-3">
           <SearchBox value={q} onChange={setQ} />
         </div>
         <ul>
           {list.length === 0 && (
-            <li className="px-4 py-3 text-[13px] font-light">
+            <li className="px-4 py-3 text-sm">
               <span className="font-medium">0 clients</span> matched
             </li>
           )}
@@ -217,9 +208,9 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                     : "border-transparent hover:bg-black/[0.02]"
                 }`}
               >
-                <span className="font-mono text-[12px] font-medium">{c.id}</span>
+                <span className="font-mono text-xs font-medium">{c.id}</span>
                 <span
-                  className="mt-0.5 block truncate text-[13px] font-light"
+                  className="mt-0.5 block truncate text-sm"
                   title={c.name}
                 >
                   {c.name}
@@ -233,10 +224,10 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
       <section className="min-w-0 flex-1 px-6 py-5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-[20px] font-medium tracking-tightish">
+            <h2 className="text-lg font-medium tracking-tightish">
               {client.id} · {client.name}
             </h2>
-            <p className="mt-1 text-[12.5px] font-light text-cpx-grey">
+            <p className="mt-1 text-xs text-cpx-grey">
               {client.sector} · {client.region} · {client.products.length} products ·{" "}
               {client.subscribedPirRefs.length} PIRs
             </p>
@@ -244,14 +235,14 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
           <span className="flex items-center gap-3">
             {/* A write that did not land must say so: the edit is still on screen. */}
             {saveError && (
-              <span className="text-[12px] font-light text-cat-1">Not saved: {saveError}</span>
+              <span className="text-xs text-status-warn-ink">Not saved: {saveError}</span>
             )}
             <button
               onClick={() => setEditing(!editing)}
-              className={`h-8 px-3 text-[13px] ${
+              className={`h-8 px-3 text-sm ${
                 editing
-                  ? "bg-cpx-green font-medium text-cpx-black"
-                  : "border border-black/15 font-light hover:bg-black/5"
+                  ? "bg-cpx-purple font-medium text-white"
+                  : "border border-black/15 hover:bg-black/5"
               }`}
             >
               {editing ? "Done" : "Edit"}
@@ -260,22 +251,22 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         </div>
 
         <div className="mt-5 border border-black/10 bg-white p-4">
-          <span className="text-[12px] font-light text-cpx-grey">
+          <span className="text-xs text-cpx-grey">
             Open against this client
           </span>
           {drp.length === 0 ? (
-            <p className="mt-2 text-[13px] font-light">
+            <p className="mt-2 text-sm">
               <span className="font-medium">0 open items</span>
             </p>
           ) : (
             <ul className="mt-2 divide-y divide-black/5">
               {drp.map((d) => (
-                <li key={d.id} className="flex items-center gap-3 py-2 text-[13px]">
-                  <span className="w-44 shrink-0 font-normal">
+                <li key={d.id} className="flex items-center gap-3 py-2 text-sm">
+                  <span className="w-44 shrink-0 font-medium">
                     {DRP_KIND_LABEL[d.kind]}
                   </span>
                   <span
-                    className="min-w-0 flex-1 truncate font-light"
+                    className="min-w-0 flex-1 truncate"
                     title={
                       d.kind === "impersonating-domain"
                         ? defang(d.subject)
@@ -284,7 +275,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                   >
                     {d.kind === "impersonating-domain" ? defang(d.subject) : d.subject}
                   </span>
-                  <span className="text-[11.5px] font-light text-cpx-grey">
+                  <span className="text-2xs text-cpx-grey">
                     {gstDate(d.firstSeen)}
                   </span>
                   <StatusPill {...DRP_TONE[d.status]} />
@@ -324,7 +315,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 <select
                   value={client.sector}
                   onChange={(e) => update((c) => ({ ...c, sector: e.target.value }))}
-                  className="h-8 border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+                  className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
                 >
                   {["Banking", "Energy", "Transport", "Aviation", "Government", "Telecom"].map(
                     (s) => (
@@ -333,7 +324,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                   )}
                 </select>
               ) : (
-                <span className="text-[13px] font-light">{client.sector}</span>
+                <span className="text-sm">{client.sector}</span>
               )}
             </Row>
             <Row label="Region">
@@ -341,27 +332,27 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 <select
                   value={client.region}
                   onChange={(e) => update((c) => ({ ...c, region: e.target.value }))}
-                  className="h-8 border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+                  className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
                 >
                   {["UAE", "GCC", "MENA"].map((s) => (
                     <option key={s}>{s}</option>
                   ))}
                 </select>
               ) : (
-                <span className="text-[13px] font-light">{client.region}</span>
+                <span className="text-sm">{client.region}</span>
               )}
             </Row>
             <Row label="Products">
               <div className="flex flex-wrap items-center gap-1.5">
                 {client.products.length === 0 && !editing && (
-                  <span className="text-[13px] font-light">
+                  <span className="text-sm">
                     <span className="font-medium">0 products</span>
                   </span>
                 )}
                 {client.products.map((p) => (
                   <span
                     key={p}
-                    className="flex items-center gap-1 bg-black/5 px-2 py-0.5 text-[12px] font-light"
+                    className="flex items-center gap-1 bg-black/5 px-2 py-0.5 text-xs"
                   >
                     {p}
                     {editing && (
@@ -412,10 +403,10 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                             setExpandedPir(expandedPir === p.ref ? null : p.ref);
                           }
                         }}
-                        className={`px-2 py-1 text-[12px] ${
+                        className={`px-2 py-1 text-xs ${
                           ticked
                             ? "bg-cpx-purple font-medium text-white"
-                            : "border border-black/15 font-light text-cpx-grey"
+                            : "border border-black/15 text-cpx-grey"
                         } ${expandedPir === p.ref ? "outline outline-1 outline-cpx-green" : ""}`}
                       >
                         {ticked ? "☑" : "☐"} {p.ref.replace("PIR", "")}
@@ -425,13 +416,13 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 </div>
                 {expandedPir && (
                   <div className="mt-3 border border-black/10 bg-black/[0.02] p-3">
-                    <span className="font-mono text-[11px] font-medium">{expandedPir}</span>
-                    <p className="mt-1 text-[13px] font-light leading-relaxed">
+                    <span className="font-mono text-2xs font-medium">{expandedPir}</span>
+                    <p className="mt-1 text-sm leading-relaxed">
                       {pirs.find((p) => p.ref === expandedPir)?.question}
                     </p>
                     {(pirs.find((p) => p.ref === expandedPir)?.parameters.length ?? 0) > 0 &&
                       pirs.find((p) => p.ref === expandedPir)?.parametersUnverified && (
-                        <p className="mt-1 text-[11.5px] font-light text-status-warn-ink">
+                        <p className="mt-1 text-2xs text-status-warn-ink">
                           Parameters pending:{" "}
                           {pirs.find((p) => p.ref === expandedPir)?.parameters.join(", ")}
                         </p>
@@ -467,25 +458,23 @@ function AddClientDialog({
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-      <div className="w-full max-w-sm border border-black/10 bg-white p-5">
-        <h2 className="text-[16px] font-medium tracking-tightish">New client</h2>
-        <div className="mt-4 space-y-3">
+    <Dialog title="New client" onClose={onClose} className="max-w-sm">
+        <div className="space-y-3">
           <label className="block">
-            <span className="text-[12px] font-light text-cpx-grey">Name</span>
+            <span className="text-xs text-cpx-grey">Name</span>
             <input
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 h-9 w-full border border-black/15 px-3 text-[13px] font-light focus:border-cpx-purple focus:outline-none"
+              className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:border-cpx-purple focus:outline-none"
             />
           </label>
           <label className="block">
-            <span className="text-[12px] font-light text-cpx-grey">Sector</span>
+            <span className="text-xs text-cpx-grey">Sector</span>
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+              className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
             >
               {["Banking", "Energy", "Transport", "Aviation", "Government", "Telecom"].map(
                 (s) => (
@@ -495,11 +484,11 @@ function AddClientDialog({
             </select>
           </label>
           <label className="block">
-            <span className="text-[12px] font-light text-cpx-grey">Region</span>
+            <span className="text-xs text-cpx-grey">Region</span>
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+              className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
             >
               {["UAE", "GCC", "MENA"].map((s) => (
                 <option key={s}>{s}</option>
@@ -507,11 +496,11 @@ function AddClientDialog({
             </select>
           </label>
         </div>
-        {error && <p className="mt-3 text-[12px] font-light text-cat-1">{error}</p>}
+        {error && <p className="mt-3 text-xs text-status-warn-ink">{error}</p>}
         <div className="mt-5 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="h-8 border border-black/15 px-3 text-[13px] font-light hover:bg-black/5"
+            className={buttonClass()}
           >
             Cancel
           </button>
@@ -527,20 +516,19 @@ function AddClientDialog({
                 setBusy(false);
               }
             }}
-            className="h-8 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black disabled:bg-black/10 disabled:text-black/40"
+            className={buttonClass("primary")}
           >
             Create
           </button>
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-4">
-      <span className="w-24 shrink-0 pt-1 text-[12px] font-light text-cpx-grey">
+      <span className="w-24 shrink-0 pt-1 text-xs text-cpx-grey">
         {label}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
@@ -577,7 +565,7 @@ function AddProduct({ onAdd }: { onAdd: (p: string) => void }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={() => setOpen(false)}
-        className="h-6 w-40 border border-cpx-purple px-1.5 text-[12px] font-light focus:outline-none"
+        className="h-6 w-40 border border-cpx-purple px-1.5 text-xs focus:outline-none"
       />
     </form>
   );
@@ -615,7 +603,7 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
         />
       </div>
       <div className="mt-3 overflow-x-auto">
-      <table className={`${T_TABLE} min-w-[42rem] bg-white text-[13px]`}>
+      <table className={`${T_TABLE} min-w-[42rem] bg-white text-sm`}>
         <colgroup>
           <col className="w-52" />
           <col className="w-20" />
@@ -635,7 +623,7 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
         <tbody>
           {rows.length === 0 && (
             <tr>
-              <td colSpan={5} className="px-3 py-6 text-center font-light">
+              <td colSpan={5} className="px-3 py-6 text-center">
                 <span className="font-medium">0 deliveries</span>
               </td>
             </tr>
@@ -645,17 +633,17 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
               <td className={`${T_TD} whitespace-nowrap`}>
                 <Link
                   href={`/reports/${encodeURIComponent(d.advisoryRef)}`}
-                  className="font-mono text-[12px] text-cat-4 underline underline-offset-2"
+                  className="font-mono text-xs text-link underline underline-offset-2"
                 >
                   {d.advisoryRef}
                 </Link>
               </td>
-              <td className={`${T_TD} ${T_NUM} font-light`}>v{d.advisoryVersion}</td>
-              <td className={`${T_TD} font-light`}>{d.channel}</td>
-              <td className={`${T_TD} font-light`}>
+              <td className={`${T_TD} ${T_NUM}`}>v{d.advisoryVersion}</td>
+              <td className={`${T_TD}`}>{d.channel}</td>
+              <td className={`${T_TD}`}>
                 <TypeBadge label={d.format.toUpperCase()} />
               </td>
-              <td className={`${T_TD} whitespace-nowrap font-light`}>
+              <td className={`${T_TD} whitespace-nowrap`}>
                 {gstDateTime(d.sentAt)}
               </td>
             </tr>

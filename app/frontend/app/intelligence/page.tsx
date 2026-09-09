@@ -25,6 +25,7 @@ import { LookupPanel } from "@/components/intelligence/LookupPanel";
 import { gstDate } from "@/lib/format";
 import { IconChevronDown, IconPlus, IconSend } from "@/components/icons";
 import Link from "next/link";
+import { PageHeader, buttonClass, useDismiss, OfflineNote } from "@/components/ui";
 
 interface StoredSession {
   id: string;
@@ -66,12 +67,18 @@ function IntelligenceInner() {
   const [workflows] = useState<Workflow[]>(WORKFLOWS);
   const endRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef<string | null>(null);
+  // The history popover is non-modal: the page stays live behind it. Escape or a
+  // click outside the header row closes it.
+  const [offline, setOffline] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const closeHistory = useCallback(() => setHistoryOpen(false), []);
+  useDismiss(headerRef, closeHistory, historyOpen);
 
   useEffect(() => {
     setSessions(readSessions());
     Promise.all([getInvestigations(user.id), getDashboardData(user.id), getReports(user.id)])
       .then(([items, data, reports]) => { setInvestigations(items); setHits(data.hits); setAdvisories(reports); setClients(data.clients); })
-      .catch(() => { setInvestigations(FALLBACK_INVESTIGATIONS); });
+      .catch(() => { setInvestigations(FALLBACK_INVESTIGATIONS); setOffline(true); });
   }, [user.id]);
 
   // The dashboard's Draft advisory action and the top bar search land here.
@@ -120,8 +127,8 @@ function IntelligenceInner() {
   if (!canSee(user.role, "intelligence")) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-[14px] font-light">Not permitted at this access level.</p>
-        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+        <p className="text-base">Not permitted at this access level.</p>
+        <Link href="/" className="text-sm text-link underline underline-offset-2">
           Dashboard
         </Link>
       </div>
@@ -185,31 +192,35 @@ function IntelligenceInner() {
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-[880px] flex-col px-6">
-      <div className="relative flex items-center gap-1 pt-4">
+      <PageHeader
+        className="pt-4"
+        title="Intelligence"
+        meta={offline ? <OfflineNote /> : undefined}
+        action={
+          <div ref={headerRef} className="relative flex items-center gap-1">
         {/* Two jobs, two sections. Neither replaces the other. */}
         <div className="flex border border-black/10">
           {(["ask", "lookup"] as const).map((k) => (
             <button
               key={k}
               onClick={() => setSection(k)}
-              className={`h-7 px-3 text-[12.5px] ${
+              className={`h-7 px-3 text-xs ${
                 section === k
                   ? "bg-cpx-purple font-medium text-white"
-                  : "font-light text-cpx-grey hover:bg-black/5"
+                  : "text-cpx-grey hover:bg-black/5"
               }`}
             >
               {k === "ask" ? "Ask" : "IOC Lookup"}
             </button>
           ))}
         </div>
-        <div className="flex-1" />
         <button
           onClick={() => setHistoryOpen(!historyOpen)}
           disabled={section !== "ask"}
-          className="flex h-7 items-center gap-1.5 px-2 text-[12px] font-light text-cpx-grey hover:bg-black/5 disabled:text-black/25 disabled:hover:bg-transparent"
+          className={buttonClass("ghost", "sm")}
         >
           History
-          <span className="bg-black/5 px-1 text-[11px]">
+          <span className="bg-black/5 px-1 text-2xs">
             {localOnly.length + investigations.length}
           </span>
           <IconChevronDown className={historyOpen ? "rotate-180" : ""} />
@@ -217,19 +228,14 @@ function IntelligenceInner() {
         <button
           onClick={newSession}
           disabled={section !== "ask"}
-          className="flex h-7 items-center gap-1.5 px-2 text-[12px] font-light text-cpx-grey hover:bg-black/5 disabled:text-black/25 disabled:hover:bg-transparent"
+          className={buttonClass("ghost", "sm")}
         >
           <IconPlus />
           New
         </button>
         {historyOpen && (
           <>
-            <button
-              aria-label="Close"
-              onClick={() => setHistoryOpen(false)}
-              className="fixed inset-0 z-30 cursor-default"
-            />
-            <div className="absolute right-0 top-11 z-40 w-96 max-w-full border border-black/10 bg-white shadow-sm">
+            <div className="absolute right-0 top-9 z-40 w-96 max-w-full border border-black/10 bg-white shadow-pop">
               <ul className="max-h-80 overflow-y-auto">
                 {localOnly.map((s) => (
                   <li key={s.id}>
@@ -238,12 +244,12 @@ function IntelligenceInner() {
                       className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-black/[0.03] ${s.id === sessionId ? "bg-black/[0.03]" : ""}`}
                     >
                       <span
-                        className="min-w-0 flex-1 truncate text-[12.5px] font-light"
+                        className="min-w-0 flex-1 truncate text-xs"
                         title={s.title}
                       >
                         {s.title}
                       </span>
-                      <span className="shrink-0 text-[11px] font-light text-cpx-grey">
+                      <span className="shrink-0 text-2xs text-cpx-grey">
                         This session
                       </span>
                     </button>
@@ -256,12 +262,12 @@ function IntelligenceInner() {
                       className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-black/[0.03] ${sessionId === `fx-${inv.id}` ? "bg-black/[0.03]" : ""}`}
                     >
                       <span
-                        className="min-w-0 flex-1 truncate text-[12.5px] font-light"
+                        className="min-w-0 flex-1 truncate text-xs"
                         title={inv.title}
                       >
                         {inv.title}
                       </span>
-                      <span className="shrink-0 text-[11px] font-light text-cpx-grey">
+                      <span className="shrink-0 text-2xs text-cpx-grey">
                         {forked.has(`fx-${inv.id}`)
                           ? "Continued"
                           : gstDate(inv.createdAt)}
@@ -273,7 +279,9 @@ function IntelligenceInner() {
             </div>
           </>
         )}
-      </div>
+          </div>
+        }
+      />
 
       {section === "lookup" && (
         <LookupPanel initial={params.get("lookup") ?? undefined} />
@@ -288,7 +296,7 @@ function IntelligenceInner() {
               <button
                 key={p}
                 onClick={() => ask(p)}
-                className="border border-black/10 bg-white px-4 py-2.5 text-left text-[13px] font-light hover:border-cpx-purple"
+                className="border border-black/10 bg-white px-4 py-2.5 text-left text-sm hover:border-cpx-purple"
               >
                 {p}
               </button>
@@ -307,7 +315,7 @@ function IntelligenceInner() {
         <div ref={endRef} />
       </div>
 
-      <div className="sticky bottom-0 bg-[#fafafa] pb-6 pt-2">
+      <div className="sticky bottom-0 bg-canvas pb-6 pt-2">
         <form
           className="border border-black/15 bg-white"
           onSubmit={(e) => {
@@ -329,7 +337,7 @@ function IntelligenceInner() {
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Ask a question"
-              className="h-12 flex-1 bg-transparent text-[14px] font-light focus:outline-none"
+              className="h-12 flex-1 bg-transparent text-base focus:outline-none"
             />
             <button
               type="submit"
@@ -342,7 +350,7 @@ function IntelligenceInner() {
           </div>
         </form>
         {!optionsAreDefault(options) && (
-          <p className="mt-1.5 text-[11px] font-light text-cpx-grey">
+          <p className="mt-1.5 text-2xs text-cpx-grey">
             These settings are sent with the question and change the answer. They
             do not filter what is already on screen.
           </p>

@@ -7,6 +7,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IconChevronDown } from "@/components/icons";
+import { buttonClass } from "@/components/ui";
 
 export interface MenuItem<T extends string> {
   key: T;
@@ -67,11 +68,11 @@ export function Menu<T extends string>({
         className={
           trigger === "icon"
             ? "flex h-7 w-7 items-center justify-center text-cpx-grey hover:bg-black/5 disabled:text-black/20"
-            : "flex h-7 shrink-0 items-center gap-1.5 whitespace-nowrap border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5 disabled:border-black/10 disabled:text-black/30"
+            : buttonClass("secondary", "sm")
         }
       >
         {trigger === "icon" ? (
-          <span aria-hidden className="text-[15px] leading-none">
+          <span aria-hidden className="text-md leading-none">
             &#8942;
           </span>
         ) : (
@@ -100,11 +101,11 @@ export function Menu<T extends string>({
                   setOpen(false);
                   onSelect(it.key);
                 }}
-                className="block w-full px-3 py-1.5 text-left text-[12.5px] font-light hover:bg-black/[0.04] disabled:text-black/25 disabled:hover:bg-transparent"
+                className="block w-full px-3 py-1.5 text-left text-xs hover:bg-black/[0.04] disabled:text-black/25 disabled:hover:bg-transparent"
               >
                 {it.label}
                 {it.hint && (
-                  <span className="mt-0.5 block text-[11px] text-cpx-grey">
+                  <span className="mt-0.5 block text-2xs text-cpx-grey">
                     {it.hint}
                   </span>
                 )}
@@ -112,7 +113,7 @@ export function Menu<T extends string>({
             </div>
           ))}
           {footer && (
-            <p className="mt-1 border-t border-black/10 px-3 pt-1.5 text-[11px] font-light text-cpx-grey">
+            <p className="mt-1 border-t border-black/10 px-3 pt-1.5 text-2xs text-cpx-grey">
               {footer}
             </p>
           )}

@@ -1,6 +1,6 @@
 # Nestor · CPX Threat Intelligence Console
 
-Frontend. Next.js App Router + TypeScript + Tailwind + shadcn/ui. Screens read from the backend through `lib/api.ts`; `fixtures/` remains the offline fallback.
+Frontend. Next.js App Router + TypeScript + Tailwind v4; no component library, the primitives live in `components/ui.tsx`. Screens read from the backend through `lib/api.ts` (base URL from the runtime env var `API_BASE_URL`, see `lib/runtime-env.ts`); `fixtures/` remains the offline fallback.
 
 Read `docs/01-screens.md` before writing a screen. Read `docs/03-brand-and-copy.md` before writing any copy.
 
@@ -56,7 +56,7 @@ But the run itself must be openable. CPX asked for this three times on 2 Septemb
 
 **5. Role filtering happens in the payload, never the DOM.** One predicate in `lib/access.ts`. **Sales must never receive raw IOC or analyst-level data** - that is a written CPX requirement with its own success indicator. Withhold at assembly and render the count: `14 indicators, withheld at this access level`.
 
-**6. Brand is CPX 2026.** Dark Purple `#1E1847`, CPX Green `#4CEE76`, Near Black `#040405`. **Zero occurrences of `#FDB913`, `#EA661F`, `#FFC72C` or `#F59E0B`.** That last one is a Tailwind default amber sitting under 5 degrees of hue from the retired CPX yellow. Tokens in `docs/03`.
+**6. Brand is CPX 2026.** Dark Purple `#1E1847`, CPX Green `#4CEE76`, Near Black `#040405`. **Zero occurrences of `#FDB913`, `#EA661F`, `#FFC72C` or `#F59E0B`.** That last one is a Tailwind default amber sitting under 5 degrees of hue from the retired CPX yellow. Tokens in `docs/03`. Type is CPX Unbounded for `h1`, `h2`, the wordmark and KPI numbers, Inter for everything else, self-hosted from `app/fonts/`; sizes come from the eight-step scale only, never `text-[Npx]`. Type is CPX Unbounded for `h1`, `h2`, the wordmark and KPI numbers, Inter for everything else, self-hosted from `app/fonts/`; sizes come from the eight-step scale only, never `text-[Npx]`.
 
 **7. UK English. No em dashes.** Use a spaced hyphen, a comma or a colon. All times GST. No `AI-XX` identifiers, no "TBC", no hedging on any screen.
 
@@ -64,7 +64,7 @@ But the run itself must be openable. CPX asked for this three times on 2 Septemb
 
 The agent must not generate facts, indicators, attribution, identities, commands or conclusions that were not retrieved. Where nothing was found, show a clear negative result with its count and the searches that ran, not a generic answer (FR-QRY-03, Praveen Singh, 2 September). **A zero count means "we hold nothing", never "it is clean".**
 
-**9. The role switcher is dev only.** Guard on `NEXT_PUBLIC_ROLE_SWITCHER`, default false. It changes the view, never the data contract.
+**9. The role switcher is dev only.** Guard on the runtime env var `ROLE_SWITCHER` (read through `lib/runtime-env.ts`, never `NEXT_PUBLIC_*`), default false. It changes the view, never the data contract.
 
 ---
 
@@ -112,6 +112,10 @@ Everyone lands on `/`. The Dashboard resolves its content from the role.
 - No `#FDB913`, `#EA661F`, `#FFC72C`, `#F59E0B`. UK English. No em dashes.
 - Where the screen shows agent output, the run behind it is openable: workflow, agents invoked, evidence, status
 - No credential value is displayed or accepted anywhere on it
+- Text sizes from the eight-step scale only; buttons via `Button` or `buttonClass`; overlays via `Dialog` or `Drawer`
+- While a fetch is in flight `SkeletonRows` holds the geometry; when it fell back to fixtures `OfflineNote` is visible
+- Text sizes from the eight-step scale only; buttons via `Button` or `buttonClass`; overlays via `Dialog` or `Drawer`
+- While a fetch is in flight `SkeletonRows` holds the geometry; when it fell back to fixtures `OfflineNote` is visible
 
 ---
 

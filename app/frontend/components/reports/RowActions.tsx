@@ -89,7 +89,7 @@ export function RowActions({
         }}
         className="flex h-7 w-7 items-center justify-center text-cpx-grey hover:bg-black/5"
       >
-        <span aria-hidden className="text-[15px] leading-none">
+        <span aria-hidden className="text-md leading-none">
           &#8942;
         </span>
       </button>
@@ -214,13 +214,13 @@ function Item({
       role="menuitem"
       disabled={disabled}
       onClick={onClick}
-      className="block w-full px-3 py-1.5 text-left text-[12.5px] font-light hover:bg-black/[0.04] disabled:text-black/25 disabled:hover:bg-transparent"
+      className="block w-full px-3 py-1.5 text-left text-xs hover:bg-black/[0.04] disabled:text-black/25 disabled:hover:bg-transparent"
     >
       <span className="flex items-center gap-2">
         {label}
         {chevron && <span className="ml-auto text-cpx-grey">&rsaquo;</span>}
       </span>
-      {hint && <span className="mt-0.5 block text-[11px] text-cpx-grey">{hint}</span>}
+      {hint && <span className="mt-0.5 block text-2xs text-cpx-grey">{hint}</span>}
     </button>
   );
 }
@@ -229,7 +229,7 @@ function Back({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button
       onClick={onClick}
-      className="mb-1 flex w-full items-center gap-2 border-b border-black/10 px-3 pb-1.5 text-left text-[11.5px] font-light text-cpx-grey hover:text-cpx-black"
+      className="mb-1 flex w-full items-center gap-2 border-b border-black/10 px-3 pb-1.5 text-left text-2xs text-cpx-grey hover:text-cpx-black"
     >
       <span aria-hidden>&lsaquo;</span>
       {label}
@@ -243,7 +243,7 @@ function Divider() {
 
 function Footer({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-1 border-t border-black/10 px-3 pt-1.5 text-[11px] font-light text-cpx-grey">
+    <p className="mt-1 border-t border-black/10 px-3 pt-1.5 text-2xs text-cpx-grey">
       {children}
     </p>
   );

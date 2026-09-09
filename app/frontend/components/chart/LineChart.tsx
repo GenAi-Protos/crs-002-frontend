@@ -134,8 +134,14 @@ export function LineChart({
           onFocus={() => setHover((h) => h ?? labels.length - 1)}
           onBlur={() => setHover(null)}
           onKeyDown={(e) => {
-            if (e.key === "ArrowRight") (e.preventDefault(), step(1));
-            if (e.key === "ArrowLeft") (e.preventDefault(), step(-1));
+            if (e.key === "ArrowRight") {
+              e.preventDefault();
+              step(1);
+            }
+            if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              step(-1);
+            }
           }}
         >
           {/* The y axis title, once, however many plots there are. */}
@@ -144,7 +150,7 @@ export function LineChart({
               transform={`translate(11 ${PAD_T + (chartH - PAD_T - AXIS_H) / 2}) rotate(-90)`}
               textAnchor="middle"
               className="fill-cpx-grey"
-              style={{ fontSize: 10, fontWeight: 300 }}
+              style={{ fontSize: 10, fontWeight: 400 }}
             >
               {yLabel}
             </text>
@@ -170,7 +176,7 @@ export function LineChart({
                       y={yIn(r, t, ceiling) + 3}
                       textAnchor="end"
                       className="fill-cpx-grey"
-                      style={{ fontSize: 9, fontWeight: 300 }}
+                      style={{ fontSize: 9, fontWeight: 400 }}
                     >
                       {t}
                     </text>
@@ -254,7 +260,7 @@ export function LineChart({
                 y={chartH - AXIS_H + 14}
                 textAnchor="middle"
                 className={hover === i ? "fill-cpx-black" : "fill-cpx-grey"}
-                style={{ fontSize: 9, fontWeight: hover === i ? 400 : 300 }}
+                style={{ fontSize: 9, fontWeight: hover === i ? 500 : 400 }}
               >
                 {l}
               </text>
@@ -267,7 +273,7 @@ export function LineChart({
               y={chartH - 4}
               textAnchor="middle"
               className="fill-cpx-grey"
-              style={{ fontSize: 10, fontWeight: 300 }}
+              style={{ fontSize: 10, fontWeight: 400 }}
             >
               {xLabel}
             </text>
@@ -278,16 +284,16 @@ export function LineChart({
             to get a value. The number leads and the series name follows. */}
         {hover !== null && (
           <div
-            className="pointer-events-none absolute top-0 z-10 w-max max-w-[15rem] -translate-x-1/2 border border-black/15 bg-white px-2 py-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.12)]"
+            className="pointer-events-none absolute top-0 z-10 w-max max-w-[15rem] -translate-x-1/2 border border-black/15 bg-white px-2 py-1.5 shadow-pop"
             style={{
               left: `${Math.min(88, Math.max(12, (x(hover) / VIEW_W) * 100))}%`,
             }}
           >
-            <p className="text-[11px] font-medium">{labels[hover]}</p>
+            <p className="text-2xs font-medium">{labels[hover]}</p>
             {series.map((s) => (
               <p
                 key={s.label}
-                className="mt-0.5 flex items-baseline gap-1.5 text-[11.5px] font-light whitespace-nowrap"
+                className="mt-0.5 flex items-baseline gap-1.5 text-2xs whitespace-nowrap"
               >
                 <span
                   aria-hidden
@@ -313,7 +319,7 @@ export function LineChart({
           {series.map((s) => (
             <li
               key={s.label}
-              className="flex items-baseline gap-1.5 text-[11.5px] font-light"
+              className="flex items-baseline gap-1.5 text-2xs"
             >
               <span
                 aria-hidden

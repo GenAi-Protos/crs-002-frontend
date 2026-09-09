@@ -20,6 +20,7 @@ import { useState } from "react";
 import type { Advisory, DiamondEdge, DiamondVertex } from "@/lib/types";
 import { emptyDiamond } from "@/lib/report-templates";
 import { defang } from "@/lib/defang";
+import { buttonClass } from "@/components/ui";
 
 const VERTICES: { key: DiamondVertex; label: string; hint: string }[] = [
   {
@@ -125,7 +126,7 @@ export function DiamondPanel({
 
       {/* Counts render including zero. A profile that has filled no vertices
           and drawn no links says exactly that. */}
-      <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey">
         <span className="font-medium text-cpx-black">{written} of 4</span> vertices
         written,{" "}
         <span className="font-medium text-cpx-black">{diamond.edges.length} of 6</span>{" "}
@@ -203,11 +204,11 @@ function Diagram({
             className={`border border-black/15 bg-white p-2.5 ${CELL[v.key]}`}
           >
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[11px] font-medium uppercase tracking-wide text-cpx-purple">
+              <span className="text-2xs font-medium uppercase tracking-wide text-cpx-purple">
                 {v.label}
               </span>
               {diamond[v.key].trim() === "" && (
-                <span className="shrink-0 text-[10.5px] font-light text-cpx-grey">
+                <span className="shrink-0 text-2xs text-cpx-grey">
                   unwritten
                 </span>
               )}
@@ -218,10 +219,10 @@ function Diagram({
                 onBlur={(e) => onEdit(v.key, e.target.value)}
                 placeholder={v.hint}
                 rows={3}
-                className="mt-1.5 w-full resize-y border border-black/10 bg-white p-1.5 text-[12.5px] font-light leading-relaxed focus:border-cpx-purple focus:outline-none"
+                className="mt-1.5 w-full resize-y border border-black/10 bg-white p-1.5 text-xs leading-relaxed focus:border-cpx-purple focus:outline-none"
               />
             ) : (
-              <p className="mt-1.5 whitespace-pre-wrap text-[12.5px] font-light leading-relaxed">
+              <p className="mt-1.5 whitespace-pre-wrap text-xs leading-relaxed">
                 {diamond[v.key].trim() === "" ? (
                   <span className="text-cpx-grey">Not stated.</span>
                 ) : (
@@ -262,7 +263,7 @@ function Relationships({
 
   return (
     <div className="mt-3">
-      <table className="w-full border-collapse text-[12.5px]">
+      <table className="w-full border-collapse text-xs">
         <thead>
           <tr className="border-b border-black/15 text-left">
             <th className="py-1.5 pr-3 font-medium">Relationship</th>
@@ -273,16 +274,16 @@ function Relationships({
         <tbody>
           {ordered.map((e) => (
             <tr key={pairKey(e.source, e.target)} className="border-b border-black/5">
-              <td className="whitespace-nowrap py-1.5 pr-3 font-light">
+              <td className="whitespace-nowrap py-1.5 pr-3">
                 {LABEL[e.source]} - {LABEL[e.target]}
               </td>
-              <td className="py-1.5 font-light">{e.label}</td>
+              <td className="py-1.5">{e.label}</td>
               {editable && (
                 <td className="py-1.5 text-right">
                   <button
                     onClick={() => onRemove(e)}
                     aria-label={`Remove ${LABEL[e.source]} to ${LABEL[e.target]}`}
-                    className="px-1 text-[12px] font-light text-cpx-grey hover:text-cpx-red"
+                    className="px-1 text-xs text-cpx-grey hover:text-cpx-red"
                   >
                     Remove
                   </button>
@@ -292,7 +293,7 @@ function Relationships({
           ))}
           {ordered.length === 0 && (
             <tr>
-              <td colSpan={editable ? 3 : 2} className="py-2 font-light">
+              <td colSpan={editable ? 3 : 2} className="py-2">
                 <span className="font-medium">0 relationships</span> stated.
               </td>
             </tr>
@@ -306,7 +307,7 @@ function Relationships({
             value={pair}
             onChange={(e) => setPair(Number(e.target.value))}
             aria-label="Vertices to link"
-            className="h-8 border border-black/15 bg-white px-1.5 text-[12px] font-light focus:border-cpx-purple focus:outline-none"
+            className="h-8 border border-black/15 bg-white px-1.5 text-xs focus:border-cpx-purple focus:outline-none"
           >
             {PAIRS.map(([from, to], i) => (
               <option key={pairKey(from, to)} value={i}>
@@ -319,7 +320,7 @@ function Relationships({
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             placeholder="How they are linked"
-            className="h-8 min-w-0 flex-1 border border-black/15 px-2 text-[12px] font-light focus:border-cpx-purple focus:outline-none"
+            className="h-8 min-w-0 flex-1 border border-black/15 px-2 text-xs focus:border-cpx-purple focus:outline-none"
           />
           <button
             disabled={label.trim() === ""}
@@ -328,7 +329,7 @@ function Relationships({
               onAdd({ source, target, label: label.trim() });
               setLabel("");
             }}
-            className="h-8 border border-black/15 px-2.5 text-[12px] font-light hover:bg-black/5 disabled:text-black/30"
+            className={buttonClass("secondary", "sm")}
           >
             {linked.has(pairKey(PAIRS[pair][0], PAIRS[pair][1])) ? "Replace" : "Add"}
           </button>

@@ -81,7 +81,7 @@ export function IconWarn({ className = "" }: P) {
   return (
     <svg viewBox="0 0 16 16" width="12" height="12" className={`${base} ${className}`} fill="currentColor" aria-hidden>
       <path d="M8 1.5 15 14H1z" />
-      <path d="M8 6v4M8 11.6v1.6" stroke="#FFD9E2" strokeWidth="1.4" fill="none" />
+      <path d="M8 6v4M8 11.6v1.6" stroke="var(--color-status-warn-fill)" strokeWidth="1.4" fill="none" />
     </svg>
   );
 }
@@ -90,7 +90,7 @@ export function IconCritical({ className = "" }: P) {
   return (
     <svg viewBox="0 0 16 16" width="12" height="12" className={`${base} ${className}`} fill="currentColor" aria-hidden>
       <path d="M5 1.5h6L15 5.5v5L11 14.5H5L1 10.5v-5z" />
-      <path d="M5.5 8h5" stroke="#fff" strokeWidth="1.6" fill="none" />
+      <path d="M5.5 8h5" stroke="white" strokeWidth="1.6" fill="none" />
     </svg>
   );
 }

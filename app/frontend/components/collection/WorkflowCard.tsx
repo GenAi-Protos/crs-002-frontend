@@ -11,19 +11,10 @@
 // the sources and connectors. A category that has never collected says
 // "Pending" rather than showing a success rate nothing produced.
 
-import { useState } from "react";
 import type { Connector, Source } from "@/lib/types";
-import {
-  RUN_STATE_LABEL,
-  nextCollectionLabel,
-  stageStates,
-  statusFor,
-  unitsFor,
-  type CategoryDefinition,
-  type RunState,
-} from "@/lib/collection-workflows";
+import { RUN_STATE_LABEL, nextCollectionLabel, stageStates, statusFor, unitsFor, type CategoryDefinition, type RunState } from "@/lib/collection-workflows";
 import { agoFromNow, gstDateTime } from "@/lib/format";
-import { StatusPill, type StatusTone } from "@/components/ui";
+import { StatusPill, type StatusTone, buttonClass } from "@/components/ui";
 import { IconChevronDown } from "@/components/icons";
 
 const TONE: Record<RunState, StatusTone> = {
@@ -66,11 +57,11 @@ export function WorkflowCard({
         <IconChevronDown className={`mt-1 shrink-0 ${open ? "rotate-180" : ""}`} />
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-2">
-            <span className="text-[15px] font-medium tracking-tightish">
+            <span className="text-md font-medium tracking-tightish">
               {definition.label}
             </span>
             <StatusPill tone={TONE[status.state]} label={RUN_STATE_LABEL[status.state]} />
-            <span className="bg-black/5 px-1.5 text-[11px] font-light">
+            <span className="bg-black/5 px-1.5 text-2xs">
               {definition.origin === "inventory"
                 ? "Inventory"
                 : definition.origin === "connector"
@@ -79,7 +70,7 @@ export function WorkflowCard({
             </span>
           </span>
 
-          <span className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[12px] sm:grid-cols-3 lg:grid-cols-5">
+          <span className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs sm:grid-cols-3 lg:grid-cols-5">
             <Fact label="Sources" value={status.units} />
             <Fact label="Enabled" value={`${status.enabled} of ${status.units}`} />
             <Fact label="Items, 30 days" value={status.items.toLocaleString("en-GB")} />
@@ -92,7 +83,7 @@ export function WorkflowCard({
           </span>
 
           {status.problem && (
-            <span className="mt-2 block text-[12px] font-light text-status-warn-ink">
+            <span className="mt-2 block text-xs text-status-warn-ink">
               {status.problem}
             </span>
           )}
@@ -102,7 +93,7 @@ export function WorkflowCard({
       {open && (
         <div className="border-t border-black/10 px-4 py-4">
           {definition.gap && (
-            <p className="mb-4 border border-black/10 bg-black/[0.02] px-3 py-2 text-[12.5px] font-light">
+            <p className="mb-4 border border-black/10 bg-black/[0.02] px-3 py-2 text-xs">
               {definition.gap}
             </p>
           )}
@@ -142,7 +133,7 @@ function Fact({
 }) {
   return (
     <span className="flex flex-col" title={title}>
-      <span className="font-light text-cpx-grey">{label}</span>
+      <span className="text-cpx-grey">{label}</span>
       <span className="font-medium">{value}</span>
     </span>
   );
@@ -171,11 +162,11 @@ function Stage({
       </span>
       <span className={`min-w-0 flex-1 ${last ? "pb-0" : "pb-4"}`}>
         <span className="flex flex-wrap items-baseline gap-2">
-          <span className="text-[13px] font-medium">
+          <span className="text-sm font-medium">
             {index}. {label}
           </span>
           <span
-            className={`text-[11px] font-light ${
+            className={`text-2xs ${
               state === "failed"
                 ? "text-status-warn-ink"
                 : state === "pending"
@@ -186,7 +177,7 @@ function Stage({
             {RUN_STATE_LABEL[state]}
           </span>
         </span>
-        <span className="mt-0.5 block text-[12px] font-light text-cpx-grey">{detail}</span>
+        <span className="mt-0.5 block text-xs text-cpx-grey">{detail}</span>
       </span>
     </li>
   );
@@ -227,7 +218,7 @@ function Actions({
         <Action label="View errors" disabled={status.failing + status.blocked === 0} />
         <Action label="Send to repository" disabled={status.state !== "awaiting-review"} />
       </div>
-      <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey">
         {/* The one thing that must never be misread on this screen. */}
         Collection runs on the server. No console action fetches a source URL.
       </p>
@@ -250,11 +241,7 @@ function Action({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`h-8 px-3 text-[12.5px] ${
-        primary
-          ? "bg-cpx-green font-medium text-cpx-black hover:brightness-95 disabled:bg-black/10 disabled:text-black/40"
-          : "border border-black/15 font-light hover:bg-black/5 disabled:border-black/10 disabled:text-black/30 disabled:hover:bg-transparent"
-      }`}
+      className={buttonClass(primary ? "primary" : "secondary")}
     >
       {label}
     </button>

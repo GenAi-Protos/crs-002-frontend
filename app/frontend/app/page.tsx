@@ -60,7 +60,7 @@ export default function Dashboard() {
       <PageHeader
         title="Dashboard"
         action={
-          <span className="text-[12px] font-light text-cpx-grey">
+          <span className="text-xs text-cpx-grey">
             {backend === "connected" ? `Backend connected · ${advisoryCount} advisories` : `Backend ${backend}`} · {stamp}
           </span>
         }

@@ -75,10 +75,10 @@ export function AnalystDashboard({ result }: { result: DashboardResult }) {
   if (result.state === "unavailable" || !result.data) {
     return (
       <Panel title="Dashboard">
-        <p className="text-[13px] font-light">
+        <p className="text-sm">
           {result.note ?? "The dashboard data could not be reached."}
         </p>
-        <p className="mt-1 text-[12px] font-light text-cpx-grey">
+        <p className="mt-1 text-xs text-cpx-grey">
           Nothing below is stale data: there is no data to show.
         </p>
       </Panel>
@@ -90,11 +90,11 @@ export function AnalystDashboard({ result }: { result: DashboardResult }) {
   if (result.state === "empty") {
     return (
       <Panel title="Dashboard">
-        <p className="text-[13px] font-light">
+        <p className="text-sm">
           <span className="font-medium">0 findings</span> in the last{" "}
           {d.window.days} days.
         </p>
-        <p className="mt-1 text-[12px] font-light text-cpx-grey">
+        <p className="mt-1 text-xs text-cpx-grey">
           A zero here means nothing was collected or matched, never that there is
           nothing to find.
         </p>
@@ -200,7 +200,7 @@ function TrendCaption({ points }: { points: Payload["detectionTrend"] }) {
     { values: points.map((p) => p.detections) },
   ];
   return (
-    <p className="mt-2 max-w-3xl text-[11.5px] font-light leading-relaxed text-cpx-grey">
+    <p className="mt-2 max-w-3xl text-2xs leading-relaxed text-cpx-grey">
       Shows the number of intelligence items collected and threats detected over
       time. Each point is the count recorded on that date.
       {separateScales(series) && (
@@ -225,7 +225,7 @@ function Provenance({
   data: Payload;
 }) {
   return (
-    <p className="flex flex-wrap items-center gap-2 text-[11.5px] font-light text-cpx-grey">
+    <p className="flex flex-wrap items-center gap-2 text-2xs text-cpx-grey">
       {/* Where the numbers came from is never left to be assumed. */}
       {result.source === "mock" && (
         <span className="bg-status-warn-fill px-1.5 text-status-warn-ink">
@@ -255,17 +255,17 @@ function KpiCard({ kpi }: { kpi: Kpi }) {
 
   const body = (
     <div className="flex h-full flex-col bg-white px-4 py-3">
-      <span className="text-[12px] font-light text-cpx-grey">{kpi.label}</span>
-      <span className="mt-1.5 text-[28px] font-medium leading-none tracking-tightish">
+      <span className="text-xs text-cpx-grey">{kpi.label}</span>
+      <span className="mt-1.5 text-2xl font-display font-medium leading-none tracking-tightish">
         {kpi.value.toLocaleString("en-GB")}
       </span>
-      <span className="mt-1.5 text-[11.5px] font-light text-cpx-grey">
+      <span className="mt-1.5 text-2xs text-cpx-grey">
         {kpi.unit}
         {kpi.window && <> · {kpi.window}</>}
       </span>
       {delta !== null && (
         <span
-          className={`mt-1.5 text-[11.5px] font-light ${
+          className={`mt-1.5 text-2xs ${
             worse ? "text-status-warn-ink" : "text-cpx-grey"
           }`}
         >
@@ -297,12 +297,12 @@ function PriorityQueue({ items }: { items: QueueItem[] }) {
       note={`${items.length} ${items.length === 1 ? "item" : "items"}, most urgent first`}
     >
       {items.length === 0 ? (
-        <p className="text-[13px] font-light">
+        <p className="text-sm">
           <span className="font-medium">0 items</span> waiting.
         </p>
       ) : (
         <div className={T_SCROLL}>
-          <table className={`${T_TABLE} min-w-[46rem] text-[13px]`}>
+          <table className={`${T_TABLE} min-w-[46rem] text-sm`}>
             <colgroup>
               <col className="w-24" />
               <col className="w-32" />
@@ -338,24 +338,24 @@ function PriorityQueue({ items }: { items: QueueItem[] }) {
                     <TypeBadge label={KIND_LABEL[it.kind]} />
                   </td>
                   <td
-                    className={`${T_TD} ${T_FLUSH} whitespace-nowrap font-mono text-[12px]`}
+                    className={`${T_TD} ${T_FLUSH} whitespace-nowrap font-mono text-xs`}
                   >
                     <Link
                       href={it.href}
-                      className="text-cat-4 underline underline-offset-2"
+                      className="text-link underline underline-offset-2"
                     >
                       {it.ref}
                     </Link>
                   </td>
                   {/* Clipped on purpose, and the full title is in the tooltip. */}
-                  <td className={`${T_TD} ${T_FLUSH} max-w-0 font-light`}>
+                  <td className={`${T_TD} ${T_FLUSH} max-w-0`}>
                     <Clipped text={it.title} />
                   </td>
-                  <td className={`${T_TD} ${T_FLUSH} ${T_NUM} font-light`}>
+                  <td className={`${T_TD} ${T_FLUSH} ${T_NUM}`}>
                     {it.clientCount}
                   </td>
                   <td
-                    className={`${T_TD} ${T_FLUSH} whitespace-nowrap font-light`}
+                    className={`${T_TD} ${T_FLUSH} whitespace-nowrap`}
                   >
                     {it.dueAt ? (
                       <span title={gstDateTime(it.dueAt)}>
@@ -381,12 +381,12 @@ function TopActors({ rows }: { rows: Payload["topActors"] }) {
   return (
     <Panel title="Most active threat actors" note="By held records in the window">
       {rows.length === 0 ? (
-        <p className="text-[13px] font-light">
+        <p className="text-sm">
           <span className="font-medium">0 actors</span> in the window.
         </p>
       ) : (
         <div className={T_SCROLL}>
-          <table className={`${T_TABLE} min-w-[26rem] text-[12.5px]`}>
+          <table className={`${T_TABLE} min-w-[26rem] text-xs`}>
             <colgroup>
               <col />
               <col className="w-20" />
@@ -419,19 +419,19 @@ function TopActors({ rows }: { rows: Payload["topActors"] }) {
                   <td className={`${T_TD} ${T_FLUSH}`}>
                     <span className="font-medium">{a.name}</span>
                     {a.aliases.length > 0 && (
-                      <span className="mt-0.5 block text-[11px] font-light leading-snug text-cpx-grey">
+                      <span className="mt-0.5 block text-2xs leading-snug text-cpx-grey">
                         {a.aliases.join(", ")}
                       </span>
                     )}
                   </td>
-                  <td className={`${T_TD} ${T_FLUSH} ${T_NUM} font-light`}>
+                  <td className={`${T_TD} ${T_FLUSH} ${T_NUM}`}>
                     {a.records}
                   </td>
-                  <td className={`${T_TD} ${T_FLUSH} ${T_NUM} font-light`}>
+                  <td className={`${T_TD} ${T_FLUSH} ${T_NUM}`}>
                     {a.clientsAffected}
                   </td>
                   <td
-                    className={`${T_TD} ${T_FLUSH} whitespace-nowrap font-light`}
+                    className={`${T_TD} ${T_FLUSH} whitespace-nowrap`}
                     title={gstDateTime(a.lastSeen)}
                   >
                     {agoFromNow(a.lastSeen)}
@@ -452,7 +452,7 @@ function SourceHealthRow({ health }: { health: Payload["sourceHealth"] }) {
   const problems = health.failing + health.silentUnexplained;
   return (
     <Panel title="Collection" note="Feeding everything above">
-      <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2 text-[13px]">
+      <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2 text-sm">
         <Stat label="Sources" value={health.total} />
         <Stat label="Enabled" value={`${health.enabled} of ${health.total}`} />
         <Stat label="Failing" value={health.failing} warn={health.failing > 0} />
@@ -467,7 +467,7 @@ function SourceHealthRow({ health }: { health: Payload["sourceHealth"] }) {
         />
       </div>
       {problems > 0 && (
-        <p className="mt-2 text-[11.5px] font-light text-cpx-grey">
+        <p className="mt-2 text-2xs text-cpx-grey">
           {problems} {problems === 1 ? "source is" : "sources are"} not reporting.
           Counts above are lower than reality by whatever those sources hold.
         </p>
@@ -487,8 +487,8 @@ function Stat({
 }) {
   return (
     <span className="flex flex-col">
-      <span className="text-[11.5px] font-light text-cpx-grey">{label}</span>
-      <span className={`text-[17px] font-medium ${warn ? "text-status-warn-ink" : ""}`}>
+      <span className="text-2xs text-cpx-grey">{label}</span>
+      <span className={`text-md font-medium ${warn ? "text-status-warn-ink" : ""}`}>
         {value}
       </span>
     </span>
@@ -509,8 +509,8 @@ function Panel({
   return (
     <section className="border border-black/10 bg-white p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-[13px] font-medium tracking-tightish">{title}</h2>
-        {note && <span className="text-[11.5px] font-light text-cpx-grey">{note}</span>}
+        <h2 className="font-sans text-sm font-medium tracking-tightish">{title}</h2>
+        {note && <span className="text-2xs text-cpx-grey">{note}</span>}
       </div>
       <div className="mt-3">{children}</div>
     </section>

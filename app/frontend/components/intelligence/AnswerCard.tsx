@@ -44,7 +44,7 @@ function linkEntities(
       <button
         key={`${ent.id}-${i}`}
         onClick={() => onEntity(ent.id)}
-        className="text-cat-4 underline underline-offset-2 hover:text-cpx-purple"
+        className="text-link underline underline-offset-2 hover:text-cpx-purple"
       >
         {part}
       </button>
@@ -103,10 +103,10 @@ export function TurnView({
   return (
     <div className="space-y-3">
       <div className="flex items-start gap-2.5">
-        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-black/10 text-[11px] font-medium">
+        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-black/10 text-2xs font-medium">
           Q
         </span>
-        <p className="pt-0.5 text-[14px] font-normal">{turn.question}</p>
+        <p className="pt-0.5 text-base font-medium">{turn.question}</p>
       </div>
       {turn.status === "streaming" || !a ? (
         <AnswerSkeleton />
@@ -136,7 +136,7 @@ function AnswerBody({
               <NestorMarkReverse size={16} />
             </span>
             {a.title && (
-              <h2 className="pt-0.5 text-[16px] font-medium tracking-tightish">
+              <h2 className="pt-0.5 text-md font-medium tracking-tightish">
                 {a.title}
               </h2>
             )}
@@ -170,7 +170,7 @@ function AnswerBody({
               <IconExport />
             </button>
             {copied && (
-              <span className="text-[11px] font-light text-cpx-grey">Copied</span>
+              <span className="text-2xs text-cpx-grey">Copied</span>
             )}
           </div>
         </div>
@@ -179,13 +179,13 @@ function AnswerBody({
           {a.blocks.map((b, i) => {
             if (b.kind === "prose")
               return (
-                <p key={i} className="text-[13.5px] font-light leading-relaxed">
+                <p key={i} className="text-sm leading-relaxed">
                   {linkEntities(b.text, a.entities, onEntity)}
                 </p>
               );
             if (b.kind === "list")
               return (
-                <ul key={i} className="list-disc space-y-1 pl-5 text-[13.5px] font-light">
+                <ul key={i} className="list-disc space-y-1 pl-5 text-sm">
                   {b.items.map((item, j) => (
                     <li key={j}>{linkEntities(item, a.entities, onEntity)}</li>
                   ))}
@@ -194,7 +194,7 @@ function AnswerBody({
             if (b.kind === "table")
               return (
                 <div key={i} className="overflow-x-auto">
-                  <table className={`${T_TABLE} text-[13px]`}>
+                  <table className={`${T_TABLE} text-sm`}>
                     <thead>
                       <tr className={T_HEAD}>
                         {b.headers.map((h) => (
@@ -210,7 +210,7 @@ function AnswerBody({
                           {r.map((cell, ci) => (
                             <td
                               key={ci}
-                              className={`${T_TD} ${T_FLUSH} font-light`}
+                              className={`${T_TD} ${T_FLUSH}`}
                             >
                               {linkEntities(cell, a.entities, onEntity)}
                             </td>
@@ -231,14 +231,14 @@ function AnswerBody({
           })}
 
           {a.negativeResults.map((n) => (
-            <p key={n.query} className="text-[13.5px] font-light">
+            <p key={n.query} className="text-sm">
               {n.query}:{" "}
               <span className="font-medium">{recordCount(n.recordCount)}</span>
             </p>
           ))}
 
           {a.sourcesUnavailable.length > 0 && (
-            <p className="text-[13.5px] font-light">
+            <p className="text-sm">
               Produced with{" "}
               <span className="font-medium">
                 {a.sourcesUnavailable.length} of {a.sourcesTotal ?? 13}
@@ -251,14 +251,14 @@ function AnswerBody({
             {a.classificationSettled ? (
               <TlpBadge tlp={a.tlp} />
             ) : (
-              <span className="inline-flex h-5 items-center bg-black/5 px-1.5 text-[11px] text-cpx-grey">
+              <span className="inline-flex h-5 items-center bg-black/5 px-1.5 text-2xs text-cpx-grey">
                 Classification pending
               </span>
             )}
             {a.producedArtefact && (
               <Link
                 href={`/reports/${encodeURIComponent(a.producedArtefact.ref)}`}
-                className="text-[12px] font-normal text-cat-4 underline underline-offset-2"
+                className="text-xs text-link underline underline-offset-2"
               >
                 Open in Reports
               </Link>
@@ -269,11 +269,11 @@ function AnswerBody({
 
       <button
         onClick={() => setSourcesOpen(!sourcesOpen)}
-        className="flex w-full items-center justify-between border-t border-black/10 px-5 py-2 text-[12px] font-light text-cpx-grey hover:bg-black/[0.02]"
+        className="flex w-full items-center justify-between border-t border-black/10 px-5 py-2 text-xs text-cpx-grey hover:bg-black/[0.02]"
       >
         <span className="flex items-center gap-2">
           Sources
-          <span className="bg-black/5 px-1 text-[11px]">{a.citations.length}</span>
+          <span className="bg-black/5 px-1 text-2xs">{a.citations.length}</span>
           {a.egress && (
             <span className="inline-flex items-center gap-1 text-status-warn-ink">
               <IconEgress />
@@ -287,11 +287,11 @@ function AnswerBody({
         <div className="border-t border-black/5 px-5 py-3">
           <ul className="space-y-1.5">
             {a.citations.map((c) => (
-              <li key={c.id} className="flex items-baseline gap-2 text-[12px]">
+              <li key={c.id} className="flex items-baseline gap-2 text-xs">
                 <span className="font-mono text-black/40">[{c.ref}]</span>
-                <span className="font-light">{c.label}</span>
+                <span className="">{c.label}</span>
                 <span className="font-medium">{recordCount(c.recordCount)}</span>
-                {c.url && <span className="font-mono text-[11px] text-black/40 break-all">{defang(c.url)}</span>}
+                {c.url && <span className="font-mono text-2xs text-black/40 break-all">{defang(c.url)}</span>}
               </li>
             ))}
           </ul>

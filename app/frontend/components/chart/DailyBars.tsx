@@ -24,8 +24,8 @@ export function DailyBars({
     >
       <defs>
         <pattern id="zeroHatch" width="4" height="4" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
-          <rect width="4" height="4" fill="#FFFFFF" />
-          <rect width="2" height="4" fill="#DFDFDF" />
+          <rect width="4" height="4" fill="white" />
+          <rect width="2" height="4" fill="var(--color-rule)" />
         </pattern>
       </defs>
       {days.map((d, i) => {
@@ -43,12 +43,12 @@ export function DailyBars({
               height={h}
               fill={
                 d.attempted === 0
-                  ? "#F2F2F2"
+                  ? "var(--color-inset)"
                   : zeroWithAttempt
                     ? "url(#zeroHatch)"
                     : "var(--color-cat-1)"
               }
-              stroke={zeroWithAttempt ? "#DFDFDF" : "none"}
+              stroke={zeroWithAttempt ? "var(--color-rule)" : "none"}
               strokeWidth={zeroWithAttempt ? 0.5 : 0}
             >
               <title>{`${d.date}: ${d.items} items, ${d.attempted} attempts`}</title>
@@ -59,8 +59,8 @@ export function DailyBars({
                 y={height - 3}
                 textAnchor="middle"
                 fontSize="9"
-                fontWeight="300"
-                fill="#333333"
+                fontWeight="400"
+                fill="var(--color-cpx-grey)"
               >
                 {d.date.slice(8)}
               </text>
@@ -68,7 +68,7 @@ export function DailyBars({
           </g>
         );
       })}
-      <line x1="0" x2={width} y1={plotH} y2={plotH} stroke="#DFDFDF" strokeWidth="1" />
+      <line x1="0" x2={width} y1={plotH} y2={plotH} stroke="var(--color-rule)" strokeWidth="1" />
     </svg>
   );
 }
