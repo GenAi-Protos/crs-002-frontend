@@ -15,7 +15,6 @@ import Link from "next/link";
 import type {
   Cell,
   Column,
-  Kpi,
   RoleDashboardResult,
   Widget,
 } from "@/lib/dashboard/types";
@@ -34,6 +33,7 @@ import {
   T_TD,
   T_TH,
 } from "@/components/table";
+import { KpiCard } from "@/components/ui";
 import { BarListH } from "@/components/chart/BarListH";
 import { Donut } from "@/components/chart/Donut";
 import {
@@ -51,7 +51,7 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
         <p className="text-sm">
           {result.note ?? "The intelligence data could not be reached."}
         </p>
-        <p className="mt-1 text-xs text-cpx-grey">
+        <p className="mt-1 text-xs text-cpx-grey-500">
           Nothing below is stale data: there is no data to show.
         </p>
       </Panel>
@@ -67,7 +67,7 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
           <span className="font-medium">0 findings</span> in the last{" "}
           {d.window.days} days.
         </p>
-        <p className="mt-1 text-xs text-cpx-grey">
+        <p className="mt-1 text-xs text-cpx-grey-500">
           A zero here means nothing was collected or matched, never that there is
           nothing to find.
         </p>
@@ -77,8 +77,8 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
 
   return (
     <div className="mt-4 space-y-4">
-      <p className="flex flex-wrap items-center gap-2 text-2xs text-cpx-grey">
-        <span className="bg-black/5 px-1.5 text-cpx-black">{d.audience}</span>
+      <p className="flex flex-wrap items-center gap-2 text-2xs text-cpx-grey-500">
+        <span className="bg-cpx-grey-50 px-1.5 text-cpx-black">{d.audience}</span>
         {result.source === "mock" && (
           <span className="bg-status-warn-fill px-1.5 text-status-warn-ink">
             Demonstration data
@@ -97,7 +97,7 @@ export function RoleDashboard({ result }: { result: RoleDashboardResult }) {
       {/* Withheld data is stated with its count. Saying nothing would imply the
           dashboard is complete, which for these roles it deliberately is not. */}
       {d.withheld.length > 0 && (
-        <p className="text-2xs text-cpx-grey">
+        <p className="text-2xs text-cpx-grey-500">
           Withheld at this access level:{" "}
           {d.withheld
             .map((w) => `${w.count.toLocaleString("en-GB")} ${w.label}`)
@@ -113,9 +113,9 @@ function WidgetView({ widget: w }: { widget: Widget }) {
   switch (w.kind) {
     case "kpis":
       return (
-        <section className="grid grid-cols-1 gap-px border border-black/10 bg-black/10 sm:grid-cols-2 xl:grid-cols-4">
-          {w.items.map((k) => (
-            <KpiCard key={k.key} kpi={k} />
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {w.items.map(({ key, ...k }) => (
+            <KpiCard key={key} {...k} />
           ))}
         </section>
       );
@@ -127,12 +127,12 @@ function WidgetView({ widget: w }: { widget: Widget }) {
             w.tone === "critical"
               ? "border-cpx-red/40 bg-status-warn-fill"
               : w.tone === "warn"
-                ? "border-black/10 bg-status-warn-fill"
-                : "border-black/10 bg-white"
+                ? "border-cpx-grey-100 bg-status-warn-fill"
+                : "border-cpx-grey-100 bg-white"
           }`}
         >
           <h2
-            className={`text-md font-medium capitalize tracking-tightish ${
+            className={`text-md font-semibold capitalize tracking-tightish ${
               w.tone === "neutral" ? "" : "text-status-warn-ink"
             }`}
           >
@@ -144,7 +144,7 @@ function WidgetView({ widget: w }: { widget: Widget }) {
           {w.points && (
             <ul className="mt-2 space-y-0.5">
               {w.points.map((p) => (
-                <li key={p} className="text-xs text-cpx-grey">
+                <li key={p} className="text-xs text-cpx-grey-500">
                   {p}
                 </li>
               ))}
@@ -185,7 +185,7 @@ function WidgetView({ widget: w }: { widget: Widget }) {
             yLabel={w.yLabel}
           />
           {w.explanation && (
-            <p className="mt-2 max-w-3xl text-2xs leading-relaxed text-cpx-grey">
+            <p className="mt-2 max-w-3xl text-2xs leading-relaxed text-cpx-grey-500">
               {w.explanation}
               {separateScales(w.series) && (
                 <>
@@ -234,13 +234,13 @@ function WidgetView({ widget: w }: { widget: Widget }) {
                       )}
                     </span>
                     {it.meta && (
-                      <span className="text-2xs text-cpx-grey">
+                      <span className="text-2xs text-cpx-grey-500">
                         {it.meta}
                       </span>
                     )}
                   </span>
                   {it.secondary && (
-                    <span className="mt-0.5 block text-xs text-cpx-grey">
+                    <span className="mt-0.5 block text-xs text-cpx-grey-500">
                       {it.secondary}
                     </span>
                   )}
@@ -257,7 +257,7 @@ function WidgetView({ widget: w }: { widget: Widget }) {
           <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
             {w.stats.map((s) => (
               <span key={s.label} className="flex flex-col">
-                <span className="text-2xs text-cpx-grey">
+                <span className="text-2xs text-cpx-grey-500">
                   {s.label}
                 </span>
                 <span
@@ -351,7 +351,7 @@ function CellView({ cell }: { cell: Cell }) {
       : cell.tone === "warn"
         ? "text-status-warn-ink"
         : cell.tone === "muted"
-          ? "text-cpx-grey"
+          ? "text-cpx-grey-500"
           : "";
 
   // Monospace values are identifiers: they break anywhere rather than push the
@@ -401,49 +401,6 @@ function CellView({ cell }: { cell: Cell }) {
   );
 }
 
-export function KpiCard({ kpi }: { kpi: Kpi }) {
-  const delta = kpi.previous === undefined ? null : kpi.value - kpi.previous;
-  // Direction is stated in words as well as sign: colour alone carries nothing.
-  const worse =
-    delta === null || delta === 0
-      ? false
-      : kpi.higherIsWorse
-        ? delta > 0
-        : delta < 0;
-
-  const body = (
-    <div className="flex h-full flex-col bg-white px-4 py-3">
-      <span className="text-xs text-cpx-grey">{kpi.label}</span>
-      <span className="mt-1.5 text-2xl font-display font-medium leading-none tracking-tightish">
-        {kpi.value.toLocaleString("en-GB")}
-      </span>
-      <span className="mt-1.5 text-2xs text-cpx-grey">
-        {kpi.unit}
-        {kpi.window && <> · {kpi.window}</>}
-      </span>
-      {delta !== null && (
-        <span
-          className={`mt-1.5 text-2xs ${
-            worse ? "text-status-warn-ink" : "text-cpx-grey"
-          }`}
-        >
-          {delta === 0
-            ? "unchanged on the previous period"
-            : `${delta > 0 ? "up" : "down"} ${Math.abs(delta).toLocaleString("en-GB")} on the previous period`}
-        </span>
-      )}
-    </div>
-  );
-
-  return kpi.href ? (
-    <Link href={kpi.href} className="block hover:bg-black/[0.02]">
-      {body}
-    </Link>
-  ) : (
-    body
-  );
-}
-
 export function Panel({
   title,
   note,
@@ -454,10 +411,10 @@ export function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border border-black/10 bg-white p-4">
+    <section className="border border-cpx-grey-100 bg-white p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-sans text-sm font-medium tracking-tightish">{title}</h2>
-        {note && <span className="text-2xs text-cpx-grey">{note}</span>}
+        <h2 className="font-sans text-sm font-semibold tracking-tightish">{title}</h2>
+        {note && <span className="text-2xs text-cpx-grey-500">{note}</span>}
       </div>
       <div className="mt-3">{children}</div>
     </section>
@@ -475,18 +432,18 @@ function Zero({ what }: { what: string }) {
 export function Skeleton() {
   return (
     <div className="mt-4 space-y-4" aria-busy="true">
-      <div className="grid grid-cols-1 gap-px border border-black/10 bg-black/10 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-px border border-cpx-grey-100 bg-cpx-grey-100 sm:grid-cols-2 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="bg-white px-4 py-3">
-            <span className="block h-3 w-24 bg-black/5" />
-            <span className="mt-2 block h-7 w-16 bg-black/5" />
-            <span className="mt-2 block h-3 w-32 bg-black/5" />
+            <span className="block h-3 w-24 bg-cpx-grey-50" />
+            <span className="mt-2 block h-7 w-16 bg-cpx-grey-50" />
+            <span className="mt-2 block h-3 w-32 bg-cpx-grey-50" />
           </div>
         ))}
       </div>
-      <div className="border border-black/10 bg-white p-4">
-        <span className="block h-3 w-32 bg-black/5" />
-        <span className="mt-3 block h-40 w-full bg-black/[0.03]" />
+      <div className="border border-cpx-grey-100 bg-white p-4">
+        <span className="block h-3 w-32 bg-cpx-grey-50" />
+        <span className="mt-3 block h-40 w-full bg-cpx-grey-50" />
       </div>
     </div>
   );

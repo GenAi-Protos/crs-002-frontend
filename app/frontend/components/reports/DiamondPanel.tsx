@@ -126,7 +126,7 @@ export function DiamondPanel({
 
       {/* Counts render including zero. A profile that has filled no vertices
           and drawn no links says exactly that. */}
-      <p className="mt-2 text-2xs text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey-500">
         <span className="font-medium text-cpx-black">{written} of 4</span> vertices
         written,{" "}
         <span className="font-medium text-cpx-black">{diamond.edges.length} of 6</span>{" "}
@@ -191,7 +191,7 @@ function Diagram({
               vectorEffect="non-scaling-stroke"
               strokeWidth={on ? 1.5 : 1}
               strokeDasharray={on ? undefined : "3 3"}
-              className={on ? "stroke-cpx-purple" : "stroke-black/15"}
+              className={on ? "stroke-cpx-purple" : "stroke-cpx-grey-200"}
             />
           );
         })}
@@ -201,14 +201,14 @@ function Diagram({
         {VERTICES.map((v) => (
           <div
             key={v.key}
-            className={`border border-black/15 bg-white p-2.5 ${CELL[v.key]}`}
+            className={`border border-cpx-grey-100 bg-white p-2.5 ${CELL[v.key]}`}
           >
             <div className="flex items-baseline justify-between gap-2">
               <span className="text-2xs font-medium uppercase tracking-wide text-cpx-purple">
                 {v.label}
               </span>
               {diamond[v.key].trim() === "" && (
-                <span className="shrink-0 text-2xs text-cpx-grey">
+                <span className="shrink-0 text-2xs text-cpx-grey-500">
                   unwritten
                 </span>
               )}
@@ -219,12 +219,12 @@ function Diagram({
                 onBlur={(e) => onEdit(v.key, e.target.value)}
                 placeholder={v.hint}
                 rows={3}
-                className="mt-1.5 w-full resize-y border border-black/10 bg-white p-1.5 text-xs leading-relaxed focus:border-cpx-purple focus:outline-none"
+                className="mt-1.5 w-full resize-y border border-cpx-grey-100 bg-white p-1.5 text-xs leading-relaxed focus:border-cpx-green focus:outline-none"
               />
             ) : (
               <p className="mt-1.5 whitespace-pre-wrap text-xs leading-relaxed">
                 {diamond[v.key].trim() === "" ? (
-                  <span className="text-cpx-grey">Not stated.</span>
+                  <span className="text-cpx-grey-500">Not stated.</span>
                 ) : (
                   renderValue(v.key, diamond[v.key])
                 )}
@@ -265,7 +265,7 @@ function Relationships({
     <div className="mt-3">
       <table className="w-full border-collapse text-xs">
         <thead>
-          <tr className="border-b border-black/15 text-left">
+          <tr className="border-b border-cpx-grey-100 text-left">
             <th className="py-1.5 pr-3 font-medium">Relationship</th>
             <th className="py-1.5 font-medium">How they are linked</th>
             {editable && <th className="w-8 py-1.5" />}
@@ -273,7 +273,7 @@ function Relationships({
         </thead>
         <tbody>
           {ordered.map((e) => (
-            <tr key={pairKey(e.source, e.target)} className="border-b border-black/5">
+            <tr key={pairKey(e.source, e.target)} className="border-b border-cpx-grey-100">
               <td className="whitespace-nowrap py-1.5 pr-3">
                 {LABEL[e.source]} - {LABEL[e.target]}
               </td>
@@ -283,7 +283,7 @@ function Relationships({
                   <button
                     onClick={() => onRemove(e)}
                     aria-label={`Remove ${LABEL[e.source]} to ${LABEL[e.target]}`}
-                    className="px-1 text-xs text-cpx-grey hover:text-cpx-red"
+                    className="px-1 text-xs text-cpx-grey-500 hover:text-cpx-red"
                   >
                     Remove
                   </button>
@@ -307,7 +307,7 @@ function Relationships({
             value={pair}
             onChange={(e) => setPair(Number(e.target.value))}
             aria-label="Vertices to link"
-            className="h-8 border border-black/15 bg-white px-1.5 text-xs focus:border-cpx-purple focus:outline-none"
+            className="h-8 border border-cpx-grey-100 bg-white px-1.5 text-xs focus:border-cpx-green focus:outline-none"
           >
             {PAIRS.map(([from, to], i) => (
               <option key={pairKey(from, to)} value={i}>
@@ -320,7 +320,7 @@ function Relationships({
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             placeholder="How they are linked"
-            className="h-8 min-w-0 flex-1 border border-black/15 px-2 text-xs focus:border-cpx-purple focus:outline-none"
+            className="h-8 min-w-0 flex-1 border border-cpx-grey-100 px-2 text-xs focus:border-cpx-green focus:outline-none"
           />
           <button
             disabled={label.trim() === ""}

@@ -70,14 +70,14 @@ export function InvestigationView({
         <div className="min-w-0">
           <button
             onClick={onBack}
-            className="text-xs text-cpx-grey hover:text-cpx-black"
+            className="text-xs text-cpx-grey-500 hover:text-cpx-black"
           >
             Back to lookup
           </button>
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-medium tracking-tightish">Investigation</h2>
+            <h2 className="text-lg font-semibold tracking-tightish">Investigation</h2>
             <IndicatorChip value={record.observable} />
-            <span className="bg-black/5 px-1.5 text-2xs">
+            <span className="bg-cpx-grey-50 px-1.5 text-2xs">
               {KIND_LABEL[record.kind]}
             </span>
           </div>
@@ -92,26 +92,26 @@ export function InvestigationView({
       </div>
 
       {/* The chain, with its counts. Reading it left to right is the point. */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2 border border-black/10 bg-white px-3 py-2.5">
+      <div className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2 border border-cpx-grey-100 bg-white px-3 py-2.5">
         {stages.map((s, i) => (
           <span key={s.key} className="flex items-center gap-1">
             <a
               href={`#stage-${s.key}`}
-              className={`flex items-baseline gap-1.5 px-1.5 py-0.5 text-xs hover:bg-black/5 ${
-                s.count === 0 ? "text-cpx-grey" : ""
+              className={`flex items-baseline gap-1.5 px-1.5 py-0.5 text-xs hover:bg-cpx-grey-50 ${
+                s.count === 0 ? "text-cpx-grey-500" : ""
               }`}
             >
               {s.label}
               <span
                 className={`px-1 text-2xs ${
-                  s.count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-black/5"
+                  s.count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-cpx-grey-50"
                 }`}
               >
                 {s.count}
               </span>
             </a>
             {i < stages.length - 1 && (
-              <IconArrowRight className="shrink-0 text-black/25" />
+              <IconArrowRight className="shrink-0 text-cpx-grey-400" />
             )}
           </span>
         ))}
@@ -134,7 +134,7 @@ export function InvestigationView({
         >
           <div className="flex flex-wrap items-center gap-2">
             <IndicatorChip value={record.observable} />
-            <span className="text-xs text-cpx-grey">
+            <span className="text-xs text-cpx-grey-500">
               risk {record.riskScore} of 100 · {record.recordCount} held records
             </span>
           </div>
@@ -151,10 +151,10 @@ export function InvestigationView({
             {g.infrastructure.map((i) => (
               <li key={i.value} className="flex flex-wrap items-baseline gap-2">
                 <IndicatorChip value={i.value} />
-                <span className="bg-black/5 px-1.5 text-2xs">
+                <span className="bg-cpx-grey-50 px-1.5 text-2xs">
                   {KIND_LABEL[i.kind as ObservableKind]}
                 </span>
-                <span className="min-w-0 flex-1 text-xs text-cpx-grey">
+                <span className="min-w-0 flex-1 text-xs text-cpx-grey-500">
                   {i.note}
                 </span>
               </li>
@@ -174,11 +174,11 @@ export function InvestigationView({
               <li key={m.name}>
                 <span className="flex flex-wrap items-baseline gap-2">
                   <span className="text-sm font-medium">{m.name}</span>
-                  <span className="bg-black/5 px-1.5 text-2xs">
+                  <span className="bg-cpx-grey-50 px-1.5 text-2xs">
                     {m.family}
                   </span>
                 </span>
-                <span className="mt-0.5 block text-xs text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">
                   {m.note}
                 </span>
               </li>
@@ -201,13 +201,13 @@ export function InvestigationView({
                   {a.aliases.map((alias) => (
                     <span
                       key={alias}
-                      className="bg-black/5 px-1.5 text-2xs"
+                      className="bg-cpx-grey-50 px-1.5 text-2xs"
                     >
                       {alias}
                     </span>
                   ))}
                 </span>
-                <span className="mt-0.5 block text-xs text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">
                   {a.note}
                 </span>
               </li>
@@ -234,7 +234,7 @@ export function InvestigationView({
                     {c.ref}
                   </Link>
                 </span>
-                <span className="mt-0.5 block text-xs text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">
                   {c.note}
                 </span>
               </li>
@@ -280,7 +280,7 @@ export function InvestigationView({
                           )}
                         </span>
                       </td>
-                      <td className={`${T_TD} ${T_FLUSH} text-cpx-grey`}>
+                      <td className={`${T_TD} ${T_FLUSH} text-cpx-grey-500`}>
                         {resolved
                           ? resolved.tactics.map((id) => TACTICS[id] ?? id).join(", ")
                           : "-"}
@@ -306,13 +306,13 @@ export function InvestigationView({
             {g.detections.map((d) => (
               <li key={d.ref}>
                 <span className="flex flex-wrap items-baseline gap-2">
-                  <span className="bg-black/5 px-1.5 text-2xs">
+                  <span className="bg-cpx-grey-50 px-1.5 text-2xs">
                     {DETECTION_LABEL[d.kind]}
                   </span>
                   <span className="text-sm font-medium">{d.name}</span>
-                  <span className="font-mono text-2xs text-cpx-grey">{d.ref}</span>
+                  <span className="font-mono text-2xs text-cpx-grey-500">{d.ref}</span>
                 </span>
-                <span className="mt-0.5 block text-xs text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">
                   {d.note}
                 </span>
               </li>
@@ -321,7 +321,7 @@ export function InvestigationView({
         </Stage>
       </div>
 
-      <p className="mt-4 text-2xs text-cpx-grey">
+      <p className="mt-4 text-2xs text-cpx-grey-500">
         Every relationship above comes from a held record. Nothing here is
         inferred from the observable alone.
       </p>
@@ -345,20 +345,20 @@ function Stage({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-4 border border-black/10 bg-white">
-      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-black/10 px-4 py-2.5">
+    <section id={id} className="scroll-mt-4 border border-cpx-grey-100 bg-white">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-cpx-grey-100 px-4 py-2.5">
         <h3 className="flex items-baseline gap-2 text-sm font-medium tracking-tightish">
-          <span className="text-cpx-grey">{index}</span>
+          <span className="text-cpx-grey-500">{index}</span>
           {title}
           <span
             className={`px-1 text-2xs ${
-              count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-black/5"
+              count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-cpx-grey-50"
             }`}
           >
             {count}
           </span>
         </h3>
-        <span className="text-2xs text-cpx-grey">{note}</span>
+        <span className="text-2xs text-cpx-grey-500">{note}</span>
       </div>
       <div className="px-4 py-3">
         {count === 0 ? (

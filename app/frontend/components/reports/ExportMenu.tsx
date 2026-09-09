@@ -67,7 +67,7 @@ export function Menu<T extends string>({
         }}
         className={
           trigger === "icon"
-            ? "flex h-7 w-7 items-center justify-center text-cpx-grey hover:bg-black/5 disabled:text-black/20"
+            ? "flex h-7 w-7 items-center justify-center text-cpx-grey-500 hover:bg-cpx-grey-50 disabled:text-cpx-grey-400"
             : buttonClass("secondary", "sm")
         }
       >
@@ -86,13 +86,13 @@ export function Menu<T extends string>({
       {open && (
         <div
           role="menu"
-          className={`absolute z-50 mt-1 min-w-[13rem] border border-black/10 bg-white py-1 shadow-sm ${
+          className={`absolute z-50 mt-1 min-w-[13rem] border border-cpx-grey-100 bg-white py-1 shadow-pop ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >
           {items.map((it) => (
             <div key={it.key}>
-              {it.separated && <div className="my-1 border-t border-black/10" />}
+              {it.separated && <div className="my-1 border-t border-cpx-grey-100" />}
               <button
                 role="menuitem"
                 disabled={it.disabled}
@@ -101,11 +101,11 @@ export function Menu<T extends string>({
                   setOpen(false);
                   onSelect(it.key);
                 }}
-                className="block w-full px-3 py-1.5 text-left text-xs hover:bg-black/[0.04] disabled:text-black/25 disabled:hover:bg-transparent"
+                className="block w-full px-3 py-1.5 text-left text-xs hover:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
               >
                 {it.label}
                 {it.hint && (
-                  <span className="mt-0.5 block text-2xs text-cpx-grey">
+                  <span className="mt-0.5 block text-2xs text-cpx-grey-500">
                     {it.hint}
                   </span>
                 )}
@@ -113,7 +113,7 @@ export function Menu<T extends string>({
             </div>
           ))}
           {footer && (
-            <p className="mt-1 border-t border-black/10 px-3 pt-1.5 text-2xs text-cpx-grey">
+            <p className="mt-1 border-t border-cpx-grey-100 px-3 pt-1.5 text-2xs text-cpx-grey-500">
               {footer}
             </p>
           )}

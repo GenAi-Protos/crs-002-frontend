@@ -28,8 +28,9 @@ const NAV: {
   { key: "manage", label: "Manage", href: "/manage", icon: <IconManage /> },
 ];
 
-// Dark Purple chrome, like the top bar. The rail collapses to icons below the
-// `rail` breakpoint (docs/01); the label survives as a title for the tooltip.
+// White rail with a hairline, like the top bar and the other CPX consoles. The
+// active destination carries a green wash and a 3px green bar. The rail collapses
+// to icons below the `rail` breakpoint (docs/01); the label survives as a title.
 export function NavRail() {
   const { user } = useConsoleUser();
   const pathname = usePathname();
@@ -39,9 +40,9 @@ export function NavRail() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed bottom-0 left-0 top-14 z-30 w-16 bg-cpx-purple rail:w-60"
+      className="fixed bottom-0 left-0 top-[60px] z-30 w-16 border-r border-cpx-grey-100 bg-white rail:w-44"
     >
-      <ul className="flex flex-col gap-1 p-2">
+      <ul className="flex flex-col gap-1 p-2 rail:p-3">
         {items.map((n) => {
           const active =
             n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
@@ -50,15 +51,18 @@ export function NavRail() {
               <Link
                 href={n.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex h-10 items-center justify-center gap-3 px-0 text-base focus-visible:outline-cpx-green rail:justify-start rail:px-3 ${
+                className={`relative flex h-9 items-center justify-center gap-2.5 rounded-sm px-0 text-base rail:justify-start rail:px-3 ${
                   active
-                    ? "bg-white/10 font-medium text-white"
-                    : "text-white/70 hover:bg-white/5 hover:text-white"
+                    ? "bg-cpx-green-50 font-semibold text-cpx-purple"
+                    : "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple"
                 }`}
                 title={n.label}
               >
                 {active && (
-                  <span aria-hidden className="absolute inset-y-0 left-0 w-0.5 bg-cpx-green" />
+                  <span
+                    aria-hidden
+                    className="absolute bottom-1.5 left-0 top-1.5 w-[3px] rounded-r-sm bg-cpx-green"
+                  />
                 )}
                 {n.icon}
                 <span className="hidden rail:inline">{n.label}</span>

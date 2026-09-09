@@ -38,7 +38,7 @@ export function AskOptionsBar({
   const outputHint = OUTPUTS.find((o) => o.value === options.output)?.hint;
 
   return (
-    <div className="border-b border-black/10 px-3 py-2.5">
+    <div className="border-b border-cpx-grey-100 px-3 py-2.5">
       <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-3 lg:grid-cols-5">
         <Field label="Client">
           <select
@@ -114,7 +114,7 @@ export function AskOptionsBar({
         </Field>
       </div>
 
-      <p className="mt-2 text-2xs text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey-500">
         {options.tlpCeiling
           ? `Evidence above TLP:${options.tlpCeiling} is excluded and counted. The ceiling does not mark the answer.`
           : `${depthHint} ${outputHint}`}
@@ -133,8 +133,8 @@ export function AskOptionsBar({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex min-w-0 flex-col gap-0.5">
-      <span className="text-2xs text-cpx-grey">{label}</span>
-      <span className="[&>select]:h-8 [&>select]:w-full [&>select]:min-w-0 [&>select]:border [&>select]:border-black/15 [&>select]:bg-white [&>select]:px-2 [&>select]:text-xs [&>select:disabled]:text-black/30 [&>select:focus]:outline-none [&>select:focus]:border-cpx-purple">
+      <span className="text-2xs text-cpx-grey-500">{label}</span>
+      <span className="[&>select]:h-8 [&>select]:w-full [&>select]:min-w-0 [&>select]:border [&>select]:border-cpx-grey-100 [&>select]:bg-white [&>select]:px-2 [&>select]:text-xs [&>select:disabled]:text-cpx-grey-400 [&>select:focus]:outline-none [&>select:focus]:border-cpx-green">
         {children}
       </span>
     </label>

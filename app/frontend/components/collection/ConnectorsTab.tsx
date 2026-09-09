@@ -28,7 +28,7 @@ export function ConnectorsTab({ initialRows = CONNECTORS }: { initialRows?: Conn
 function Group({ label, rows }: { label: string; rows: Connector[] }) {
   return (
     <section>
-      <h2 className="font-sans text-xs font-medium uppercase tracking-wide text-cpx-grey">
+      <h2 className="font-sans text-xs font-semibold uppercase tracking-wide text-cpx-grey-500">
         {label}
       </h2>
       <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -42,7 +42,7 @@ function Group({ label, rows }: { label: string; rows: Connector[] }) {
 
 function ConnectorCard({ c }: { c: Connector }) {
   return (
-    <div className="border border-black/10 bg-white p-4">
+    <div className="border border-cpx-grey-100 bg-white p-4">
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-base font-medium tracking-tightish">{c.name}</h3>
         {!c.verified && (
@@ -51,7 +51,7 @@ function ConnectorCard({ c }: { c: Connector }) {
           </span>
         )}
       </div>
-      <p className="mt-1 text-xs text-cpx-grey">
+      <p className="mt-1 text-xs text-cpx-grey-500">
         {captureModeLabel[c.captureMode]}
       </p>
       <div className="mt-3">
@@ -66,7 +66,7 @@ function ConnectorCard({ c }: { c: Connector }) {
           <StatusPill tone="idle" label="Not connected" />
         )}
       </div>
-      <p className="mt-2 flex items-center gap-1 text-2xs text-cpx-grey">
+      <p className="mt-2 flex items-center gap-1 text-2xs text-cpx-grey-500">
         {c.residency === "egress" ? (
           <>
             <IconEgress />

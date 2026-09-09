@@ -93,7 +93,7 @@ export function Donut({
           x={radius}
           y={radius + 14}
           textAnchor="middle"
-          className="fill-cpx-grey"
+          className="fill-cpx-grey-500"
           style={{ fontSize: 10, fontWeight: 400 }}
         >
           {totalLabel}
@@ -110,7 +110,7 @@ export function Donut({
             />
             <span className="">{s.label}</span>
             <span className="ml-auto font-medium">{s.value}</span>
-            <span className="w-10 text-right text-cpx-grey">
+            <span className="w-10 text-right text-cpx-grey-500">
               {total === 0 ? "0%" : `${Math.round((s.value / total) * 100)}%`}
             </span>
           </li>

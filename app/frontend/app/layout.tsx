@@ -70,7 +70,7 @@ export default function RootLayout({
           <main
             id="main"
             tabIndex={-1}
-            className="ml-16 mt-14 min-h-[calc(100vh-3.5rem)] focus:outline-none rail:ml-60"
+            className="ml-16 mt-[60px] min-h-[calc(100vh-60px)] focus:outline-none rail:ml-44"
           >
             {children}
           </main>

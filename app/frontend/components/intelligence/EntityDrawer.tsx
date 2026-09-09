@@ -38,8 +38,8 @@ export function EntityDrawer({
       onClose={onClose}
       title={
         <>
-          <h2 className="text-md font-medium tracking-tightish">{entity.name}</h2>
-          <span className="text-2xs uppercase tracking-wide text-cpx-grey">
+          <h2 className="text-md font-semibold tracking-tightish">{entity.name}</h2>
+          <span className="text-2xs uppercase tracking-wide text-cpx-grey-500">
             {entity.type}
           </span>
         </>
@@ -47,18 +47,18 @@ export function EntityDrawer({
     >
         <div className="space-y-5">
           <section>
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-cpx-grey">
+            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-cpx-grey-500">
               Findings
             </h3>
-            <p className="text-xs text-cpx-grey">
+            <p className="text-xs text-cpx-grey-500">
               <span className="font-medium text-cpx-black">{relatedHits.length}</span>{" "}
               matched
             </p>
             <ul className="mt-2 space-y-2">
               {relatedHits.map((h) => (
-                <li key={h.id} className="border border-black/10 p-2.5">
+                <li key={h.id} className="border border-cpx-grey-100 p-2.5">
                   <p className="text-sm font-medium">{h.title}</p>
-                  <p className="mt-1 text-2xs text-cpx-grey">
+                  <p className="mt-1 text-2xs text-cpx-grey-500">
                     {h.pirRef} · {gstDate(h.firedAt)} · {h.confidence}%
                   </p>
                 </li>
@@ -66,10 +66,10 @@ export function EntityDrawer({
             </ul>
           </section>
           <section>
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-cpx-grey">
+            <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-cpx-grey-500">
               Advisories
             </h3>
-            <p className="text-xs text-cpx-grey">
+            <p className="text-xs text-cpx-grey-500">
               <span className="font-medium text-cpx-black">
                 {relatedAdvisories.length}
               </span>{" "}

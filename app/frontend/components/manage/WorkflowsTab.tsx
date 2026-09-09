@@ -11,7 +11,11 @@
 // not one.
 //
 // Each step names the agent that carries it, and the name crosses to the agent
-// specification. The two Manage tabs are one model seen from two sides.
+// specification. The two Manage tabs are one model seen from two sides, and
+// since they are, they are laid out the same way: a list on the left and one
+// specification on the right. As a grid of cards this held nineteen chips on a
+// single face, three wrapping groups deep, and buried the only fact that says
+// whether a workflow can run at all.
 //
 // Nothing has run, so no card claims a run. "Never run" is the honest reading
 // and a success rate would be an invented metric (hard rule 8).
@@ -21,8 +25,16 @@ import { useConsoleUser } from "@/lib/role-context";
 import { canAdminister } from "@/lib/access";
 import type { Agent, Workflow, WorkflowStatus, WorkflowTrigger } from "@/lib/types";
 import { agoFromNow, gstDateTime } from "@/lib/format";
-import { ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
-import { IconChevronDown } from "@/components/icons";
+import {
+  DetailRow,
+  Fact,
+  FilterChip,
+  ListMeta,
+  SearchBox,
+  StatusPill,
+  type StatusTone,
+  buttonClass,
+} from "@/components/ui";
 
 const STATUS: Record<WorkflowStatus, { tone: StatusTone; label: string }> = {
   published: { tone: "good", label: "Published" },
@@ -39,6 +51,14 @@ const TRIGGER: Record<WorkflowTrigger, string> = {
 
 type Filter = "all" | WorkflowStatus;
 
+/** How much of a workflow actually exists. The one fact that decides if it runs. */
+function readiness(w: Workflow, agents: Agent[]) {
+  const built = w.agentRefs.filter(
+    (id) => agents.find((a) => a.id === id)?.status === "active",
+  ).length;
+  return { built, total: w.agentRefs.length };
+}
+
 export function WorkflowsTab({
   workflows,
   agents,
@@ -48,7 +68,7 @@ export function WorkflowsTab({
   workflows: Workflow[];
   agents: Agent[];
   // Set when the reader arrived from an agent's workflow list. That workflow
-  // opens and scrolls to itself, so the cross-link lands somewhere visible.
+  // is selected, so the cross-link lands on the thing it named.
   openRef?: string | null;
   onOpenAgent: (agentId: string) => void;
 }) {
@@ -56,7 +76,7 @@ export function WorkflowsTab({
   const admin = canAdminister(user.role);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
-  const [openRefs, setOpenRefs] = useState<Set<string>>(new Set());
+  const [selectedRef, setSelectedRef] = useState<string | null>(null);
 
   const counts = useMemo(
     () => ({
@@ -92,23 +112,9 @@ export function WorkflowsTab({
       );
   }, [workflows, q, filter]);
 
-  const toggle = (ref: string) =>
-    setOpenRefs((prev) => {
-      const next = new Set(prev);
-      if (next.has(ref)) next.delete(ref);
-      else next.add(ref);
-      return next;
-    });
-
   useEffect(() => {
-    if (!openRef) return;
-    setOpenRefs((prev) => new Set(prev).add(openRef));
-    document
-      .getElementById(`wf-${openRef}`)
-      ?.scrollIntoView({ block: "center", behavior: "smooth" });
+    if (openRef) setSelectedRef(openRef);
   }, [openRef]);
-
-  const allOpen = list.length > 0 && list.every((w) => openRefs.has(w.ref));
 
   if (workflows.length === 0) {
     return (
@@ -118,6 +124,12 @@ export function WorkflowsTab({
     );
   }
 
+  // A cross-link from an agent must land even on a workflow this search hides.
+  const workflow =
+    list.find((w) => w.ref === selectedRef) ??
+    workflows.find((w) => w.ref === selectedRef) ??
+    list[0];
+
   return (
     <div className="mt-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -126,7 +138,7 @@ export function WorkflowsTab({
           {(["all", "published", "draft", "disabled"] as Filter[])
             .filter((f) => f === "all" || counts[f] > 0)
             .map((f) => (
-              <Chip
+              <FilterChip
                 key={f}
                 label={f === "all" ? "All" : STATUS[f].label}
                 count={counts[f]}
@@ -136,14 +148,6 @@ export function WorkflowsTab({
             ))}
         </div>
         <div className="flex-1" />
-        <button
-          onClick={() =>
-            setOpenRefs(allOpen ? new Set() : new Set(list.map((w) => w.ref)))
-          }
-          className={buttonClass("secondary", "sm")}
-        >
-          {allOpen ? "Collapse all" : "Expand all"}
-        </button>
         <ListMeta
           shown={list.length}
           total={workflows.length}
@@ -151,83 +155,121 @@ export function WorkflowsTab({
         />
       </div>
 
-      <p className="mt-2 text-xs text-cpx-grey">
+      <p className="mt-2 text-xs text-cpx-grey-500">
         <span className="font-medium text-cpx-black">{counts.published}</span> published
         · <span className="font-medium text-cpx-black">{counts.draft}</span> draft ·{" "}
         {admin ? "You may edit" : "Read only at this access level"}
       </p>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-2">
-        {list.map((w) => (
-          <WorkflowCard
-            key={w.ref}
-            workflow={w}
-            agents={agents}
-            admin={admin}
-            highlighted={w.ref === openRef}
-            open={openRefs.has(w.ref)}
-            onToggle={() => toggle(w.ref)}
-            onOpenAgent={onOpenAgent}
-          />
-        ))}
-      </div>
-
-      {list.length === 0 && (
+      {list.length === 0 ? (
         <p className="mt-6 text-sm">
           <span className="font-medium">0 workflows</span> match this search
         </p>
+      ) : (
+        <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[18rem_1fr]">
+          <ul className="border border-cpx-grey-100 bg-white">
+            {list.map((w) => {
+              const { built, total } = readiness(w, agents);
+              return (
+                <li key={w.ref}>
+                  <button
+                    onClick={() => setSelectedRef(w.ref)}
+                    className={`block w-full border-l-2 px-3 py-2.5 text-left ${
+                      w.ref === workflow.ref
+                        ? "border-cpx-green bg-cpx-green-50/40"
+                        : "border-transparent hover:bg-cpx-grey-50"
+                    }`}
+                  >
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 truncate text-sm font-medium">
+                        {w.name}
+                      </span>
+                      <span className="shrink-0 font-mono text-2xs text-cpx-grey-500">
+                        {w.version}
+                      </span>
+                    </span>
+                    <span className="mt-1 block text-2xs text-cpx-grey-500">
+                      {STATUS[w.status].label} · {built} of {total} agents built
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+
+          <WorkflowDetail
+            workflow={workflow}
+            agents={agents}
+            admin={admin}
+            onOpenAgent={onOpenAgent}
+          />
+        </div>
       )}
     </div>
   );
 }
 
-function WorkflowCard({
+function WorkflowDetail({
   workflow: w,
   agents,
   admin,
-  open,
-  highlighted,
-  onToggle,
   onOpenAgent,
 }: {
   workflow: Workflow;
   agents: Agent[];
   admin: boolean;
-  open: boolean;
-  highlighted: boolean;
-  onToggle: () => void;
   onOpenAgent: (agentId: string) => void;
 }) {
   const nameOf = (id: string) => agents.find((a) => a.id === id)?.name ?? id;
-  // A workflow is only as built as the agents it dispatches. Saying so is more
-  // use than a status badge on its own.
-  const builtAgents = w.agentRefs.filter(
-    (id) => agents.find((a) => a.id === id)?.status === "active",
-  ).length;
+  const { built, total } = readiness(w, agents);
 
   return (
-    <section
-      id={`wf-${w.ref}`}
-      className={`flex flex-col border bg-white ${
-        highlighted ? "border-cpx-purple" : "border-black/10"
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3 px-4 pt-3">
+    <section className="min-w-0">
+      <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h3 className="text-md font-medium leading-tight tracking-tightish">
-            {w.name}
-          </h3>
-          <p className="mt-1 text-xs leading-relaxed text-cpx-grey">
-            {w.purpose}
-          </p>
+          <h2 className="text-lg font-semibold tracking-tightish">{w.name}</h2>
+          <p className="mt-1 text-sm leading-relaxed">{w.purpose}</p>
         </div>
         <span className="flex shrink-0 items-center gap-2">
-          <span className="font-mono text-2xs text-cpx-grey">{w.version}</span>
+          <span className="font-mono text-2xs text-cpx-grey-500">{w.version}</span>
           <StatusPill {...STATUS[w.status]} />
         </span>
       </div>
 
-      <dl className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 px-4 text-xs sm:grid-cols-4">
+      {/* Readiness leads, because a workflow that dispatches agents nobody has
+          built cannot run, and that was buried in an 11px line before. */}
+      <div className="mt-4 border border-cpx-grey-100 bg-white p-3">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
+            Readiness
+          </span>
+          <span className="text-xs">
+            <span className="font-medium">{built}</span> of {total} agents built
+          </span>
+        </span>
+        <span
+          aria-hidden
+          className="mt-2 flex h-1.5 w-full overflow-hidden bg-cpx-grey-100"
+        >
+          <span
+            className={built === total ? "bg-cpx-green" : "bg-cpx-bright"}
+            style={{ width: `${total === 0 ? 0 : (built / total) * 100}%` }}
+          />
+        </span>
+        <span className="mt-2 block text-2xs text-cpx-grey-500">
+          {w.steps.length} steps · {w.updateCount}{" "}
+          {w.updateCount === 1 ? "change" : "changes"} · updated{" "}
+          {gstDateTime(w.updatedAt)}
+        </span>
+      </div>
+
+      {w.gap && (
+        <p className="mt-3 border border-cpx-grey-100 bg-cpx-grey-50 px-3 py-2 text-xs">
+          {w.gap}
+        </p>
+      )}
+
+      <dl className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 text-xs sm:grid-cols-4">
         <Fact label="Trigger" value={TRIGGER[w.trigger]} title={w.triggerDetail} />
         <Fact
           label="Approval"
@@ -241,103 +283,91 @@ function WorkflowCard({
         />
       </dl>
 
-      <div className="mt-3 space-y-2 px-4">
-        <Chips
-          label="Agents"
-          items={w.agentRefs.map((id) => ({ key: id, text: nameOf(id) }))}
-          onSelect={onOpenAgent}
-        />
-        <Chips
-          label="Tools"
-          items={w.toolNames.map((t) => ({ key: t, text: t }))}
-          mono
-        />
-        <Chips
-          label="Sources"
-          items={w.sourceScope.map((s) => ({ key: s, text: s }))}
-        />
-      </div>
-
-      <p className="mt-3 px-4 text-2xs text-cpx-grey">
-        <span className="font-medium text-cpx-black">{builtAgents}</span> of{" "}
-        {w.agentRefs.length} agents built · {w.steps.length} steps ·{" "}
-        {w.updateCount} {w.updateCount === 1 ? "change" : "changes"}
-      </p>
-
-      {w.gap && (
-        <p className="mx-4 mt-3 border border-black/10 bg-black/[0.02] px-3 py-2 text-xs">
-          {w.gap}
-        </p>
-      )}
-
-      <button
-        onClick={onToggle}
-        aria-expanded={open}
-        className="mt-3 flex items-center gap-1.5 border-t border-black/10 px-4 py-2 text-left text-xs hover:bg-black/[0.02]"
-      >
-        <IconChevronDown className={open ? "rotate-180" : ""} />
-        {open ? "Hide the run" : `Show the run · ${w.steps.length} steps`}
-      </button>
-
-      {open && (
-        <div className="border-t border-black/10 px-4 py-4">
-          <ol className="space-y-0">
-            {w.steps.map((s, i) => (
-              <li key={s.label} className="flex gap-3">
-                {/* A rail, so the steps read as a sequence rather than a list. */}
-                <span className="flex flex-col items-center">
-                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-white ring-1 ring-black/20" />
-                  {i < w.steps.length - 1 && (
-                    <span className="w-px flex-1 bg-black/10" />
-                  )}
-                </span>
-                <span
-                  className={`min-w-0 flex-1 ${i === w.steps.length - 1 ? "" : "pb-4"}`}
-                >
-                  <span className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-sm font-medium">
-                      {i + 1}. {s.label}
-                    </span>
-                    <button
-                      onClick={() => onOpenAgent(s.agentRef)}
-                      className="bg-black/5 px-1 text-2xs hover:bg-black/10"
-                    >
-                      {nameOf(s.agentRef)}
-                    </button>
-                  </span>
-                  <span className="mt-0.5 block text-xs text-cpx-grey">
-                    {s.detail}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ol>
-
-          <Block label="Outputs" count={w.outputs.length}>
-            <ul className="space-y-1">
-              {w.outputs.map((o) => (
-                <li key={o} className="text-xs">
-                  {o}
-                </li>
-              ))}
-            </ul>
-          </Block>
-
-          <Block label="Version">
-            <p className="text-xs">
-              {w.version} · {w.updateCount}{" "}
-              {w.updateCount === 1 ? "change" : "changes"} · updated{" "}
-              {gstDateTime(w.updatedAt)}
-            </p>
-          </Block>
-
-          <Block label="Basis">
-            <p className="text-xs text-cpx-grey">{w.basis}</p>
-          </Block>
-
-          <Actions workflow={w} admin={admin} />
+      {/* Full width, so a chip group is a group rather than a ragged wrap
+          around a 60px label gutter. */}
+      <DetailRow label="Agents" count={w.agentRefs.length}>
+        <div className="flex flex-wrap gap-1.5">
+          {w.agentRefs.map((id) => (
+            <button
+              key={id}
+              onClick={() => onOpenAgent(id)}
+              className="bg-cpx-grey-50 px-1.5 text-2xs hover:bg-cpx-grey-100"
+            >
+              {nameOf(id)}
+            </button>
+          ))}
         </div>
-      )}
+      </DetailRow>
+
+      <DetailRow label="Tools" count={w.toolNames.length}>
+        <div className="flex flex-wrap gap-1.5">
+          {w.toolNames.map((t) => (
+            <span key={t} className="bg-cpx-grey-50 px-1.5 font-mono text-2xs">
+              {t}
+            </span>
+          ))}
+        </div>
+      </DetailRow>
+
+      <DetailRow label="Sources" count={w.sourceScope.length}>
+        <div className="flex flex-wrap gap-1.5">
+          {w.sourceScope.map((s) => (
+            <span key={s} className="bg-cpx-grey-50 px-1.5 text-2xs">
+              {s}
+            </span>
+          ))}
+        </div>
+      </DetailRow>
+
+      <DetailRow label="The run" count={w.steps.length}>
+        <ol className="space-y-0">
+          {w.steps.map((s, i) => (
+            <li key={s.label} className="flex gap-3">
+              {/* A rail, so the steps read as a sequence rather than a list. */}
+              <span className="flex flex-col items-center">
+                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-white ring-1 ring-cpx-grey-200" />
+                {i < w.steps.length - 1 && (
+                  <span className="w-px flex-1 bg-cpx-grey-100" />
+                )}
+              </span>
+              <span
+                className={`min-w-0 flex-1 ${i === w.steps.length - 1 ? "" : "pb-4"}`}
+              >
+                <span className="flex flex-wrap items-baseline gap-2">
+                  <span className="text-sm font-medium">
+                    {i + 1}. {s.label}
+                  </span>
+                  <button
+                    onClick={() => onOpenAgent(s.agentRef)}
+                    className="bg-cpx-grey-50 px-1 text-2xs hover:bg-cpx-grey-100"
+                  >
+                    {nameOf(s.agentRef)}
+                  </button>
+                </span>
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">
+                  {s.detail}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </DetailRow>
+
+      <DetailRow label="Outputs" count={w.outputs.length}>
+        <ul className="space-y-1">
+          {w.outputs.map((o) => (
+            <li key={o} className="text-xs">
+              {o}
+            </li>
+          ))}
+        </ul>
+      </DetailRow>
+
+      <DetailRow label="Basis">
+        <p className="text-xs text-cpx-grey-500">{w.basis}</p>
+      </DetailRow>
+
+      <Actions workflow={w} admin={admin} />
     </section>
   );
 }
@@ -347,7 +377,7 @@ function WorkflowCard({
 // live and does nothing is worse than one that says why it is not.
 function Actions({ workflow: w, admin }: { workflow: Workflow; admin: boolean }) {
   return (
-    <div className="mt-5 border-t border-black/10 pt-4">
+    <div className="mt-5 border-t border-cpx-grey-100 pt-4">
       <div className="flex flex-wrap gap-2">
         <Action label="Open" primary />
         {admin && (
@@ -363,91 +393,11 @@ function Actions({ workflow: w, admin }: { workflow: Workflow; admin: boolean })
           </>
         )}
       </div>
-      <p className="mt-2 text-2xs text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey-500">
         {admin
           ? "Publishing a workflow does not publish its output. A lead analyst approves every client-facing artefact."
           : "Read only at this access level. The administrator changes a workflow."}
       </p>
-    </div>
-  );
-}
-
-function Fact({
-  label,
-  value,
-  title,
-}: {
-  label: string;
-  value: string;
-  title?: string;
-}) {
-  return (
-    <div className="min-w-0" title={title}>
-      <dt className="text-cpx-grey">{label}</dt>
-      <dd className="truncate font-medium">{value}</dd>
-    </div>
-  );
-}
-
-function Chips({
-  label,
-  items,
-  onSelect,
-  mono,
-}: {
-  label: string;
-  items: { key: string; text: string }[];
-  onSelect?: (key: string) => void;
-  mono?: boolean;
-}) {
-  return (
-    <div className="flex flex-wrap items-baseline gap-1.5">
-      <span className="w-[3.75rem] shrink-0 text-2xs text-cpx-grey">
-        {label}
-        <span className="ml-1 text-cpx-black">{items.length}</span>
-      </span>
-      {items.map((it) =>
-        onSelect ? (
-          <button
-            key={it.key}
-            onClick={() => onSelect(it.key)}
-            className="bg-black/5 px-1.5 text-2xs hover:bg-black/10"
-          >
-            {it.text}
-          </button>
-        ) : (
-          <span
-            key={it.key}
-            className={`bg-black/5 px-1.5 text-2xs ${
-              mono ? "font-mono text-2xs" : ""
-            }`}
-          >
-            {it.text}
-          </span>
-        ),
-      )}
-    </div>
-  );
-}
-
-function Block({
-  label,
-  count,
-  children,
-}: {
-  label: string;
-  count?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mt-4 border-t border-black/10 pt-3">
-      <span className="flex items-baseline gap-2 text-2xs text-cpx-grey">
-        {label}
-        {count !== undefined && (
-          <span className="bg-black/5 px-1 text-2xs text-cpx-black">{count}</span>
-        )}
-      </span>
-      <div className="mt-1.5">{children}</div>
     </div>
   );
 }
@@ -467,34 +417,6 @@ function Action({
       className={buttonClass(primary ? "primary" : "secondary")}
     >
       {label}
-    </button>
-  );
-}
-
-function Chip({
-  label,
-  count,
-  active,
-  onClick,
-}: {
-  label: string;
-  count: number;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs ${
-        active
-          ? "border-cpx-purple bg-cpx-purple font-medium text-white"
-          : "border-black/15 hover:bg-black/5"
-      }`}
-    >
-      {label}
-      <span className={`px-1 text-2xs ${active ? "bg-white/15" : "bg-black/5"}`}>
-        {count}
-      </span>
     </button>
   );
 }

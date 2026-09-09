@@ -149,7 +149,7 @@ export function LineChart({
             <text
               transform={`translate(11 ${PAD_T + (chartH - PAD_T - AXIS_H) / 2}) rotate(-90)`}
               textAnchor="middle"
-              className="fill-cpx-grey"
+              className="fill-cpx-grey-500"
               style={{ fontSize: 10, fontWeight: 400 }}
             >
               {yLabel}
@@ -168,14 +168,14 @@ export function LineChart({
                       y1={yIn(r, t, ceiling)}
                       y2={yIn(r, t, ceiling)}
                       stroke="currentColor"
-                      className={t === 0 ? "text-black/20" : "text-black/10"}
+                      className={t === 0 ? "text-cpx-grey-400" : "text-cpx-grey-400"}
                       strokeWidth={1}
                     />
                     <text
                       x={PAD_L - 6}
                       y={yIn(r, t, ceiling) + 3}
                       textAnchor="end"
-                      className="fill-cpx-grey"
+                      className="fill-cpx-grey-500"
                       style={{ fontSize: 9, fontWeight: 400 }}
                     >
                       {t}
@@ -246,7 +246,7 @@ export function LineChart({
               y1={PAD_T - 4}
               y2={chartH - AXIS_H}
               stroke="currentColor"
-              className="text-black/25"
+              className="text-cpx-grey-400"
               strokeWidth={1}
               strokeDasharray="3 2"
             />
@@ -259,7 +259,7 @@ export function LineChart({
                 x={x(i)}
                 y={chartH - AXIS_H + 14}
                 textAnchor="middle"
-                className={hover === i ? "fill-cpx-black" : "fill-cpx-grey"}
+                className={hover === i ? "fill-cpx-black" : "fill-cpx-grey-500"}
                 style={{ fontSize: 9, fontWeight: hover === i ? 500 : 400 }}
               >
                 {l}
@@ -272,7 +272,7 @@ export function LineChart({
               x={PAD_L + plotW / 2}
               y={chartH - 4}
               textAnchor="middle"
-              className="fill-cpx-grey"
+              className="fill-cpx-grey-500"
               style={{ fontSize: 10, fontWeight: 400 }}
             >
               {xLabel}
@@ -284,7 +284,7 @@ export function LineChart({
             to get a value. The number leads and the series name follows. */}
         {hover !== null && (
           <div
-            className="pointer-events-none absolute top-0 z-10 w-max max-w-[15rem] -translate-x-1/2 border border-black/15 bg-white px-2 py-1.5 shadow-pop"
+            className="pointer-events-none absolute top-0 z-10 w-max max-w-[15rem] -translate-x-1/2 border border-cpx-grey-100 bg-white px-2 py-1.5 shadow-pop"
             style={{
               left: `${Math.min(88, Math.max(12, (x(hover) / VIEW_W) * 100))}%`,
             }}
@@ -303,7 +303,7 @@ export function LineChart({
                 <span className="font-medium">
                   {s.values[hover].toLocaleString("en-GB")}
                 </span>
-                <span className="text-cpx-grey">
+                <span className="text-cpx-grey-500">
                   {valueUnit ? `${valueUnit} ` : ""}
                   {s.label.toLowerCase()}
                 </span>
@@ -327,7 +327,7 @@ export function LineChart({
                 style={{ background: s.color }}
               />
               {s.label}
-              <span className="text-cpx-grey">
+              <span className="text-cpx-grey-500">
                 {s.values.reduce((a, b) => a + b, 0).toLocaleString("en-GB")} in
                 the window{facet ? ", own scale" : ""}
               </span>

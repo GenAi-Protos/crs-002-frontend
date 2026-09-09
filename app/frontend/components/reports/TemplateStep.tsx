@@ -104,8 +104,8 @@ export function TemplateStep({
 
   return (
     <>
-      <p className="mt-3 flex items-baseline gap-2 text-xs text-cpx-grey">
-        <span className="bg-black/5 px-1.5 text-2xs text-cpx-black">{type}</span>
+      <p className="mt-3 flex items-baseline gap-2 text-xs text-cpx-grey-500">
+        <span className="bg-cpx-grey-50 px-1.5 text-2xs text-cpx-black">{type}</span>
         {standard.name}
       </p>
 
@@ -113,7 +113,7 @@ export function TemplateStep({
         Template selection
       </h3>
 
-      <div className="mt-2 border border-black/10">
+      <div className="mt-2 border border-cpx-grey-100">
         <Option
           checked={kind === "standard"}
           onSelect={() => {
@@ -123,7 +123,7 @@ export function TemplateStep({
           label="Use standard template"
           note={`The ${standard.sections.length} sections CPX publishes this format with.`}
         />
-        <div className="border-t border-black/10">
+        <div className="border-t border-cpx-grey-100">
           <Option
             checked={kind === "custom"}
             onSelect={() => {
@@ -152,16 +152,16 @@ export function TemplateStep({
               {imported?.warnings.map((w) => (
                 <p
                   key={w}
-                  className="mt-2 border border-black/10 bg-status-warn-fill px-2.5 py-1.5 text-xs text-status-warn-ink"
+                  className="mt-2 border border-cpx-grey-100 bg-status-warn-fill px-2.5 py-1.5 text-xs text-status-warn-ink"
                 >
                   {w}
                 </p>
               ))}
 
               {imported && imported.sections.length > 0 && (
-                <div className="mt-2 border border-black/10 bg-black/[0.02] px-2.5 py-2">
+                <div className="mt-2 border border-cpx-grey-100 bg-cpx-grey-50 px-2.5 py-2">
                   <p className="text-xs font-medium">Custom template</p>
-                  <p className="mt-0.5 break-all text-xs text-cpx-grey">
+                  <p className="mt-0.5 break-all text-xs text-cpx-grey-500">
                     {imported.name}
                   </p>
                   <p className="mt-1 text-xs">
@@ -213,7 +213,7 @@ export function TemplateStep({
       </div>
 
       {!usable && (
-        <p className="mt-2 text-right text-2xs text-cpx-grey">
+        <p className="mt-2 text-right text-2xs text-cpx-grey-500">
           {editing
             ? "Save or cancel your changes to continue."
             : kind === "custom" && imported
@@ -250,13 +250,13 @@ function TemplatePreview({
   const add = () => onChange([...sections, { heading: "", guidance: "" }]);
 
   return (
-    <div className="mt-3 border border-black/10">
-      <div className="flex items-center gap-2 border-b border-black/10 px-3 py-1.5">
-        <span className="text-2xs text-cpx-grey">
+    <div className="mt-3 border border-cpx-grey-100">
+      <div className="flex items-center gap-2 border-b border-cpx-grey-100 px-3 py-1.5">
+        <span className="text-2xs text-cpx-grey-500">
           Template preview <span className="text-cpx-black">{sections.length}</span>
         </span>
         {edited && !editing && (
-          <span className="bg-black/5 px-1.5 text-2xs">Edited</span>
+          <span className="bg-cpx-grey-50 px-1.5 text-2xs">Edited</span>
         )}
         <div className="flex-1" />
         {editing ? (
@@ -287,23 +287,23 @@ function TemplatePreview({
 
       <ol className="max-h-64 overflow-y-auto">
         {sections.map((s, i) => (
-          <li key={i} className="border-b border-black/5 px-3 py-2 last:border-b-0">
+          <li key={i} className="border-b border-cpx-grey-100 px-3 py-2 last:border-b-0">
             {editing ? (
               <>
                 <span className="flex items-center gap-2">
-                  <span className="w-4 shrink-0 text-xs text-cpx-grey">
+                  <span className="w-4 shrink-0 text-xs text-cpx-grey-500">
                     {i + 1}.
                   </span>
                   <input
                     value={s.heading}
                     onChange={(e) => set(i, { heading: e.target.value })}
                     placeholder="Section title"
-                    className="h-8 min-w-0 flex-1 border border-black/15 px-2 text-xs font-medium focus:border-cpx-purple focus:outline-none"
+                    className="h-8 min-w-0 flex-1 border border-cpx-grey-100 px-2 text-xs font-medium focus:border-cpx-green focus:outline-none"
                   />
                   <button
                     onClick={() => remove(i)}
                     aria-label={`Remove section ${i + 1}`}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center border border-black/15 text-cpx-grey hover:bg-black/5"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center border border-cpx-grey-100 text-cpx-grey-500 hover:bg-cpx-grey-50"
                   >
                     &times;
                   </button>
@@ -313,7 +313,7 @@ function TemplatePreview({
                   onChange={(e) => set(i, { guidance: e.target.value })}
                   rows={2}
                   placeholder="What belongs in this section"
-                  className="ml-6 mt-1.5 w-[calc(100%-3.5rem)] resize-y border border-black/15 px-2 py-1 text-xs focus:border-cpx-purple focus:outline-none"
+                  className="ml-6 mt-1.5 w-[calc(100%-3.5rem)] resize-y border border-cpx-grey-100 px-2 py-1 text-xs focus:border-cpx-green focus:outline-none"
                 />
               </>
             ) : (
@@ -321,11 +321,11 @@ function TemplatePreview({
                 <span className="flex gap-2 text-xs">
                   {/* One number, this list's own: a heading arrives stripped of
                       whatever numbering its source document carried. */}
-                  <span className="text-cpx-grey">{i + 1}.</span>
+                  <span className="text-cpx-grey-500">{i + 1}.</span>
                   <span className="font-medium">{s.heading}</span>
                 </span>
                 {s.guidance && (
-                  <span className="mt-0.5 block pl-5 text-2xs text-cpx-grey">
+                  <span className="mt-0.5 block pl-5 text-2xs text-cpx-grey-500">
                     {s.guidance}
                   </span>
                 )}
@@ -336,7 +336,7 @@ function TemplatePreview({
       </ol>
 
       {editing && (
-        <div className="border-t border-black/10 px-3 py-2">
+        <div className="border-t border-cpx-grey-100 px-3 py-2">
           <button
             onClick={add}
             className={buttonClass("secondary", "sm")}
@@ -365,18 +365,18 @@ function Option({
       onClick={onSelect}
       role="radio"
       aria-checked={checked}
-      className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left hover:bg-black/[0.03]"
+      className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left hover:bg-cpx-grey-50"
     >
       <span
         className={`mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border ${
-          checked ? "border-cpx-purple" : "border-black/25"
+          checked ? "border-cpx-purple" : "border-cpx-grey-100"
         }`}
       >
         {checked && <span className="h-1.5 w-1.5 rounded-full bg-cpx-purple" />}
       </span>
       <span className="min-w-0">
         <span className="block text-sm font-medium">{label}</span>
-        <span className="mt-0.5 block text-xs text-cpx-grey">{note}</span>
+        <span className="mt-0.5 block text-xs text-cpx-grey-500">{note}</span>
       </span>
     </button>
   );

@@ -170,18 +170,18 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)]">
-      <aside className="w-80 shrink-0 border-r border-black/10 bg-white">
+    <div className="flex min-h-[calc(100vh-60px)]">
+      <aside className="w-80 shrink-0 border-r border-cpx-grey-100 bg-white">
         <div className="flex items-center justify-between px-4 pb-2 pt-5">
-          <h1 className="text-xl font-medium tracking-tightish">Clients</h1>
+          <h1 className="text-xl font-semibold tracking-tightish">Clients</h1>
           <span className="flex items-center gap-2">
-            <span className="text-xs text-cpx-grey">
+            <span className="text-xs text-cpx-grey-500">
               {allClients.length}
             </span>
             <button
               onClick={() => setShowAdd(true)}
               aria-label="Add client"
-              className="flex h-6 w-6 items-center justify-center border border-black/15 text-black/60 hover:bg-black/5"
+              className="flex h-6 w-6 items-center justify-center border border-cpx-grey-100 text-cpx-grey-500 hover:bg-cpx-grey-50"
             >
               <IconPlus />
             </button>
@@ -207,8 +207,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 href={`/clients/${c.id}`}
                 className={`block border-l-2 px-4 py-2.5 ${
                   c.id === client.id
-                    ? "border-cpx-purple bg-black/[0.03]"
-                    : "border-transparent hover:bg-black/[0.02]"
+                    ? "border-cpx-green bg-cpx-green-50/40"
+                    : "border-transparent hover:bg-cpx-grey-50"
                 }`}
               >
                 <span className="font-mono text-xs font-medium">{c.id}</span>
@@ -227,10 +227,10 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
       <section className="min-w-0 flex-1 px-6 py-5">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-medium tracking-tightish">
+            <h2 className="text-lg font-semibold tracking-tightish">
               {client.id} · {client.name}
             </h2>
-            <p className="mt-1 text-xs text-cpx-grey">
+            <p className="mt-1 text-xs text-cpx-grey-500">
               {client.sector} · {client.region} · {client.products.length} products ·{" "}
               {client.subscribedPirRefs.length} PIRs
             </p>
@@ -244,8 +244,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
               onClick={() => setEditing(!editing)}
               className={`h-8 px-3 text-sm ${
                 editing
-                  ? "bg-cpx-purple font-medium text-white"
-                  : "border border-black/15 hover:bg-black/5"
+                  ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+                  : "border border-cpx-grey-100 hover:bg-cpx-grey-50"
               }`}
             >
               {editing ? "Done" : "Edit"}
@@ -253,8 +253,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
           </span>
         </div>
 
-        <div className="mt-5 border border-black/10 bg-white p-4">
-          <span className="text-xs text-cpx-grey">
+        <div className="mt-5 border border-cpx-grey-100 bg-white p-4">
+          <span className="text-xs text-cpx-grey-500">
             Open against this client
           </span>
           {drp.length === 0 ? (
@@ -262,7 +262,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
               <span className="font-medium">0 open items</span>
             </p>
           ) : (
-            <ul className="mt-2 divide-y divide-black/5">
+            <ul className="mt-2 divide-y divide-cpx-grey-100">
               {drp.map((d) => (
                 <li key={d.id} className="flex items-center gap-3 py-2 text-sm">
                   <span className="w-44 shrink-0 font-medium">
@@ -278,7 +278,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                   >
                     {d.kind === "impersonating-domain" ? defang(d.subject) : d.subject}
                   </span>
-                  <span className="text-2xs text-cpx-grey">
+                  <span className="text-2xs text-cpx-grey-500">
                     {gstDate(d.firstSeen)}
                   </span>
                   <StatusPill {...DRP_TONE[d.status]} />
@@ -318,7 +318,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 <select
                   value={client.sector}
                   onChange={(e) => update((c) => ({ ...c, sector: e.target.value }))}
-                  className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
+                  className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
                 >
                   {["Banking", "Energy", "Transport", "Aviation", "Government", "Telecom"].map(
                     (s) => (
@@ -335,7 +335,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 <select
                   value={client.region}
                   onChange={(e) => update((c) => ({ ...c, region: e.target.value }))}
-                  className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
+                  className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
                 >
                   {["UAE", "GCC", "MENA"].map((s) => (
                     <option key={s}>{s}</option>
@@ -355,7 +355,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 {client.products.map((p) => (
                   <span
                     key={p}
-                    className="flex items-center gap-1 bg-black/5 px-2 py-0.5 text-xs"
+                    className="flex items-center gap-1 bg-cpx-grey-50 px-2 py-0.5 text-xs"
                   >
                     {p}
                     {editing && (
@@ -366,7 +366,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                             products: c.products.filter((x) => x !== p),
                           }))
                         }
-                        className="text-black/40 hover:text-cpx-red"
+                        className="text-cpx-grey-400 hover:text-cpx-red"
                       >
                         ×
                       </button>
@@ -408,8 +408,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                         }}
                         className={`px-2 py-1 text-xs ${
                           ticked
-                            ? "bg-cpx-purple font-medium text-white"
-                            : "border border-black/15 text-cpx-grey"
+                            ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+                            : "border border-cpx-grey-100 text-cpx-grey-500"
                         } ${expandedPir === p.ref ? "outline outline-1 outline-cpx-green" : ""}`}
                       >
                         {ticked ? "☑" : "☐"} {p.ref.replace("PIR", "")}
@@ -418,7 +418,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                   })}
                 </div>
                 {expandedPir && (
-                  <div className="mt-3 border border-black/10 bg-black/[0.02] p-3">
+                  <div className="mt-3 border border-cpx-grey-100 bg-cpx-grey-50 p-3">
                     <span className="font-mono text-2xs font-medium">{expandedPir}</span>
                     <p className="mt-1 text-sm leading-relaxed">
                       {pirs.find((p) => p.ref === expandedPir)?.question}
@@ -464,20 +464,20 @@ function AddClientDialog({
     <Dialog title="New client" onClose={onClose} className="max-w-sm">
         <div className="space-y-3">
           <label className="block">
-            <span className="text-xs text-cpx-grey">Name</span>
+            <span className="text-xs text-cpx-grey-500">Name</span>
             <input
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:border-cpx-purple focus:outline-none"
+              className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:border-cpx-green focus:outline-none"
             />
           </label>
           <label className="block">
-            <span className="text-xs text-cpx-grey">Sector</span>
+            <span className="text-xs text-cpx-grey-500">Sector</span>
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
+              className="mt-1 h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
             >
               {["Banking", "Energy", "Transport", "Aviation", "Government", "Telecom"].map(
                 (s) => (
@@ -487,11 +487,11 @@ function AddClientDialog({
             </select>
           </label>
           <label className="block">
-            <span className="text-xs text-cpx-grey">Region</span>
+            <span className="text-xs text-cpx-grey-500">Region</span>
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
+              className="mt-1 h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
             >
               {["UAE", "GCC", "MENA"].map((s) => (
                 <option key={s}>{s}</option>
@@ -531,7 +531,7 @@ function AddClientDialog({
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-4">
-      <span className="w-24 shrink-0 pt-1 text-xs text-cpx-grey">
+      <span className="w-24 shrink-0 pt-1 text-xs text-cpx-grey-500">
         {label}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
@@ -546,7 +546,7 @@ function AddProduct({ onAdd }: { onAdd: (p: string) => void }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex h-6 w-6 items-center justify-center border border-black/15 text-black/50 hover:bg-black/5"
+        className="flex h-6 w-6 items-center justify-center border border-cpx-grey-100 text-cpx-grey-500 hover:bg-cpx-grey-50"
       >
         <IconPlus />
       </button>
@@ -568,7 +568,7 @@ function AddProduct({ onAdd }: { onAdd: (p: string) => void }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={() => setOpen(false)}
-        className="h-6 w-40 border border-cpx-purple px-1.5 text-xs focus:outline-none"
+        className="h-6 w-40 border border-cpx-green px-1.5 text-xs focus:outline-none"
       />
     </form>
   );

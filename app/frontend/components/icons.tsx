@@ -168,7 +168,7 @@ export function IconPlus({ className = "" }: P) {
 export function IconSend({ className = "" }: P) {
   return (
     <svg viewBox="0 0 16 16" width="16" height="16" className={`${base} ${className}`} fill="currentColor" aria-hidden>
-      <path d="M2 8l12-6-4 6 4 6z" />
+      <path d="M14 8 2 2l4 6-4 6z" />
     </svg>
   );
 }

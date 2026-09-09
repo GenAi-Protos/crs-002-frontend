@@ -11,7 +11,7 @@ export function SplitBar({
   const total = segments.reduce((s, x) => s + x.value, 0);
   return (
     <div>
-      <div className="flex h-5 w-full gap-0.5 bg-black/5">
+      <div className="flex h-5 w-full gap-0.5 bg-cpx-grey-50">
         {total > 0 &&
           segments.map((s, i) => (
             <span
@@ -28,7 +28,7 @@ export function SplitBar({
         {segments.map((s, i) => (
           <span key={s.label} className="flex items-center gap-1.5 text-xs">
             <span className="inline-block h-2.5 w-2.5" style={{ background: COLORS[i] }} />
-            <span className="text-cpx-grey">{s.label}</span>
+            <span className="text-cpx-grey-500">{s.label}</span>
             <span className="font-medium">{s.value}</span>
           </span>
         ))}

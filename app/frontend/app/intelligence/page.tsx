@@ -191,7 +191,7 @@ function IntelligenceInner() {
   const forked = new Set(sessions.map((s) => s.id));
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-[880px] flex-col px-6">
+    <div className="mx-auto flex min-h-[calc(100vh-60px)] max-w-[880px] flex-col px-6">
       <PageHeader
         className="pt-4"
         title="Intelligence"
@@ -199,7 +199,7 @@ function IntelligenceInner() {
         action={
           <div ref={headerRef} className="relative flex items-center gap-1">
         {/* Two jobs, two sections. Neither replaces the other. */}
-        <div className="flex border border-black/10">
+        <div className="flex border border-cpx-grey-100">
           {(["ask", "lookup"] as const).map((k) => (
             <button
               key={k}
@@ -207,7 +207,7 @@ function IntelligenceInner() {
               className={`h-7 px-3 text-xs ${
                 section === k
                   ? "bg-cpx-purple font-medium text-white"
-                  : "text-cpx-grey hover:bg-black/5"
+                  : "text-cpx-grey-500 hover:bg-cpx-grey-50"
               }`}
             >
               {k === "ask" ? "Ask" : "IOC Lookup"}
@@ -220,7 +220,7 @@ function IntelligenceInner() {
           className={buttonClass("ghost", "sm")}
         >
           History
-          <span className="bg-black/5 px-1 text-2xs">
+          <span className="bg-cpx-grey-50 px-1 text-2xs">
             {localOnly.length + investigations.length}
           </span>
           <IconChevronDown className={historyOpen ? "rotate-180" : ""} />
@@ -235,13 +235,13 @@ function IntelligenceInner() {
         </button>
         {historyOpen && (
           <>
-            <div className="absolute right-0 top-9 z-40 w-96 max-w-full border border-black/10 bg-white shadow-pop">
+            <div className="absolute right-0 top-9 z-40 w-96 max-w-full border border-cpx-grey-100 bg-white shadow-pop">
               <ul className="max-h-80 overflow-y-auto">
                 {localOnly.map((s) => (
                   <li key={s.id}>
                     <button
                       onClick={() => openStored(s)}
-                      className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-black/[0.03] ${s.id === sessionId ? "bg-black/[0.03]" : ""}`}
+                      className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-cpx-grey-50 ${s.id === sessionId ? "bg-cpx-grey-50" : ""}`}
                     >
                       <span
                         className="min-w-0 flex-1 truncate text-xs"
@@ -249,7 +249,7 @@ function IntelligenceInner() {
                       >
                         {s.title}
                       </span>
-                      <span className="shrink-0 text-2xs text-cpx-grey">
+                      <span className="shrink-0 text-2xs text-cpx-grey-500">
                         This session
                       </span>
                     </button>
@@ -259,7 +259,7 @@ function IntelligenceInner() {
                   <li key={inv.id}>
                     <button
                       onClick={() => openInvestigation(inv.id)}
-                      className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-black/[0.03] ${sessionId === `fx-${inv.id}` ? "bg-black/[0.03]" : ""}`}
+                      className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-cpx-grey-50 ${sessionId === `fx-${inv.id}` ? "bg-cpx-grey-50" : ""}`}
                     >
                       <span
                         className="min-w-0 flex-1 truncate text-xs"
@@ -267,7 +267,7 @@ function IntelligenceInner() {
                       >
                         {inv.title}
                       </span>
-                      <span className="shrink-0 text-2xs text-cpx-grey">
+                      <span className="shrink-0 text-2xs text-cpx-grey-500">
                         {forked.has(`fx-${inv.id}`)
                           ? "Continued"
                           : gstDate(inv.createdAt)}
@@ -289,14 +289,16 @@ function IntelligenceInner() {
 
       {section === "ask" && (
         <>
-      <div className="flex-1 space-y-8 py-6">
+      <div className="flex flex-1 flex-col space-y-8 py-6">
         {turns.length === 0 && (
-          <div className="flex min-h-[50vh] flex-col justify-end gap-2">
+          // Centred in the space above the composer: an empty console that
+          // stacks its openers against the bottom edge reads as a broken feed.
+          <div className="flex flex-1 flex-col justify-end gap-2 pb-2">
             {STARTER_PROMPTS.map((p) => (
               <button
                 key={p}
                 onClick={() => ask(p)}
-                className="border border-black/10 bg-white px-4 py-2.5 text-left text-sm hover:border-cpx-purple"
+                className="border border-cpx-grey-100 bg-white px-4 py-2.5 text-left text-sm hover:border-cpx-green"
               >
                 {p}
               </button>
@@ -317,7 +319,7 @@ function IntelligenceInner() {
 
       <div className="sticky bottom-0 bg-canvas pb-6 pt-2">
         <form
-          className="border border-black/15 bg-white"
+          className="border border-cpx-grey-100 bg-white"
           onSubmit={(e) => {
             e.preventDefault();
             if (draft.trim()) ask(draft.trim());
@@ -343,14 +345,14 @@ function IntelligenceInner() {
               type="submit"
               aria-label="Send"
               disabled={!draft.trim()}
-              className="flex h-9 w-9 items-center justify-center bg-cpx-green text-cpx-black disabled:bg-black/5 disabled:text-black/30"
+              className="flex h-9 w-9 items-center justify-center bg-cpx-green text-cpx-black disabled:bg-cpx-grey-50 disabled:text-cpx-grey-400"
             >
               <IconSend />
             </button>
           </div>
         </form>
         {!optionsAreDefault(options) && (
-          <p className="mt-1.5 text-2xs text-cpx-grey">
+          <p className="mt-1.5 text-2xs text-cpx-grey-500">
             These settings are sent with the question and change the answer. They
             do not filter what is already on screen.
           </p>

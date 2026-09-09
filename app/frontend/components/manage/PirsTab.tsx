@@ -201,7 +201,7 @@ export function PirsTab({
       </div>
 
       {adding && (
-        <div className="mt-3 border border-black/15 bg-black/[0.02] p-4">
+        <div className="mt-3 border border-cpx-grey-100 bg-cpx-grey-50 p-4">
           <PirForm
             heading="Add PIR"
             initial={blankDraft()}
@@ -254,9 +254,12 @@ export function PirsTab({
                       {p.ref}
                     </td>
                     {/* The question wraps in full. A PIR that is cut off is a
-                        PIR nobody can answer. */}
+                        PIR nobody can answer. Held to a readable measure: at
+                        full table width a question ran past 90 characters. */}
                     <td className={`${T_TD} leading-relaxed`}>
-                      {p.question}
+                      {/* The cap sits on a block inside the cell: max-width on a
+                          cell itself is ignored while the table lays out auto. */}
+                      <span className="block max-w-[62ch]">{p.question}</span>
                     </td>
                     <td className={T_TD}>
                       <TypeBadge label={p.coverage} />
@@ -276,7 +279,7 @@ export function PirsTab({
                     )}
                   </tr>
                   {editing && (
-                    <tr className="border-b border-black/[0.06] bg-black/[0.02]">
+                    <tr className="border-b border-cpx-grey-100 bg-cpx-grey-50">
                       <td colSpan={5} className="px-3 py-4">
                         <PirForm
                           heading={`Edit ${p.ref}`}
@@ -314,12 +317,12 @@ function Filter({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="flex items-center gap-1.5 text-xs text-cpx-grey">
+    <label className="flex items-center gap-1.5 text-xs text-cpx-grey-500">
       {label}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-8 max-w-[15rem] border border-black/15 bg-white px-2 text-sm text-cpx-black focus:border-cpx-purple focus:outline-none"
+        className="h-8 max-w-[15rem] border border-cpx-grey-100 bg-white px-2 text-sm text-cpx-black focus:border-cpx-green focus:outline-none"
       >
         <option value={ALL}>{ALL}</option>
         {options.map((o) => (
@@ -369,13 +372,13 @@ function PirForm({
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <span className="text-2xs text-cpx-grey">Category</span>
+          <span className="text-2xs text-cpx-grey-500">Category</span>
           <select
             value={draft.category}
             onChange={(e) =>
               setDraft({ ...draft, category: e.target.value as PirCategory })
             }
-            className="mt-1 h-8 w-full border border-black/15 bg-white px-2 text-sm focus:border-cpx-purple focus:outline-none"
+            className="mt-1 h-8 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:border-cpx-green focus:outline-none"
           >
             {CATEGORIES.map((c) => (
               <option key={c}>{c}</option>
@@ -384,13 +387,13 @@ function PirForm({
         </label>
 
         <label className="block">
-          <span className="text-2xs text-cpx-grey">Coverage</span>
+          <span className="text-2xs text-cpx-grey-500">Coverage</span>
           <input
             value={draft.coverage}
             onChange={(e) => setDraft({ ...draft, coverage: e.target.value })}
             list="pir-coverage-values"
             placeholder="Threat Actors"
-            className="mt-1 h-8 w-full border border-black/15 bg-white px-2 text-sm focus:border-cpx-purple focus:outline-none"
+            className="mt-1 h-8 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:border-cpx-green focus:outline-none"
           />
           <datalist id="pir-coverage-values">
             {[
@@ -412,13 +415,13 @@ function PirForm({
       </div>
 
       <label className="mt-3 block">
-        <span className="text-2xs text-cpx-grey">PIR</span>
+        <span className="text-2xs text-cpx-grey-500">PIR</span>
         <textarea
           value={draft.question}
           onChange={(e) => setDraft({ ...draft, question: e.target.value })}
           rows={3}
           placeholder="What threat actors are actively targeting [Client]'s industry?"
-          className="mt-1 w-full border border-black/15 bg-white px-2 py-1.5 text-sm leading-relaxed focus:border-cpx-purple focus:outline-none"
+          className="mt-1 w-full border border-cpx-grey-100 bg-white px-2 py-1.5 text-sm leading-relaxed focus:border-cpx-green focus:outline-none"
         />
       </label>
 
@@ -434,13 +437,13 @@ function PirForm({
         </label>
         {/* Derived from the text, never typed: the parameters and the question
             cannot disagree. Per-client lists sit at open item B2. */}
-        <span className="text-2xs text-cpx-grey">
+        <span className="text-2xs text-cpx-grey-500">
           Parameters{" "}
           {parameters.length === 0 ? (
             <span className="text-cpx-black">none</span>
           ) : (
             parameters.map((p) => (
-              <span key={p} className="ml-1 bg-black/5 px-1.5 text-cpx-black">
+              <span key={p} className="ml-1 bg-cpx-grey-50 px-1.5 text-cpx-black">
                 {PARAMETER_LABEL[p]}
               </span>
             ))
@@ -458,7 +461,7 @@ function PirForm({
         <button
           onClick={submit}
           disabled={!valid || saving}
-          className="h-8 bg-cpx-purple px-3 text-sm font-medium text-white hover:brightness-110 disabled:opacity-40"
+          className="h-8 bg-cpx-green px-3 text-base font-medium text-cpx-purple hover:bg-cpx-green-600 disabled:opacity-40"
         >
           {saving ? "Saving" : "Save"}
         </button>

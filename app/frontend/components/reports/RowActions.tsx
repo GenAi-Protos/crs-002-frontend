@@ -87,7 +87,7 @@ export function RowActions({
           e.stopPropagation();
           setOpen(!open);
         }}
-        className="flex h-7 w-7 items-center justify-center text-cpx-grey hover:bg-black/5"
+        className="flex h-7 w-7 items-center justify-center text-cpx-grey-500 hover:bg-cpx-grey-50"
       >
         <span aria-hidden className="text-md leading-none">
           &#8942;
@@ -98,7 +98,7 @@ export function RowActions({
         <div
           role="menu"
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-0 top-8 z-50 min-w-[14rem] border border-black/10 bg-white py-1 text-left shadow-sm"
+          className="absolute right-0 top-8 z-50 min-w-[14rem] border border-cpx-grey-100 bg-white py-1 text-left shadow-pop"
         >
           {level === "root" && (
             <>
@@ -214,13 +214,13 @@ function Item({
       role="menuitem"
       disabled={disabled}
       onClick={onClick}
-      className="block w-full px-3 py-1.5 text-left text-xs hover:bg-black/[0.04] disabled:text-black/25 disabled:hover:bg-transparent"
+      className="block w-full px-3 py-1.5 text-left text-xs hover:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
     >
       <span className="flex items-center gap-2">
         {label}
-        {chevron && <span className="ml-auto text-cpx-grey">&rsaquo;</span>}
+        {chevron && <span className="ml-auto text-cpx-grey-500">&rsaquo;</span>}
       </span>
-      {hint && <span className="mt-0.5 block text-2xs text-cpx-grey">{hint}</span>}
+      {hint && <span className="mt-0.5 block text-2xs text-cpx-grey-500">{hint}</span>}
     </button>
   );
 }
@@ -229,7 +229,7 @@ function Back({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button
       onClick={onClick}
-      className="mb-1 flex w-full items-center gap-2 border-b border-black/10 px-3 pb-1.5 text-left text-2xs text-cpx-grey hover:text-cpx-black"
+      className="mb-1 flex w-full items-center gap-2 border-b border-cpx-grey-100 px-3 pb-1.5 text-left text-2xs text-cpx-grey-500 hover:text-cpx-black"
     >
       <span aria-hidden>&lsaquo;</span>
       {label}
@@ -238,12 +238,12 @@ function Back({ onClick, label }: { onClick: () => void; label: string }) {
 }
 
 function Divider() {
-  return <div className="my-1 border-t border-black/10" />;
+  return <div className="my-1 border-t border-cpx-grey-100" />;
 }
 
 function Footer({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-1 border-t border-black/10 px-3 pt-1.5 text-2xs text-cpx-grey">
+    <p className="mt-1 border-t border-cpx-grey-100 px-3 pt-1.5 text-2xs text-cpx-grey-500">
       {children}
     </p>
   );

@@ -2,8 +2,8 @@
 
 Five destinations. Two detail routes. Read the layouts, not the prose.
 
-**Shell:** slim 56px top bar, collapsible 240px left rail (64px icons below 1100px).
-Top bar: CPX reverse logo · Nestor mark and wordmark · search · role switcher (dev only) · profile.
+**Shell:** white 60px top bar and white 176px left rail, both with a hairline (64px icons below 1100px); the active destination sits on a green wash with a 3px green bar. The CSD-007 style guide is the visual reference.
+Top bar: CPX primary logo · Nestor mark and wordmark · Live chip · search · role switcher (dev only) · user chip.
 
 **Every list:** search box · stated default sort · cursor pagination with an honest total (`Showing 50 of 431`) · CSV export.
 
@@ -238,7 +238,15 @@ The 185-row table plus the health heatmap. Columns: `Source | Sheet | Class | Rh
 
 **One editable field: `Expected rhythm`**, four values (Continuous, Hourly, Daily, Weekly). **It does not control polling.** It tells the alarm what normal quiet looks like: a weekly CERT blog silent for nine days is fine, an IOC blocklist silent for six hours is broken. Seeded from the class, replaced by measured behaviour once there is history.
 
-**Keep the heatmap:** 185 sources by day over 30, grouped by class, virtualised, with a 45-degree hatch for `attempted, zero items`. A silent failure appears as a horizontal grey stripe with a start date. **185 collectors cannot be supervised as a list**, and the state column is a filter, not a replacement.
+**Collection health, revised 9 September 2026.** This section previously read: *"Keep the heatmap: 185 sources by day over 30, grouped by class, virtualised ... 185 collectors cannot be supervised as a list, and the state column is a filter, not a replacement."* The grid was never virtualised, so it painted about 5,550 cells on arrival, grouped by collector class while every other control on the tab groups by category, and its legend named three states while eight fills rendered.
+
+What replaces it keeps the requirement and drops the wall:
+
+1. **Needs attention**, at the top, above the category filter and unfiltered by it. Every source that is failing, silent-unexplained or blocked, each with the reason in words and a link to its detail page. A silent failure is now named, not left as a stripe to be spotted.
+2. **Thirty days by category**, one row each. The colour is the **share of that category's sources that returned items that day**, in quartiles, not the volume: on a median day IOC Feeds collects 3,442 items and Ransomware Monitoring 443, so a shared absolute ramp needs decade-wide steps and hides a 60% collapse. The share means the same thing on every row and its denominator is printed beside it. Volume is in the tooltip, exactly.
+3. **The per-source grid survives**, one category at a time, behind that row's expand, quietest first and paged. All 185 stay reachable.
+
+The legend renders from the same map as the cells, so the two cannot drift. `lib/collection-health.ts` holds the derivation; `scripts/check-collection-health.mjs` checks the ladder.
 
 **URLs render as inert plain text.** Never anchors. One row carries an embedded API key.
 

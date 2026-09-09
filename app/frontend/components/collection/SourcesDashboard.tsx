@@ -9,6 +9,8 @@
 
 import { useMemo, useState } from "react";
 import type { Connector, Source } from "@/lib/types";
+import { needsAttention } from "@/lib/collection-health";
+import { FilterChip } from "@/components/ui";
 import {
   CATEGORY_DEFINITIONS,
   statusFor,
@@ -56,17 +58,17 @@ export function SourcesDashboard({
 
   return (
     <div>
-      <Summary rows={rows} />
+      <Summary rows={rows} sources={sources} />
 
       <div className="mt-5 flex flex-wrap gap-1.5">
-        <Chip
+        <FilterChip
           label="All sources"
           count={rows.reduce((n, r) => n + r.status.units, 0)}
           active={value === "all"}
           onClick={() => onChange("all")}
         />
         {rows.map(({ definition, status }) => (
-          <Chip
+          <FilterChip
             key={definition.key}
             label={definition.label}
             count={status.units}
@@ -96,13 +98,14 @@ export function SourcesDashboard({
 
 type Row = { definition: (typeof CATEGORY_DEFINITIONS)[number]; status: ReturnType<typeof statusFor> };
 
-function Summary({ rows }: { rows: Row[] }) {
+function Summary({ rows, sources }: { rows: Row[]; sources: Source[] }) {
   const units = rows.reduce((n, r) => n + r.status.units, 0);
   const enabled = rows.reduce((n, r) => n + r.status.enabled, 0);
   const items = rows.reduce((n, r) => n + r.status.items, 0);
   // "With issues" counts units, not categories: an analyst chasing a problem
-  // wants the number of things to fix.
-  const issues = rows.reduce((n, r) => n + r.status.failing + r.status.blocked, 0);
+  // wants the number of things to fix. It counts exactly what the Needs
+  // attention list above holds, so the two cannot disagree on one screen.
+  const issues = needsAttention(sources).length;
   const latest = rows
     .map((r) => r.status.lastCollection)
     .filter((d): d is string => Boolean(d))
@@ -111,7 +114,7 @@ function Summary({ rows }: { rows: Row[] }) {
   const emptyCategories = rows.filter((r) => r.status.units === 0).length;
 
   return (
-    <div className="grid grid-cols-2 gap-px border border-black/10 bg-black/10 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-px border border-cpx-grey-100 bg-cpx-grey-100 sm:grid-cols-3 lg:grid-cols-5">
       <Tile label="Total sources" value={units.toLocaleString("en-GB")} />
       <Tile
         label="Enabled"
@@ -147,7 +150,7 @@ function Tile({
 }) {
   return (
     <div className="bg-white px-4 py-3">
-      <span className="text-2xs text-cpx-grey">{label}</span>
+      <span className="text-2xs text-cpx-grey-500">{label}</span>
       <span
         className={`mt-1 block text-xl font-display font-medium leading-none tracking-tightish ${
           warn ? "text-status-warn-ink" : ""
@@ -155,35 +158,8 @@ function Tile({
       >
         {value}
       </span>
-      {hint && <span className="mt-1.5 block text-2xs text-cpx-grey">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-2xs text-cpx-grey-500">{hint}</span>}
     </div>
   );
 }
 
-function Chip({
-  label,
-  count,
-  active,
-  onClick,
-}: {
-  label: string;
-  count: number;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs ${
-        active
-          ? "border-cpx-purple bg-cpx-purple font-medium text-white"
-          : `border-black/15 hover:bg-black/5 ${count === 0 ? "text-cpx-grey" : ""}`
-      }`}
-    >
-      {label}
-      <span className={`px-1 text-2xs ${active ? "bg-white/15" : "bg-black/5"}`}>
-        {count}
-      </span>
-    </button>
-  );
-}

@@ -203,7 +203,7 @@ export default function ReportsPage() {
           value={year}
           onChange={(e) => setYear(e.target.value)}
           aria-label="Year"
-          className="h-8 border border-black/15 bg-white px-2 text-sm focus:outline-none"
+          className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
         >
           {years.map((y) => (
             <option key={y}>{y}</option>
@@ -221,8 +221,8 @@ export default function ReportsPage() {
               }}
               className={`h-8 px-2.5 text-xs ${
                 types.has(t)
-                  ? "bg-cpx-purple font-medium text-white"
-                  : "border border-black/15 text-cpx-grey"
+                  ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+                  : "border border-cpx-grey-100 text-cpx-grey-500"
               }`}
             >
               {t}
@@ -365,9 +365,9 @@ export default function ReportsPage() {
                   </td>
                 </tr>
                 {a.type === "RFI" && rfiOpen && a.rfi && (
-                  <tr className="border-b border-black/5 bg-black/[0.02]">
+                  <tr className="border-b border-cpx-grey-100 bg-cpx-grey-50">
                     <td colSpan={6} className="px-6 py-3">
-                      <p className="text-xs text-cpx-grey">
+                      <p className="text-xs text-cpx-grey-500">
                         {a.rfi.requester} · due {gstDate(a.rfi.dueAt)} ·{" "}
                         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
                       </p>
@@ -376,7 +376,7 @@ export default function ReportsPage() {
                         {a.rfi.steps.map((s) => (
                           <li key={s.label} className="flex items-center gap-2 text-xs">
                             <span
-                              className={`flex h-4 w-4 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-black/20"}`}
+                              className={`flex h-4 w-4 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-100"}`}
                             >
                               {s.done ? "✓" : ""}
                             </span>
@@ -446,11 +446,11 @@ export default function ReportsPage() {
       )}
 
       {notice && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-black/10 bg-white px-4 py-2 text-xs shadow-sm">
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-cpx-grey-100 bg-white px-4 py-2 text-xs shadow-pop">
           {notice}
           <button
             onClick={() => setNotice(null)}
-            className="ml-3 text-cpx-grey hover:text-cpx-black"
+            className="ml-3 text-cpx-grey-500 hover:text-cpx-black"
           >
             Dismiss
           </button>

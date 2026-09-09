@@ -139,7 +139,7 @@ export function LookupPanel({ initial }: { initial?: string } = {}) {
         <select
           value={kind}
           onChange={(e) => setKind(e.target.value as ObservableKind)}
-          className="h-11 border border-black/15 bg-white px-2 text-sm focus:border-cpx-purple focus:outline-none"
+          className="h-11 border border-cpx-grey-100 bg-white px-2 text-sm focus:border-cpx-green focus:outline-none"
         >
           {(["ip", "domain", "hash"] as ObservableKind[]).map((k) => (
             <option key={k} value={k}>
@@ -147,8 +147,8 @@ export function LookupPanel({ initial }: { initial?: string } = {}) {
             </option>
           ))}
         </select>
-        <div className="flex min-w-[16rem] flex-1 items-center gap-2 border border-black/15 bg-white pl-3 pr-2">
-          <IconSearch className="shrink-0 text-cpx-grey" />
+        <div className="flex min-w-[16rem] flex-1 items-center gap-2 border border-cpx-grey-100 bg-white pl-3 pr-2">
+          <IconSearch className="shrink-0 text-cpx-grey-500" />
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -172,26 +172,26 @@ export function LookupPanel({ initial }: { initial?: string } = {}) {
       </form>
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        <span className="text-2xs text-cpx-grey">Demo records</span>
+        <span className="text-2xs text-cpx-grey-500">Demo records</span>
         {samplesFor(kind).map((s) => (
           <button
             key={s}
             onClick={() => pick(s)}
-            className="bg-black/5 px-1.5 py-0.5 font-mono text-2xs text-cpx-grey hover:bg-black/10"
+            className="bg-cpx-grey-50 px-1.5 py-0.5 font-mono text-2xs text-cpx-grey-500 hover:bg-cpx-grey-100"
           >
             {s.length > 28 ? `${s.slice(0, 16)}...${s.slice(-6)}` : s}
           </button>
         ))}
       </div>
 
-      <p className="mt-2 flex items-center gap-1.5 text-2xs text-cpx-grey">
+      <p className="mt-2 flex items-center gap-1.5 text-2xs text-cpx-grey-500">
         <IconEgress />
         A lookup sends the observable to the configured providers. It leaves the
         UAE region and is recorded.
       </p>
 
       {mismatch && (
-        <p className="mt-3 border border-black/10 bg-black/[0.02] px-3 py-2 text-xs">
+        <p className="mt-3 border border-cpx-grey-100 bg-cpx-grey-50 px-3 py-2 text-xs">
           That value looks like {KIND_LABEL[detectKind(input)!].toLowerCase()} and{" "}
           {KIND_LABEL[kind].toLowerCase()} is selected. The lookup will run as
           selected.
@@ -199,7 +199,7 @@ export function LookupPanel({ initial }: { initial?: string } = {}) {
       )}
 
       {failure && (
-        <p className="mt-4 border border-black/10 bg-status-warn-fill px-3 py-2 text-xs text-status-warn-ink">
+        <p className="mt-4 border border-cpx-grey-100 bg-status-warn-fill px-3 py-2 text-xs text-status-warn-ink">
           {failure}
         </p>
       )}
@@ -211,7 +211,7 @@ export function LookupPanel({ initial }: { initial?: string } = {}) {
       {live && <NothingHeld live={live} />}
 
       {!record && !live && !failure && (
-        <p className="mt-6 text-xs text-cpx-grey">
+        <p className="mt-6 text-xs text-cpx-grey-500">
           Each provider is asked separately, and one failing does not silence the
           others.
         </p>
@@ -237,14 +237,14 @@ function Result({
       {record.kind === "domain" && <DomainDetail record={record} />}
       {record.kind === "hash" && <HashDetail record={record} />}
 
-      <div className="border border-black/10 bg-white p-4">
+      <div className="border border-cpx-grey-100 bg-white p-4">
         <button
           onClick={onInvestigate}
-          className="h-9 bg-cpx-purple px-4 text-sm font-medium text-white hover:brightness-110"
+          className="h-9 bg-cpx-green px-4 text-base font-medium text-cpx-purple hover:bg-cpx-green-600"
         >
           Investigate
         </button>
-        <p className="mt-2 text-2xs text-cpx-grey">
+        <p className="mt-2 text-2xs text-cpx-grey-500">
           Lookup is the check on this observable. Investigate is what it is part
           of: infrastructure, malware, actor, campaign, techniques and the
           detection content that covers them.
@@ -256,7 +256,7 @@ function Result({
 
 function Verdict({ record }: { record: LookupRecord }) {
   return (
-    <section className="border border-black/10 bg-white p-4">
+    <section className="border border-cpx-grey-100 bg-white p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -288,7 +288,7 @@ function Verdict({ record }: { record: LookupRecord }) {
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-black/10 pt-3 text-xs sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-cpx-grey-100 pt-3 text-xs sm:grid-cols-4">
         <Fact
           label="Risk score"
           value={`${record.riskScore} of 100`}
@@ -300,13 +300,13 @@ function Verdict({ record }: { record: LookupRecord }) {
       </div>
 
       {record.threatCategories.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-baseline gap-1.5 border-t border-black/10 pt-3">
-          <span className="text-2xs text-cpx-grey">
+        <div className="mt-3 flex flex-wrap items-baseline gap-1.5 border-t border-cpx-grey-100 pt-3">
+          <span className="text-2xs text-cpx-grey-500">
             Threat categories{" "}
             <span className="text-cpx-black">{record.threatCategories.length}</span>
           </span>
           {record.threatCategories.map((c) => (
-            <span key={c} className="bg-black/5 px-1.5 text-2xs">
+            <span key={c} className="bg-cpx-grey-50 px-1.5 text-2xs">
               {c}
             </span>
           ))}
@@ -327,14 +327,14 @@ function Providers({ providers }: { providers: ProviderVerdict[] }) {
         {providers.map((p) => {
           const s = statusOf(p.status);
           return (
-            <div key={p.provider} className="border border-black/10 p-3">
+            <div key={p.provider} className="border border-cpx-grey-100 p-3">
               <div className="flex items-start justify-between gap-2">
                 <span className="text-sm font-medium">{p.provider}</span>
                 <StatusPill {...s} />
               </div>
               <div className="mt-2.5 flex items-end justify-between gap-2">
                 <span>
-                  <span className="text-2xs text-cpx-grey">Score</span>
+                  <span className="text-2xs text-cpx-grey-500">Score</span>
                   <span className="mt-0.5 block text-lg font-display font-medium leading-none tracking-tightish">
                     {/* Zero is a verdict. Not returned is a different one. */}
                     {p.score === null ? "Not returned" : p.score}
@@ -347,7 +347,7 @@ function Providers({ providers }: { providers: ProviderVerdict[] }) {
                         ? "text-cpx-red"
                         : p.verdict === "suspicious"
                           ? "text-status-warn-ink"
-                          : "text-cpx-grey"
+                          : "text-cpx-grey-500"
                     }`}
                   >
                     {VERDICT_LABEL[p.verdict]}
@@ -359,7 +359,7 @@ function Providers({ providers }: { providers: ProviderVerdict[] }) {
                   {p.categories.map((c) => (
                     <span
                       key={c}
-                      className="bg-black/5 px-1.5 text-2xs"
+                      className="bg-cpx-grey-50 px-1.5 text-2xs"
                     >
                       {c}
                     </span>
@@ -367,12 +367,12 @@ function Providers({ providers }: { providers: ProviderVerdict[] }) {
                 </div>
               )}
               {p.error && (
-                <p className="mt-2 border-t border-black/10 pt-2 text-2xs text-status-warn-ink">
+                <p className="mt-2 border-t border-cpx-grey-100 pt-2 text-2xs text-status-warn-ink">
                   {p.error}
                 </p>
               )}
               {p.checkedAt && (
-                <p className="mt-2 text-2xs text-cpx-grey">
+                <p className="mt-2 text-2xs text-cpx-grey-500">
                   {gstDateTime(p.checkedAt)}
                 </p>
               )}
@@ -380,7 +380,7 @@ function Providers({ providers }: { providers: ProviderVerdict[] }) {
           );
         })}
       </div>
-      <p className="mt-3 text-2xs text-cpx-grey">
+      <p className="mt-3 text-2xs text-cpx-grey-500">
         Providers are asked separately and disagreement is kept. No verdict here
         is averaged into another.
       </p>
@@ -418,8 +418,8 @@ function DomainDetail({ record }: { record: DomainLookup }) {
         <Fact label="DNS records" value={record.dnsRecords.length} />
       </div>
 
-      <div className="mt-4 border-t border-black/10 pt-3">
-        <span className="text-2xs text-cpx-grey">
+      <div className="mt-4 border-t border-cpx-grey-100 pt-3">
+        <span className="text-2xs text-cpx-grey-500">
           DNS records <span className="text-cpx-black">{record.dnsRecords.length}</span>
         </span>
         <div className="mt-2 overflow-x-auto">
@@ -453,7 +453,7 @@ function DomainDetail({ record }: { record: DomainLookup }) {
                     </span>
                   </td>
                   <td
-                    className={`${T_TD} ${T_FLUSH} ${T_NUM} text-cpx-grey`}
+                    className={`${T_TD} ${T_FLUSH} ${T_NUM} text-cpx-grey-500`}
                   >
                     {r.ttl}
                   </td>
@@ -489,15 +489,15 @@ function HashDetail({ record }: { record: HashLookup }) {
         <Fact label="Malware family" value={record.malwareFamily} />
       </div>
 
-      <div className="mt-4 border-t border-black/10 pt-3">
-        <span className="text-2xs text-cpx-grey">
+      <div className="mt-4 border-t border-cpx-grey-100 pt-3">
+        <span className="text-2xs text-cpx-grey-500">
           Detection ratio
         </span>
         <div className="mt-1.5 flex items-center gap-3">
           <span className="text-xl font-display font-medium leading-none tracking-tightish">
-            {detected} <span className="text-cpx-grey">/ {total}</span>
+            {detected} <span className="text-cpx-grey-500">/ {total}</span>
           </span>
-          <span className="h-2 flex-1 bg-black/10">
+          <span className="h-2 flex-1 bg-cpx-grey-100">
             <span
               className="block h-2 bg-cpx-red"
               style={{ width: `${Math.round((detected / total) * 100)}%` }}
@@ -506,14 +506,14 @@ function HashDetail({ record }: { record: HashLookup }) {
         </div>
       </div>
 
-      <div className="mt-4 border-t border-black/10 pt-3">
-        <span className="text-2xs text-cpx-grey">
+      <div className="mt-4 border-t border-cpx-grey-100 pt-3">
+        <span className="text-2xs text-cpx-grey-500">
           Behaviour <span className="text-cpx-black">{record.behaviours.length}</span>
         </span>
         <ul className="mt-2 space-y-1.5">
           {record.behaviours.map((b) => (
             <li key={b} className="flex gap-2 text-xs">
-              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-black/30" />
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cpx-black/30" />
               {b}
             </li>
           ))}
@@ -529,12 +529,12 @@ function NothingHeld({ live }: { live: LiveResult }) {
   const answered = live.results.filter((r) => r.status === "live").length;
   return (
     <div className="mt-6 space-y-3">
-      <section className="border border-black/10 bg-white p-4">
+      <section className="border border-cpx-grey-100 bg-white p-4">
         <div className="flex flex-wrap items-center gap-2">
           <IndicatorChip value={live.observable} />
           <StatusPill tone="idle" label="Nothing held" />
           {live.mode !== "LIVE" && (
-            <span className="bg-black/5 px-1.5 text-2xs">
+            <span className="bg-cpx-grey-50 px-1.5 text-2xs">
               {live.mode} mode
             </span>
           )}
@@ -545,7 +545,7 @@ function NothingHeld({ live }: { live: LiveResult }) {
           providers answered.
         </p>
         {live.mode !== "LIVE" && (
-          <p className="mt-2 border border-black/10 bg-black/[0.02] px-3 py-2 text-xs">
+          <p className="mt-2 border border-cpx-grey-100 bg-cpx-grey-50 px-3 py-2 text-xs">
             Reputation providers are in {live.mode.toLowerCase()} mode. No provider
             was contacted and no verdict below is a real one.
           </p>
@@ -554,7 +554,7 @@ function NothingHeld({ live }: { live: LiveResult }) {
 
       <Providers providers={live.results} />
 
-      <p className="text-2xs text-cpx-grey">
+      <p className="text-2xs text-cpx-grey-500">
         Holding nothing is not the same as the observable being clean. There is
         nothing to investigate because there is nothing held, not because there
         is nothing there.
@@ -575,10 +575,10 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border border-black/10 bg-white p-4">
+    <section className="border border-cpx-grey-100 bg-white p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-sm font-medium tracking-tightish">{title}</h3>
-        {meta && <span className="text-2xs text-cpx-grey">{meta}</span>}
+        {meta && <span className="text-2xs text-cpx-grey-500">{meta}</span>}
       </div>
       <div className="mt-3">{children}</div>
     </section>
@@ -596,7 +596,7 @@ function Fact({
 }) {
   return (
     <div className="min-w-0">
-      <span className="block text-cpx-grey">{label}</span>
+      <span className="block text-cpx-grey-500">{label}</span>
       <span className={`block font-medium ${warn ? "text-cpx-red" : ""}`}>
         {value}
       </span>
@@ -614,8 +614,8 @@ function Sub({
   values: string[];
 }) {
   return (
-    <div className="mt-4 border-t border-black/10 pt-3">
-      <span className="text-2xs text-cpx-grey">
+    <div className="mt-4 border-t border-cpx-grey-100 pt-3">
+      <span className="text-2xs text-cpx-grey-500">
         {label} <span className="text-cpx-black">{count}</span>
       </span>
       <div className="mt-1.5 flex flex-wrap gap-1.5">

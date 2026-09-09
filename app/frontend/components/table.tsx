@@ -31,16 +31,18 @@ export const T_SCROLL = "overflow-x-auto";
 export const T_TABLE = "w-full border-collapse";
 
 /** The header row: one rule under it. */
-export const T_HEAD = "border-b border-black/10 text-left";
+export const T_HEAD = "border-b border-cpx-grey-100 text-left";
 
 /**
  * The header band sits on the cell rather than the row, so a sticky header
- * stays opaque as rows scroll under it.
+ * stays opaque as rows scroll under it. CSD-007 head: grey-50 band, 12px
+ * uppercase, semibold, secondary grey.
  */
-export const T_TH = `${PAD} bg-band py-2 text-2xs font-medium whitespace-nowrap text-cpx-grey`;
+export const T_TH = `${PAD} bg-cpx-grey-50 py-2 text-xs font-semibold uppercase tracking-wide whitespace-nowrap text-cpx-grey-500`;
 
+/** Row hover is a 40% green-50 wash, the same as every other CPX console. */
 export const T_ROW =
-  "border-b border-black/[0.06] align-top transition-colors hover:bg-black/[0.02]";
+  "border-b border-cpx-grey-100 align-top transition-colors hover:bg-cpx-green-50/40";
 
 export const T_TD = `${PAD} py-2 align-top`;
 
@@ -71,10 +73,10 @@ export function TypeBadge({
   return (
     <span
       title={title}
-      className={`inline-flex h-[18px] max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-[2px] px-1.5 text-2xs ${
+      className={`inline-flex h-[18px] max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-sm px-1.5 text-2xs font-medium ${
         tone === "warn"
           ? "bg-status-warn-fill text-status-warn-ink"
-          : "bg-black/[0.06] text-cpx-grey"
+          : "bg-cpx-grey-100 text-cpx-grey-700"
       }`}
     >
       {label}
@@ -124,7 +126,7 @@ export function CopyButton({
       onClick={copy}
       title={copied ? "Copied" : `Copy ${what} as shown`}
       aria-label={copied ? "Copied" : `Copy ${what} as shown`}
-      className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center text-cpx-grey opacity-45 transition-opacity hover:opacity-100 focus-visible:opacity-100 ${className}`}
+      className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center text-cpx-grey-500 opacity-45 transition-opacity hover:opacity-100 focus-visible:opacity-100 ${className}`}
     >
       {copied ? (
         <IconCheck className="text-green-contrast" />
@@ -173,6 +175,9 @@ export function MonoValue({
  */
 export function ConfidenceValue({ value }: { value: number }) {
   const pct = Math.max(0, Math.min(100, Math.round(value)));
+  // CSD-007 thresholds: 85 and over green, 70 to 84 blue, under 70 red.
+  const fill =
+    pct >= 85 ? "bg-cpx-green-500" : pct >= 70 ? "bg-cpx-blue-500" : "bg-cpx-red-500";
   return (
     <span
       className="inline-flex items-center gap-2 whitespace-nowrap"
@@ -183,10 +188,10 @@ export function ConfidenceValue({ value }: { value: number }) {
       </span>
       <span
         aria-hidden
-        className="h-1.5 w-10 shrink-0 overflow-hidden rounded-[2px] bg-black/10"
+        className="h-1.5 w-10 shrink-0 overflow-hidden rounded-sm bg-cpx-grey-100"
       >
         <span
-          className="block h-full rounded-[2px] bg-cpx-purple"
+          className={`block h-full rounded-sm ${fill}`}
           style={{ width: `${pct}%` }}
         />
       </span>
@@ -241,8 +246,8 @@ export function ColumnInfo({
         aria-expanded={open}
         aria-label={`What ${heading} means`}
         title={`What ${heading} means`}
-        className={`ml-1 inline-flex h-[18px] w-[18px] items-center justify-center rounded-[2px] transition-opacity ${
-          open ? "bg-black/[0.06] opacity-100" : "opacity-50 hover:opacity-100"
+        className={`ml-1 inline-flex h-[18px] w-[18px] items-center justify-center rounded-sm transition-opacity ${
+          open ? "bg-cpx-grey-100 opacity-100" : "opacity-50 hover:opacity-100"
         }`}
       >
         <IconHistory />
@@ -252,16 +257,16 @@ export function ColumnInfo({
         <span
           role="dialog"
           aria-label={heading}
-          className="absolute left-0 top-6 z-30 block w-[22rem] border border-black/15 bg-white p-3 text-left shadow-pop"
+          className="absolute left-0 top-6 z-30 block w-[22rem] border border-cpx-grey-100 bg-white p-3 text-left shadow-pop"
         >
           <span className="block text-xs font-medium tracking-tightish">
             {heading}
           </span>
-          <span className="mt-1 block text-2xs leading-relaxed text-cpx-grey">
+          <span className="mt-1 block text-2xs leading-relaxed text-cpx-grey-500">
             {body}
           </span>
           {rows.length > 0 && (
-            <span className="mt-2 block border-t border-black/10 pt-2">
+            <span className="mt-2 block border-t border-cpx-grey-100 pt-2">
               {rows.map((r) => (
                 <span
                   key={r.label + r.value}

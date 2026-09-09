@@ -148,7 +148,7 @@ export function GlobalSearch() {
 
   return (
     <div ref={boxRef} className="relative hidden md:block">
-      <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-white/50" />
+      <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-cpx-grey-500" />
       <input
         ref={inputRef}
         value={q}
@@ -163,36 +163,32 @@ export function GlobalSearch() {
         role="combobox"
         aria-expanded={open}
         aria-controls="global-search-results"
-        className="h-8 w-64 border border-white/20 bg-white/10 pl-8 pr-3 text-sm text-white placeholder:text-white/50 focus:border-cpx-green focus:outline-none xl:w-80"
+        className="h-8 w-64 rounded-sm border border-cpx-grey-100 bg-white pl-8 pr-3 text-sm text-cpx-black placeholder:text-cpx-grey-500 focus:border-cpx-green focus:outline-none xl:w-80"
       />
 
       {open && (
         <div
           id="global-search-results"
-          className="absolute right-0 top-10 z-50 max-h-[70vh] w-[38rem] overflow-y-auto border border-black/15 bg-white text-cpx-black shadow-pop"
+          className="absolute right-0 top-10 z-50 max-h-[70vh] w-[38rem] overflow-y-auto border border-cpx-grey-100 bg-white text-cpx-black shadow-pop"
         >
           {/* Filters stay visible while typing: the counts are the fastest way
               to see where a match actually lives. */}
-          <div className="sticky top-0 flex flex-wrap items-center gap-1 border-b border-black/10 bg-white px-3 py-2">
+          <div className="sticky top-0 flex flex-wrap items-center gap-1 border-b border-cpx-grey-100 bg-white px-3 py-2">
             {FILTERS.map((f) => {
               const n = counts?.[f];
               return (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`flex items-center gap-1 border px-2 py-0.5 text-xs ${
+                  className={`flex items-center gap-1 rounded-sm border px-2 py-0.5 text-xs font-medium ${
                     filter === f
-                      ? "border-cpx-purple bg-cpx-purple text-white"
-                      : "border-black/15 hover:bg-black/5"
+                      ? "border-cpx-green bg-cpx-green-50 text-cpx-black"
+                      : "border-cpx-grey-100 text-cpx-grey-700 hover:bg-cpx-grey-50"
                   }`}
                 >
                   {FILTER_LABEL[f]}
                   {n !== undefined && n > 0 && (
-                    <span
-                      className={filter === f ? "text-white/70" : "text-cpx-grey"}
-                    >
-                      {n}
-                    </span>
+                    <span className="text-cpx-grey-500">{n}</span>
                   )}
                 </button>
               );
@@ -209,14 +205,14 @@ export function GlobalSearch() {
               onClear={() => setRecent(clearRecent())}
             />
           ) : !corpus ? (
-            <p className="px-3 py-6 text-center text-xs text-cpx-grey">
+            <p className="px-3 py-6 text-center text-xs text-cpx-grey-500">
               Loading records
             </p>
           ) : result && result.total > 0 ? (
             <>
               {result.groups.map((group) => (
                 <section key={group.category}>
-                  <h3 className="border-b border-black/[0.06] bg-band px-3 py-1.5 text-2xs font-medium uppercase tracking-[0.06em] text-cpx-grey">
+                  <h3 className="border-b border-cpx-grey-100 bg-band px-3 py-1.5 text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
                     {group.label}
                   </h3>
                   <ul>
@@ -227,8 +223,8 @@ export function GlobalSearch() {
                           <button
                             onMouseEnter={() => setCursor(index)}
                             onClick={() => go(hit.href, q)}
-                            className={`flex w-full items-start gap-2 border-b border-black/[0.06] px-3 py-2 text-left ${
-                              index === cursor ? "bg-black/[0.04]" : "hover:bg-black/[0.02]"
+                            className={`flex w-full items-start gap-2 border-b border-cpx-grey-100 px-3 py-2 text-left ${
+                              index === cursor ? "bg-cpx-grey-50" : "hover:bg-cpx-grey-50"
                             }`}
                           >
                             <span className="min-w-0 flex-1">
@@ -239,19 +235,19 @@ export function GlobalSearch() {
                                   {hit.title}
                                 </span>
                                 {hit.badge && (
-                                  <span className="rounded-[2px] bg-black/[0.06] px-1.5 text-2xs text-cpx-grey">
+                                  <span className="rounded-sm bg-cpx-grey-100 px-1.5 text-2xs text-cpx-grey-500">
                                     {hit.badge}
                                   </span>
                                 )}
                                 {hit.related && (
-                                  <span className="rounded-[2px] bg-black/[0.06] px-1.5 text-2xs text-cpx-grey">
+                                  <span className="rounded-sm bg-cpx-grey-100 px-1.5 text-2xs text-cpx-grey-500">
                                     related
                                   </span>
                                 )}
                               </span>
                               {/* Why it matched. Without this a result list is
                                   a guess the reader has to check. */}
-                              <span className="mt-0.5 block text-2xs leading-snug text-cpx-grey">
+                              <span className="mt-0.5 block text-2xs leading-snug text-cpx-grey-500">
                                 {hit.context}
                               </span>
                             </span>
@@ -261,7 +257,7 @@ export function GlobalSearch() {
                     })}
                   </ul>
                   {group.more > 0 && (
-                    <p className="border-b border-black/[0.06] px-3 py-1.5 text-2xs text-cpx-grey">
+                    <p className="border-b border-cpx-grey-100 px-3 py-1.5 text-2xs text-cpx-grey-500">
                       {group.more} more in {group.label}. Narrow the search or open
                       the destination.
                     </p>
@@ -281,12 +277,12 @@ export function GlobalSearch() {
               </p>
               {/* A zero here means we hold nothing that matches, never that the
                   observable is clean. */}
-              <p className="mt-1 text-2xs text-cpx-grey">
+              <p className="mt-1 text-2xs text-cpx-grey-500">
                 Nothing held matches. This is a statement about our records, not
                 about the value.
               </p>
               {result && result.withheld > 0 && (
-                <p className="mt-1 text-2xs text-cpx-grey">
+                <p className="mt-1 text-2xs text-cpx-grey-500">
                   {result.withheld} withheld at this access level.
                 </p>
               )}
@@ -319,7 +315,7 @@ function Recent({
 }) {
   if (items.length === 0) {
     return (
-      <p className="px-3 py-5 text-xs text-cpx-grey">
+      <p className="px-3 py-5 text-xs text-cpx-grey-500">
         Search an address, domain, hash, malware family, threat actor, campaign,
         report reference or PIR.
       </p>
@@ -327,13 +323,13 @@ function Recent({
   }
   return (
     <div>
-      <div className="flex items-center justify-between border-b border-black/[0.06] bg-band px-3 py-1.5">
-        <h3 className="text-2xs font-medium uppercase tracking-[0.06em] text-cpx-grey">
+      <div className="flex items-center justify-between border-b border-cpx-grey-100 bg-band px-3 py-1.5">
+        <h3 className="text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
           Recent searches
         </h3>
         <button
           onClick={onClear}
-          className="text-2xs text-cpx-grey hover:text-cpx-black"
+          className="text-2xs text-cpx-grey-500 hover:text-cpx-black"
         >
           Clear
         </button>
@@ -343,7 +339,7 @@ function Recent({
           <li key={r}>
             <button
               onClick={() => onPick(r)}
-              className="block w-full border-b border-black/[0.06] px-3 py-2 text-left text-xs hover:bg-black/[0.02]"
+              className="block w-full border-b border-cpx-grey-100 px-3 py-2 text-left text-xs hover:bg-cpx-grey-50"
             >
               {r}
             </button>
@@ -364,7 +360,7 @@ function Footer({
   onAsk: () => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-2xs text-cpx-grey">
+    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-2xs text-cpx-grey-500">
       <span>
         {result.total} {result.total === 1 ? "record" : "records"} held
         {result.withheld > 0 && (

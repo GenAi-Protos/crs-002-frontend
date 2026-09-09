@@ -31,7 +31,7 @@ export function Columns({
       {n > 1 && (
         <div className="mb-2 flex items-center gap-4">
           {series.map((s, i) => (
-            <span key={s} className="flex items-center gap-1.5 text-2xs text-cpx-grey">
+            <span key={s} className="flex items-center gap-1.5 text-2xs text-cpx-grey-500">
               <span className="inline-block h-2.5 w-2.5" style={{ background: COLORS[i] }} />
               {s}
             </span>

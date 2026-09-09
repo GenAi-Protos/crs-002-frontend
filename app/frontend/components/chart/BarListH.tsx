@@ -17,11 +17,11 @@ export function BarListH({
         <li key={i.label} className="flex items-center gap-2.5">
           <span
             title={i.label}
-            className={`shrink-0 truncate text-xs text-cpx-grey ${labelClass}`}
+            className={`shrink-0 truncate text-xs text-cpx-grey-500 ${labelClass}`}
           >
             {i.label}
           </span>
-          <span className="relative h-3.5 flex-1 bg-black/5" title={`${i.label}: ${i.value}`}>
+          <span className="relative h-3.5 flex-1 bg-cpx-grey-50" title={`${i.label}: ${i.value}`}>
             <span
               className="absolute inset-y-0 left-0"
               style={{ width: `${(i.value / max) * 100}%`, background: i.color ?? color }}

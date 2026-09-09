@@ -15,7 +15,7 @@ import { useConsoleUser } from "@/lib/role-context";
 import { canAdminister } from "@/lib/access";
 import type { Agent, Workflow } from "@/lib/types";
 import { gstDateTime } from "@/lib/format";
-import { ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
+import { DetailRow, ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
 import { IconEgress } from "@/components/icons";
 import { CATEGORY_DEFINITIONS } from "@/lib/collection-workflows";
 
@@ -100,33 +100,33 @@ export function AgentsTab({
         />
       </div>
 
-      <p className="mt-2 text-xs text-cpx-grey">
+      <p className="mt-2 text-xs text-cpx-grey-500">
         <span className="font-medium text-cpx-black">{built}</span> of{" "}
         <span className="font-medium text-cpx-black">{agents.length}</span> built ·{" "}
         {admin ? "You may edit" : "Read only at this access level"}
       </p>
 
       <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[18rem_1fr]">
-        <ul className="border border-black/10 bg-white">
+        <ul className="border border-cpx-grey-100 bg-white">
           {list.map((a) => (
             <li key={a.id}>
               <button
                 onClick={() => onSelect(a.id)}
                 className={`block w-full border-l-2 px-3 py-2.5 text-left ${
                   a.id === agent.id
-                    ? "border-cpx-purple bg-black/[0.03]"
-                    : "border-transparent hover:bg-black/[0.02]"
+                    ? "border-cpx-green bg-cpx-green-50/40"
+                    : "border-transparent hover:bg-cpx-grey-50"
                 }`}
               >
                 <span className="flex items-center gap-2">
                   <span className="text-sm font-medium">{a.name}</span>
                   {a.kind === "supervisor" && (
-                    <span className="bg-black/5 px-1 text-2xs">
+                    <span className="bg-cpx-grey-50 px-1 text-2xs">
                       Supervisor
                     </span>
                   )}
                 </span>
-                <span className="mt-1 block text-2xs text-cpx-grey">
+                <span className="mt-1 block text-2xs text-cpx-grey-500">
                   {STATUS[a.status].label}
                 </span>
               </button>
@@ -168,7 +168,7 @@ function AgentDetail({
     <section className="min-w-0">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-lg font-medium tracking-tightish">{agent.name}</h2>
+          <h2 className="text-lg font-semibold tracking-tightish">{agent.name}</h2>
           <p className="mt-1 text-sm leading-relaxed">{agent.purpose}</p>
         </div>
         <span className="flex shrink-0 items-center gap-2">
@@ -182,25 +182,25 @@ function AgentDetail({
       </div>
 
       {agent.status === "specified" && (
-        <p className="mt-3 border border-black/10 bg-black/[0.02] px-3 py-2 text-xs">
+        <p className="mt-3 border border-cpx-grey-100 bg-cpx-grey-50 px-3 py-2 text-xs">
           Specified in the BRD and not built yet. What follows is the
           specification, not a running configuration, and nothing has run, so
           there is no success rate to show.
         </p>
       )}
 
-      <Row label="Instruction">
+      <DetailRow label="Instruction">
         <p className="whitespace-pre-wrap text-sm leading-relaxed">
           {agent.instruction.text}
         </p>
-        <p className="mt-2 text-2xs text-cpx-grey">
+        <p className="mt-2 text-2xs text-cpx-grey-500">
           Version {agent.instruction.version} · {agent.updateCount}{" "}
           {agent.updateCount === 1 ? "change" : "changes"} · {agent.instruction.updatedBy}{" "}
           · {gstDateTime(agent.instruction.updatedAt)}
         </p>
-      </Row>
+      </DetailRow>
 
-      <Row label="Skills" count={agent.skills.length}>
+      <DetailRow label="Skills" count={agent.skills.length}>
         {agent.skills.length === 0 ? (
           <Zero what="skills" />
         ) : (
@@ -208,16 +208,16 @@ function AgentDetail({
             {agent.skills.map((s) => (
               <li key={s.name}>
                 <span className="text-sm font-medium">{s.name}</span>
-                <span className="mt-0.5 block text-xs text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">
                   {s.description}
                 </span>
               </li>
             ))}
           </ul>
         )}
-      </Row>
+      </DetailRow>
 
-      <Row label="Tools" count={agent.tools.length}>
+      <DetailRow label="Tools" count={agent.tools.length}>
         {agent.tools.length === 0 ? (
           <Zero what="tools" />
         ) : (
@@ -234,29 +234,29 @@ function AgentDetail({
                       Leaves region
                     </span>
                   )}
-                  <span className="text-xs text-cpx-grey">
+                  <span className="text-xs text-cpx-grey-500">
                     {t.purpose}
                   </span>
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-2xs text-cpx-grey">
+            <p className="mt-2 text-2xs text-cpx-grey-500">
               <span className="font-medium text-cpx-black">{egressTools.length}</span>{" "}
               of {agent.tools.length} leave the UAE region
             </p>
           </>
         )}
-      </Row>
+      </DetailRow>
 
       {agent.dispatches.length > 0 && (
-        <Row label="Dispatches" count={agent.dispatches.length}>
+        <DetailRow label="Dispatches" count={agent.dispatches.length}>
           <p className="text-sm">
             {agent.dispatches.map(nameOf).join(", ")}
           </p>
-        </Row>
+        </DetailRow>
       )}
 
-      <Row label="Sources" count={agent.sourceRefs.length}>
+      <DetailRow label="Sources" count={agent.sourceRefs.length}>
         {agent.sourceRefs.length === 0 ? (
           <Zero what="sources" />
         ) : (
@@ -264,9 +264,9 @@ function AgentDetail({
             {agent.sourceRefs.map(sourceLabel).join(", ")}
           </p>
         )}
-      </Row>
+      </DetailRow>
 
-      <Row label="Workflows" count={agent.workflowRefs.length}>
+      <DetailRow label="Workflows" count={agent.workflowRefs.length}>
         {agent.workflowRefs.length === 0 ? (
           <Zero what="workflows" />
         ) : (
@@ -275,16 +275,16 @@ function AgentDetail({
               <button
                 key={ref}
                 onClick={() => onOpenWorkflow(ref)}
-                className="bg-black/5 px-1.5 text-xs hover:bg-black/10"
+                className="bg-cpx-grey-50 px-1.5 text-xs hover:bg-cpx-grey-100"
               >
                 {workflowName(ref)}
               </button>
             ))}
           </div>
         )}
-      </Row>
+      </DetailRow>
 
-      <Row label="Permissions" count={agent.permissions.length}>
+      <DetailRow label="Permissions" count={agent.permissions.length}>
         <ul className="space-y-1">
           {agent.permissions.map((p) => (
             <li key={p} className="text-sm">
@@ -292,39 +292,18 @@ function AgentDetail({
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-2xs text-cpx-grey">
+        <p className="mt-2 text-2xs text-cpx-grey-500">
           No agent may release a client-facing artefact. A lead analyst approves.
         </p>
-      </Row>
+      </DetailRow>
 
-      <Row label="Basis">
-        <p className="text-xs text-cpx-grey">{agent.basis}</p>
-      </Row>
+      <DetailRow label="Basis">
+        <p className="text-xs text-cpx-grey-500">{agent.basis}</p>
+      </DetailRow>
     </section>
   );
 }
 
-function Row({
-  label,
-  count,
-  children,
-}: {
-  label: string;
-  count?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mt-5 border-t border-black/10 pt-4">
-      <span className="flex items-baseline gap-2 text-xs text-cpx-grey">
-        {label}
-        {count !== undefined && (
-          <span className="bg-black/5 px-1 text-2xs text-cpx-black">{count}</span>
-        )}
-      </span>
-      <div className="mt-2">{children}</div>
-    </div>
-  );
-}
 
 // Counts render including zero, and a zero says what it is a zero of.
 function Zero({ what }: { what: string }) {

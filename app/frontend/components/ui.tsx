@@ -3,6 +3,7 @@
 // Shared primitives. PageHeader deliberately has no description prop:
 // if a screen needs explaining, it is the wrong screen.
 
+import Link from "next/link";
 import { defang } from "@/lib/defang";
 import type { Tlp } from "@/lib/types";
 import {
@@ -40,7 +41,7 @@ export function PageHeader({
   return (
     <div className={`mb-5 flex items-center justify-between gap-4 ${className}`}>
       <div className="flex min-w-0 items-center gap-3">
-        <h1 className="text-xl font-medium tracking-tightish">{title}</h1>
+        <h1 className="text-xl font-semibold tracking-tightish">{title}</h1>
         {meta}
       </div>
       {action}
@@ -49,27 +50,28 @@ export function PageHeader({
 }
 
 // ---------------------------------------------------------------------------
-// Buttons. One primary (CPX Green, near-black text), one secondary, one ghost,
-// one danger. Every button in the console goes through here so hover, disabled
-// and size are spelled once.
+// Buttons, the CSD-007 recipes (style guide 7.1). One primary (CPX Green, Dark
+// Purple text), one secondary, one ghost, one danger. Every button in the console
+// goes through here so hover, disabled and size are spelled once. Green is for
+// the one hero action per view; everything else is the white outline button.
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type ButtonSize = "sm" | "md";
 
 const BUTTON_VARIANT: Record<ButtonVariant, string> = {
   primary:
-    "bg-cpx-green font-medium text-cpx-black hover:brightness-95 disabled:bg-black/10 disabled:text-black/40 disabled:hover:brightness-100",
+    "bg-cpx-green font-medium text-cpx-purple hover:bg-cpx-green-600 disabled:opacity-50 disabled:hover:bg-cpx-green",
   secondary:
-    "border border-black/15 hover:bg-black/5 disabled:border-black/10 disabled:text-black/30 disabled:hover:bg-transparent",
+    "border border-cpx-grey-100 bg-white font-medium hover:bg-cpx-grey-50 disabled:opacity-50 disabled:hover:bg-white",
   ghost:
-    "text-cpx-grey hover:bg-black/5 hover:text-cpx-black disabled:text-black/25 disabled:hover:bg-transparent",
-  // Accent Red text is 3.2:1 on white, so destructive actions carry the warn ink.
+    "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple disabled:opacity-50 disabled:hover:bg-transparent",
+  // Accent Red text is 3.2:1 on white, so destructive actions carry red-700.
   danger:
-    "border border-status-warn-ink text-status-warn-ink hover:bg-status-warn-fill disabled:border-black/10 disabled:text-black/30 disabled:hover:bg-transparent",
+    "border border-cpx-red-200 bg-white font-medium text-cpx-red-700 hover:bg-cpx-red-50 disabled:opacity-50 disabled:hover:bg-white",
 };
 
 const BUTTON_SIZE: Record<ButtonSize, string> = {
-  md: "h-8 px-3 text-sm",
+  md: "h-8 px-3 text-base",
   sm: "h-7 px-2.5 text-xs",
 };
 
@@ -158,18 +160,18 @@ export function Dialog({
       aria-labelledby={id}
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className={`m-auto w-full max-w-md border border-black/10 bg-white p-0 text-cpx-black shadow-pop ${className}`}
+      className={`m-auto w-full max-w-md border border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-pop ${className}`}
     >
       <div className="p-5">
         <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 id={id} className="text-md font-medium tracking-tightish">
+          <h2 id={id} className="text-md font-semibold tracking-tightish">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center text-black/40 hover:bg-black/5 hover:text-cpx-black"
+            className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
           >
             <IconClose />
           </button>
@@ -200,9 +202,9 @@ export function Drawer({
       aria-labelledby={id}
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className={`fixed bottom-0 left-auto right-0 top-14 m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-black/10 bg-white p-0 text-cpx-black ${className}`}
+      className={`fixed bottom-0 left-auto right-0 top-[60px] m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-xl ${className}`}
     >
-      <div className="flex items-center justify-between gap-4 border-b border-black/10 px-5 py-3">
+      <div className="flex items-center justify-between gap-4 border-b border-cpx-grey-100 px-5 py-3">
         <div id={id} className="min-w-0">
           {title}
         </div>
@@ -210,7 +212,7 @@ export function Drawer({
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="flex h-7 w-7 shrink-0 items-center justify-center text-black/40 hover:bg-black/5 hover:text-cpx-black"
+          className="flex h-7 w-7 shrink-0 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
         >
           <IconClose />
         </button>
@@ -249,23 +251,31 @@ export function useDismiss<T extends HTMLElement>(
 export type StatusTone = "good" | "warn" | "critical" | "idle";
 
 // Colour never carries meaning alone: every status ships an icon and a label.
+// Soft tinted pills, the CSD-007 ladder: green good, bright purple needs
+// attention, red critical, grey nothing yet.
 export function StatusPill({ tone, label }: { tone: StatusTone; label: string }) {
   const map: Record<StatusTone, { box: string; icon: ReactNode }> = {
     good: {
-      box: "bg-cpx-green text-cpx-black ring-1 ring-cpx-purple",
+      box: "border-cpx-green-200 bg-cpx-green-50 text-cpx-green-800",
       icon: <IconCheck />,
     },
     warn: {
-      box: "bg-status-warn-fill text-status-warn-ink",
-      icon: <IconWarn className="text-status-warn-ink" />,
+      box: "border-cpx-bright-200 bg-cpx-bright-50 text-cpx-bright-700",
+      icon: <IconWarn />,
     },
-    critical: { box: "bg-cpx-red text-white", icon: <IconCritical className="text-white" /> },
-    idle: { box: "bg-status-idle text-cpx-black", icon: <IconDash /> },
+    critical: {
+      box: "border-cpx-red-200 bg-cpx-red-100 text-cpx-red-700",
+      icon: <IconCritical />,
+    },
+    idle: {
+      box: "border-cpx-grey-300 bg-cpx-grey-200 text-cpx-grey-700",
+      icon: <IconDash />,
+    },
   };
   const m = map[tone];
   return (
     <span
-      className={`inline-flex h-5 items-center gap-1 rounded-[2px] px-1.5 text-2xs ${m.box}`}
+      className={`inline-flex h-5 items-center gap-1 rounded-sm border px-1.5 text-2xs font-medium ${m.box}`}
     >
       {m.icon}
       {label}
@@ -277,8 +287,8 @@ export function StatusPill({ tone, label }: { tone: StatusTone; label: string })
 // wording, on every screen that fell back to fixtures.
 export function OfflineNote() {
   return (
-    <span className="inline-flex h-5 items-center gap-1 bg-status-warn-fill px-1.5 text-2xs text-status-warn-ink">
-      <IconWarn className="text-status-warn-ink" />
+    <span className="inline-flex h-5 items-center gap-1 rounded-sm border border-cpx-blue-100 bg-cpx-blue-50 px-1.5 text-2xs font-medium text-cpx-blue-700">
+      <IconWarn />
       Demonstration data. Backend unreachable.
     </span>
   );
@@ -289,7 +299,7 @@ export function SkeletonRows({ rows = 6, className = "" }: { rows?: number; clas
   return (
     <div aria-busy="true" aria-label="Loading" className={`space-y-2 ${className}`}>
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="h-8 bg-black/5" style={{ width: `${100 - (i % 3) * 8}%` }} />
+        <div key={i} className="h-8 bg-cpx-grey-100" style={{ width: `${100 - (i % 3) * 8}%` }} />
       ))}
     </div>
   );
@@ -299,14 +309,14 @@ export function TlpBadge({ tlp }: { tlp: Tlp }) {
   const dark = tlp === "RED" || tlp === "AMBER+STRICT";
   return (
     <span
-      className={`inline-flex h-5 items-center rounded-[2px] px-1.5 font-mono text-2xs ${
+      className={`inline-flex h-5 items-center rounded-sm px-1.5 font-mono text-2xs ${
         dark
           ? "bg-cpx-red text-white"
           : tlp === "AMBER"
             ? "bg-status-warn-fill text-status-warn-ink"
             : tlp === "GREEN"
               ? "bg-green-contrast text-white"
-              : "bg-black/10 text-cpx-grey"
+              : "bg-cpx-grey-100 text-cpx-grey-500"
       }`}
     >
       TLP:{tlp}
@@ -317,7 +327,7 @@ export function TlpBadge({ tlp }: { tlp: Tlp }) {
 // A defanged observable: inert, never an anchor, never prefetched.
 export function IndicatorChip({ value }: { value: string }) {
   return (
-    <span className="inline-flex max-w-full items-center rounded-[2px] bg-black/5 px-1.5 py-0.5 font-mono text-xs text-cpx-grey break-all">
+    <span className="inline-flex max-w-full items-center rounded-sm bg-cpx-grey-50 px-1.5 py-0.5 font-mono text-xs text-cpx-grey-500 break-all">
       {defang(value)}
     </span>
   );
@@ -326,7 +336,7 @@ export function IndicatorChip({ value }: { value: string }) {
 // Inert URL rendering for the source inventory. Plain text, always defanged.
 export function InertUrl({ url }: { url: string }) {
   return (
-    <span className="font-mono text-2xs text-cpx-grey/80 break-all">
+    <span className="font-mono text-2xs text-cpx-grey-500 break-all">
       {defang(url)}
     </span>
   );
@@ -345,14 +355,14 @@ export function SearchBox({
 }) {
   return (
     <div className={`relative ${className}`}>
-      <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-black/40" />
+      <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-cpx-grey-500" />
       <input
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-8 w-full border border-black/15 bg-white pl-8 pr-3 text-sm focus:border-cpx-purple focus:outline-none"
+        className="h-8 w-full rounded-sm border border-cpx-grey-100 bg-white pl-8 pr-3 text-sm focus:border-cpx-green focus:outline-none"
       />
     </div>
   );
@@ -373,12 +383,12 @@ export function ListMeta({
   note?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 text-xs text-cpx-grey">
+    <div className="flex flex-wrap items-center gap-3 text-xs text-cpx-grey-500">
       <span>
         Showing <span className="font-medium text-cpx-black">{shown}</span> of{" "}
         <span className="font-medium text-cpx-black">{total}</span>
       </span>
-      <span className="text-black/30">·</span>
+      <span className="text-cpx-grey-400">·</span>
       <span>{sort}</span>
       {onExport && (
         <Button variant="secondary" size="sm" onClick={onExport} className="ml-1">
@@ -403,7 +413,7 @@ export function Tabs<T extends string>({
   label?: string;
 }) {
   return (
-    <div role="tablist" aria-label={label} className="flex items-end gap-1 border-b border-black/10">
+    <div role="tablist" aria-label={label} className="flex items-end gap-1 border-b border-cpx-grey-100">
       {tabs.map((t) => {
         const selected = value === t.key;
         return (
@@ -413,15 +423,15 @@ export function Tabs<T extends string>({
             role="tab"
             aria-selected={selected}
             onClick={() => onChange(t.key)}
-            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm ${
+            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-base ${
               selected
-                ? "border-cpx-purple font-medium text-cpx-purple"
-                : "border-transparent text-cpx-grey hover:text-cpx-black"
+                ? "border-cpx-green font-semibold text-cpx-purple"
+                : "border-transparent text-cpx-grey-500 hover:text-cpx-purple"
             }`}
           >
             {t.label}
             {t.count !== undefined && (
-              <span className="bg-black/5 px-1 text-2xs">{t.count}</span>
+              <span className="rounded-sm bg-cpx-grey-100 px-1 text-2xs text-cpx-grey-700">{t.count}</span>
             )}
           </button>
         );
@@ -430,34 +440,189 @@ export function Tabs<T extends string>({
   );
 }
 
-export function CountTile({
+// ---------------------------------------------------------------------------
+// The KPI card. One definition for every dashboard: both of them used to carry
+// a byte-identical private copy.
+//
+// The card answers three questions in reading order: what is counted, how many,
+// and whether that is going the wrong way. The change is a chip rather than a
+// sentence, because a sentence in colour reads as a link, and it carries an
+// arrow and a word as well as a colour: colour never says anything on its own.
+
+export interface KpiCardProps {
+  label: string;
+  value: number;
+  /** What the number counts, in the analyst's words. */
+  unit: string;
+  /** The period the number covers, where it has one. */
+  window?: string;
+  /** Prior-period value. No previous, no chip: a change is never inferred. */
+  previous?: number;
+  /** True where an increase is bad. Decides which direction reads as worse. */
+  higherIsWorse?: boolean;
+  href?: string;
+}
+
+export function KpiCard({
   label,
   value,
-  hint,
+  unit,
+  window,
+  previous,
+  higherIsWorse,
   href,
-}: {
-  label: string;
-  value: ReactNode;
-  hint?: string;
-  href?: string;
-}) {
+}: KpiCardProps) {
+  const delta = previous === undefined ? null : value - previous;
+  const worse =
+    delta === null || delta === 0 ? false : higherIsWorse ? delta > 0 : delta < 0;
+  const better = delta !== null && delta !== 0 && !worse;
+
+  // The accent carries the same judgement as the chip, so the card can be read
+  // from the edge of the eye. Flat, or no prior period, stays neutral.
+  const accent = worse
+    ? "border-l-cpx-red-400"
+    : better
+      ? "border-l-cpx-green"
+      : "border-l-cpx-grey-300";
+
+  const chipTone = worse
+    ? "bg-cpx-red-50 text-cpx-red-700"
+    : better
+      ? "bg-cpx-green-50 text-cpx-green-800"
+      : "bg-cpx-grey-50 text-cpx-grey-700";
+
+  const sentence =
+    delta === null
+      ? undefined
+      : delta === 0
+        ? "unchanged on the previous period"
+        : `${delta > 0 ? "up" : "down"} ${Math.abs(delta).toLocaleString(
+            "en-GB",
+          )} on the previous period`;
+
   const body = (
-    <div className="flex h-full flex-col justify-between border border-black/10 bg-white p-4">
-      <span className="text-xs text-cpx-grey">{label}</span>
-      <span className="mt-2 font-display text-2xl font-medium leading-none tracking-tightish">
-        {value}
+    <div
+      className={`flex h-full min-h-[100px] flex-col justify-between border border-l-4 border-cpx-grey-100 bg-white p-4 transition-colors ${accent} ${
+        href ? "hover:border-cpx-green-200 hover:bg-cpx-green-50/40" : ""
+      }`}
+    >
+      <span className="text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
+        {label}
       </span>
-      {hint && (
-        <span className="mt-2 text-2xs text-cpx-grey">{hint}</span>
-      )}
+      <span className="mt-2 flex flex-wrap items-baseline gap-2">
+        <span className="font-display text-2xl font-semibold leading-none tracking-tightish tabular-nums">
+          {value.toLocaleString("en-GB")}
+        </span>
+        {delta !== null && (
+          <span
+            title={sentence}
+            className={`inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-2xs font-medium tabular-nums ${chipTone}`}
+          >
+            {delta === 0 ? (
+              "no change"
+            ) : (
+              <>
+                <span aria-hidden>{delta > 0 ? "↑" : "↓"}</span>
+                {Math.abs(delta).toLocaleString("en-GB")}{" "}
+                {delta > 0 ? "more" : "fewer"}
+              </>
+            )}
+          </span>
+        )}
+      </span>
+      <span className="mt-2 text-xs text-cpx-grey-500">
+        {unit}
+        {window && <> · {window}</>}
+      </span>
     </div>
   );
   return href ? (
-    <a href={href} className="block hover:bg-black/[0.02]">
+    <Link href={href} className="block">
       {body}
-    </a>
+    </Link>
   ) : (
     body
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Small shared pieces. Each of these replaced three or more identical private
+// copies; keep them here so a restyle lands once.
+
+/** A selectable filter chip. Selected is green, the console's selection colour. */
+export function FilterChip({
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  count?: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs ${
+        active
+          ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+          : `border-cpx-grey-100 hover:bg-cpx-grey-50 ${count === 0 ? "text-cpx-grey-500" : ""}`
+      }`}
+    >
+      {label}
+      {count !== undefined && (
+        <span
+          className={`px-1 text-2xs ${active ? "bg-cpx-green-100" : "bg-cpx-grey-50"}`}
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+/** A label over its value. The console's one label-value pair. */
+export function Fact({
+  label,
+  value,
+  title,
+  truncate = true,
+}: {
+  label: string;
+  value: ReactNode;
+  title?: string;
+  truncate?: boolean;
+}) {
+  return (
+    <div className="min-w-0" title={title}>
+      <dt className="text-2xs text-cpx-grey-500">{label}</dt>
+      <dd className={`font-medium ${truncate ? "truncate" : ""}`}>{value}</dd>
+    </div>
+  );
+}
+
+/** A labelled section inside a detail pane, with an optional count. */
+export function DetailRow({
+  label,
+  count,
+  children,
+}: {
+  label: string;
+  count?: number;
+  children: ReactNode;
+}) {
+  return (
+    <div className="mt-5 border-t border-cpx-grey-100 pt-4">
+      <span className="flex items-baseline gap-2 text-xs text-cpx-grey-500">
+        {label}
+        {count !== undefined && (
+          <span className="bg-cpx-grey-50 px-1 text-2xs text-cpx-black">{count}</span>
+        )}
+      </span>
+      <div className="mt-2">{children}</div>
+    </div>
   );
 }
 

@@ -168,7 +168,7 @@ export default function ReportPage({
           needed as the window narrows. Every item is nowrap and shrink-0:
           without that a flex child compresses below its text and wraps inside
           itself, which is what turned this bar into six stacked fragments. */}
-      <div className="sticky top-14 z-20 flex h-14 items-center gap-2 border-b border-black/10 bg-white px-6">
+      <div className="sticky top-[60px] z-20 flex h-14 items-center gap-2 border-b border-cpx-grey-100 bg-white px-6">
         <span className="shrink-0 whitespace-nowrap font-mono text-sm font-medium">
           {a.ref}
         </span>
@@ -178,12 +178,12 @@ export default function ReportPage({
         {/* Report type, stated. Which format a document follows is the first
             thing a reviewer needs and it was only implicit in the reference. */}
         <span
-          className="shrink-0 bg-black/5 px-1.5 py-0.5 text-2xs"
+          className="shrink-0 bg-cpx-grey-50 px-1.5 py-0.5 text-2xs"
           title={template?.name}
         >
           {a.type}
         </span>
-        <span className="shrink-0 whitespace-nowrap text-xs text-cpx-grey">
+        <span className="shrink-0 whitespace-nowrap text-xs text-cpx-grey-500">
           v{a.version}
         </span>
         <span className="shrink-0 whitespace-nowrap text-xs">
@@ -199,19 +199,19 @@ export default function ReportPage({
             first. The full value stays on the title attribute. */}
         <span className="hidden min-w-0 items-center gap-2 xl:flex">
           {a.pirRefs.map((p) => (
-            <span key={p} className="shrink-0 bg-black/5 px-1.5 py-0.5 text-2xs">
+            <span key={p} className="shrink-0 bg-cpx-grey-50 px-1.5 py-0.5 text-2xs">
               {p}
             </span>
           ))}
         </span>
         <span
-          className="hidden shrink-0 truncate whitespace-nowrap text-xs text-cpx-grey lg:inline"
+          className="hidden shrink-0 truncate whitespace-nowrap text-xs text-cpx-grey-500 lg:inline"
           title={`Owner: ${a.owner ?? "unassigned"}`}
         >
           {a.owner ?? "-"}
         </span>
         <span
-          className="hidden shrink-0 whitespace-nowrap text-xs text-cpx-grey 2xl:inline"
+          className="hidden shrink-0 whitespace-nowrap text-xs text-cpx-grey-500 2xl:inline"
           title={`Last updated ${gstDateTime(lastUpdated)}`}
         >
           {gstDate(lastUpdated)}
@@ -239,7 +239,7 @@ export default function ReportPage({
         />
       )}
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-black/10 bg-white px-6 py-1.5 text-2xs text-cpx-grey">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-cpx-grey-100 bg-white px-6 py-1.5 text-2xs text-cpx-grey-500">
         <span>
           Report type <span className="text-cpx-black">{a.type}</span>
           {template && <> · {template.name}</>}
@@ -293,14 +293,14 @@ export default function ReportPage({
       )}
 
       <article className="mx-auto max-w-[720px] px-6 py-8">
-        <h1 className="text-xl font-medium leading-snug tracking-tightish">
+        <h1 className="text-xl font-semibold leading-snug tracking-tightish">
           {a.title}
         </h1>
 
         <div className="mt-6 space-y-7">
           {a.sections.map((s) => (
             <section key={s.id} id={s.id} className="scroll-mt-32">
-              <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
+              <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
                 {s.heading}
               </h2>
               {s.heading === "TTPs Mapping" || s.heading === "MITRE ATT&CK Mapping" ? (
@@ -341,7 +341,7 @@ export default function ReportPage({
                     }))
                   }
                   rows={Math.max(2, Math.ceil(s.body.length / 90))}
-                  className="mt-2 w-full resize-y border border-transparent bg-transparent text-sm leading-relaxed hover:border-black/10 focus:border-black/15 focus:bg-white focus:outline-none"
+                  className="mt-2 w-full resize-y border border-transparent bg-transparent text-sm leading-relaxed hover:border-cpx-grey-100 focus:border-cpx-grey-100 focus:bg-white focus:outline-none"
                 />
               ) : (
                 <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">
@@ -349,7 +349,7 @@ export default function ReportPage({
                 </p>
               )}
               {s.citations.length > 0 && (
-                <p className="mt-1.5 text-2xs text-cpx-grey">
+                <p className="mt-1.5 text-2xs text-cpx-grey-500">
                   {s.citations
                     .map((c) => `[${c.ref}] ${c.label}, ${recordCount(c.recordCount)}`)
                     .join(" · ")}
@@ -363,7 +363,7 @@ export default function ReportPage({
 
         {publishedState && (
           <section className="mt-10">
-            <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
+            <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
               Delivery
             </h2>
             <p className="mt-2 text-xs">
@@ -383,7 +383,7 @@ export default function ReportPage({
       </article>
 
       {!isDigest && (lead || (publishedState && editable === false && canWriteReports(user.role))) && (
-        <footer className="fixed bottom-0 left-16 right-0 z-20 flex h-14 items-center gap-2 border-t border-black/10 bg-white px-6 rail:left-60">
+        <footer className="fixed bottom-0 left-16 right-0 z-20 flex h-14 items-center gap-2 border-t border-cpx-grey-100 bg-white px-6 rail:left-44">
           {publishedState ? (
             <button
                 onClick={() =>
@@ -454,7 +454,7 @@ export default function ReportPage({
                       })));
                       setShowSendBack(false);
                     }}
-                    className="w-full border border-black/10 px-3 py-2 text-left text-sm hover:border-cpx-purple"
+                    className="w-full border border-cpx-grey-100 px-3 py-2 text-left text-sm hover:border-cpx-green"
                   >
                     {r.label}
                   </button>
@@ -500,7 +500,7 @@ function SourcesSection({ a }: { a: Advisory }) {
 
   return (
     <section className="mt-10">
-      <h2 className="border-b border-black/10 pb-1 text-md font-medium tracking-tightish">
+      <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
         Sources
       </h2>
       <p className="mt-2 text-xs">
@@ -574,7 +574,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
   if (a.checks.length === 0) return null;
   if (failed.length === 0) {
     return (
-      <div className="flex items-center gap-2 border-b border-black/10 bg-white px-6 py-2 text-xs">
+      <div className="flex items-center gap-2 border-b border-cpx-grey-100 bg-white px-6 py-2 text-xs">
         <IconCheck className="text-green-contrast" />
         All checks passed.
       </div>
@@ -585,7 +585,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
     // One line, not one line per check. Every check is unpassed on a new draft,
     // and three stacked red rows read as a fault rather than as the ordinary
     // starting state of a document nobody has written yet.
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-black/10 bg-white px-6 py-2 text-xs">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-cpx-grey-100 bg-white px-6 py-2 text-xs">
       <IconWarn className={blocking > 0 ? "text-cpx-red" : "text-status-warn-ink"} />
       <span className="whitespace-nowrap">
         <span className="font-medium">
@@ -593,12 +593,12 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
         </span>{" "}
         checks not passed
         {blocking > 0 && (
-          <span className="text-cpx-grey">, {blocking} blocking</span>
+          <span className="text-cpx-grey-500">, {blocking} blocking</span>
         )}
       </span>
-      <span className="text-cpx-grey">·</span>
+      <span className="text-cpx-grey-500">·</span>
       {failed.map((c, i) => (
-        <span key={c.id} className="text-cpx-grey">
+        <span key={c.id} className="text-cpx-grey-500">
           {c.anchorSectionId ? (
             <a href={`#${c.anchorSectionId}`} className="underline underline-offset-2">
               {c.label}
@@ -628,7 +628,7 @@ function TechniquesTable({
     <div className="mt-3">
       <table className="w-full border-collapse text-xs">
         <thead>
-          <tr className="border-b border-black/15 text-left">
+          <tr className="border-b border-cpx-grey-100 text-left">
             <th className="py-1.5 pr-3 font-medium">Tactic</th>
             <th className="py-1.5 pr-3 font-medium">Technique</th>
             <th className="py-1.5 pr-3 font-medium">Name</th>
@@ -637,7 +637,7 @@ function TechniquesTable({
         </thead>
         <tbody>
           {a.techniques.map((t) => (
-            <tr key={t.techniqueId} className="border-b border-black/5">
+            <tr key={t.techniqueId} className="border-b border-cpx-grey-100">
               <td className="py-1.5 pr-3">
                 {t.tacticId} {TACTICS[t.tacticId]}
               </td>
@@ -661,9 +661,9 @@ function TechniquesTable({
             value={newId}
             onChange={(e) => setNewId(e.target.value)}
             placeholder="Technique ID"
-            className="h-8 w-36 border border-black/15 px-2 font-mono text-xs focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-36 border border-cpx-grey-100 px-2 font-mono text-xs focus:border-cpx-green focus:outline-none"
           />
-          <span className="text-xs text-cpx-grey">
+          <span className="text-xs text-cpx-grey-500">
             {newId.trim() === ""
               ? ""
               : resolved
@@ -726,7 +726,7 @@ function CvssTable({
     <div className="mt-3">
       <table className="w-full border-collapse text-xs">
         <thead>
-          <tr className="border-b border-black/15 text-left">
+          <tr className="border-b border-cpx-grey-100 text-left">
             <th className="py-1.5 pr-3 font-medium">CVE</th>
             <th className="py-1.5 pr-3 font-medium">Score</th>
             <th className="py-1.5 pr-3 font-medium">Authority</th>
@@ -735,7 +735,7 @@ function CvssTable({
         </thead>
         <tbody>
           {a.cvss.map((c, i) => (
-            <tr key={i} className="border-b border-black/5">
+            <tr key={i} className="border-b border-cpx-grey-100">
               <td className="py-1.5 pr-3 font-mono text-xs">{c.cveId}</td>
               <td className="py-1.5 pr-3 font-medium">{c.value.toFixed(1)}</td>
               <td className="py-1.5 pr-3">{c.source}</td>
@@ -757,19 +757,19 @@ function CvssTable({
             value={cve}
             onChange={(e) => setCve(e.target.value)}
             placeholder="CVE ID"
-            className="h-8 w-40 border border-black/15 px-2 font-mono text-xs focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-40 border border-cpx-grey-100 px-2 font-mono text-xs focus:border-cpx-green focus:outline-none"
           />
           <input
             value={score}
             onChange={(e) => setScore(e.target.value)}
             placeholder="Score"
-            className="h-8 w-20 border border-black/15 px-2 text-xs focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-20 border border-cpx-grey-100 px-2 text-xs focus:border-cpx-green focus:outline-none"
           />
           <input
             value={source}
             onChange={(e) => setSource(e.target.value)}
             placeholder="Authority"
-            className="h-8 w-36 border border-black/15 px-2 text-xs focus:border-cpx-purple focus:outline-none"
+            className="h-8 w-36 border border-cpx-grey-100 px-2 text-xs focus:border-cpx-green focus:outline-none"
           />
           <button
             disabled={!valid}
@@ -807,12 +807,12 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
     <article className="mx-auto max-w-[720px] px-6 py-8">
       <div className="flex items-center gap-3">
         <span className="font-mono text-sm font-medium">{a.ref}</span>
-        <span className="bg-black/5 px-1.5 py-0.5 text-2xs">RFI</span>
+        <span className="bg-cpx-grey-50 px-1.5 py-0.5 text-2xs">RFI</span>
       </div>
-      <h1 className="mt-3 text-xl font-medium leading-snug tracking-tightish">
+      <h1 className="mt-3 text-xl font-semibold leading-snug tracking-tightish">
         {a.rfi.question}
       </h1>
-      <p className="mt-2 text-xs text-cpx-grey">
+      <p className="mt-2 text-xs text-cpx-grey-500">
         {a.rfi.requester} · due {gstDateTime(a.rfi.dueAt)} ·{" "}
         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
       </p>
@@ -820,7 +820,7 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
         {a.rfi.steps.map((s) => (
           <li key={s.label} className="flex items-center gap-2.5 text-sm">
             <span
-              className={`flex h-5 w-5 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-black/20"}`}
+              className={`flex h-5 w-5 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-100"}`}
             >
               {s.done ? "✓" : ""}
             </span>

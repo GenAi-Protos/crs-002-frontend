@@ -28,7 +28,7 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
   return (
     <div className="mt-4 max-w-3xl xl:max-w-none">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-cpx-grey">
+        <span className="text-xs text-cpx-grey-500">
           <span className="font-medium text-cpx-black">{watches.length}</span> watches ·
           Name A to Z
         </span>
@@ -41,7 +41,9 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
         </button>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 items-start gap-2 xl:grid-cols-2">
+      {/* One column: these cards expand in place, and in a two-column grid an
+          expanded card left a card-height hole beside its collapsed neighbour. */}
+      <div className="mt-3 flex max-w-[880px] flex-col gap-2">
         {watches.length === 0 && (
           <p className="text-sm">
             <span className="font-medium">0 watches</span>
@@ -52,7 +54,7 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
           .map((w) => {
             const isOpen = open === w.id;
             return (
-              <div key={w.id} className="border border-black/10 bg-white">
+              <div key={w.id} className="border border-cpx-grey-100 bg-white">
                 <button
                   onClick={() => setOpen(isOpen ? null : w.id)}
                   className="flex w-full items-center gap-3 px-4 py-3 text-left"
@@ -61,31 +63,31 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
                     {w.name}
                   </span>
                   {w.pirRefs.map((p) => (
-                    <span key={p} className="bg-black/5 px-1.5 py-0.5 text-2xs">
+                    <span key={p} className="bg-cpx-grey-50 px-1.5 py-0.5 text-2xs">
                       {p}
                     </span>
                   ))}
-                  <span className="text-xs text-cpx-grey">{w.cadence}</span>
+                  <span className="text-xs text-cpx-grey-500">{w.cadence}</span>
                   <IconChevronDown className={isOpen ? "rotate-180" : ""} />
                 </button>
                 {isOpen && (
-                  <div className="border-t border-black/5 px-4 py-3">
+                  <div className="border-t border-cpx-grey-100 px-4 py-3">
                     <div className="flex flex-wrap gap-1.5">
                       {w.terms.map((t) => (
                         <span
                           key={t}
-                          className="bg-black/5 px-2 py-0.5 font-mono text-xs"
+                          className="bg-cpx-grey-50 px-2 py-0.5 font-mono text-xs"
                         >
                           {t}
                         </span>
                       ))}
                     </div>
-                    <p className="mt-2 text-xs text-cpx-grey">
+                    <p className="mt-2 text-xs text-cpx-grey-500">
                       {w.language} · {w.region}
                     </p>
                     {w.lastRun ? (
                       <div className="mt-3">
-                        <p className="text-xs text-cpx-grey">
+                        <p className="text-xs text-cpx-grey-500">
                           Last run {gstDateTime(w.lastRun.at)}
                         </p>
                         <ul className="mt-1 space-y-0.5">
@@ -210,14 +212,14 @@ function WatchDialog({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-9 w-full border border-black/15 px-3 text-sm focus:border-cpx-purple focus:outline-none"
+              className="h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:border-cpx-green focus:outline-none"
             />
           </Field>
           <Field label="Terms, comma separated">
             <input
               value={terms}
               onChange={(e) => setTerms(e.target.value)}
-              className="h-9 w-full border border-black/15 px-3 font-mono text-xs focus:border-cpx-purple focus:outline-none"
+              className="h-9 w-full border border-cpx-grey-100 px-3 font-mono text-xs focus:border-cpx-green focus:outline-none"
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">
@@ -225,7 +227,7 @@ function WatchDialog({
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
+                className="h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
               >
                 {["English", "Arabic", "English and Arabic"].map((l) => (
                   <option key={l}>{l}</option>
@@ -236,7 +238,7 @@ function WatchDialog({
               <select
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                className="h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
+                className="h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
               >
                 {["Global", "Middle East", "UAE"].map((r) => (
                   <option key={r}>{r}</option>
@@ -259,8 +261,8 @@ function WatchDialog({
                   title={p.question}
                   className={`px-2 py-1 text-xs ${
                     pirRefs.includes(p.ref)
-                      ? "bg-cpx-purple font-medium text-white"
-                      : "border border-black/15 text-cpx-grey"
+                      ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+                      : "border border-cpx-grey-100 text-cpx-grey-500"
                   }`}
                 >
                   {p.ref}
@@ -272,7 +274,7 @@ function WatchDialog({
             <select
               value={cadence}
               onChange={(e) => setCadence(e.target.value as Rhythm)}
-              className="h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
+              className="h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
             >
               {CADENCES.map((c) => (
                 <option key={c}>{c}</option>
@@ -319,7 +321,7 @@ function WatchDialog({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs text-cpx-grey">{label}</span>
+      <span className="text-xs text-cpx-grey-500">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
   );

@@ -59,6 +59,13 @@ const sevCell = (s: Severity): Cell => ({
   swatch: SEVERITY_COLOR[s],
 });
 
+/**
+ * A state enum as a reader sees it: "in-review" becomes "In review".
+ * The enum is the contract with the backend, never the words on screen.
+ */
+const stateLabel = (s: string): string =>
+  s.replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase());
+
 /** A relative date with the exact one on hover. Held on a single line. */
 const agoCell = (iso: string): Cell => ({
   text: agoFromNow(iso),
@@ -417,7 +424,7 @@ function buildWidget(
           { text: a.ref, mono: true, href: `/reports/${a.ref}` },
           { text: a.title },
           ...(access.clientDetail ? [{ text: String(a.clientCount) }] : []),
-          { text: a.status, tone: a.status === "in-review" ? "warn" : "muted" },
+          { text: stateLabel(a.status), tone: a.status === "in-review" ? "warn" : "muted" },
         ]),
       };
 
@@ -442,7 +449,7 @@ function buildWidget(
           { text: f.title },
           { text: f.category, tone: "muted" },
           { text: String(f.clientCount) },
-          { text: f.status, tone: f.status === "new" ? "warn" : "muted" },
+          { text: stateLabel(f.status), tone: f.status === "new" ? "warn" : "muted" },
         ]),
       };
 
@@ -484,7 +491,7 @@ function buildWidget(
           { text: i.title },
           { text: i.owner, tone: "muted" },
           {
-            text: i.status.replace("-", " "),
+            text: stateLabel(i.status),
             tone: i.status === "awaiting-review" ? "warn" : "muted",
           },
           agoCell(i.openedAt),
@@ -602,7 +609,7 @@ function buildWidget(
             mono: f.techniqueIds.length > 0,
             tone: f.techniqueIds.length ? undefined : "muted",
           },
-          { text: f.status, tone: f.status === "new" ? "warn" : "muted" },
+          { text: stateLabel(f.status), tone: f.status === "new" ? "warn" : "muted" },
         ]),
       };
 

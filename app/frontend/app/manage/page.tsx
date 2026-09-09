@@ -133,9 +133,9 @@ const PENDING: Record<"audit", { what: string; basis: string }> = {
 function NotBuiltYet({ tab }: { tab: "audit" }) {
   const p = PENDING[tab];
   return (
-    <div className="mt-6 max-w-2xl border border-black/10 bg-black/[0.02] p-4">
+    <div className="mt-6 max-w-2xl border border-cpx-grey-100 bg-cpx-grey-50 p-4">
       <p className="text-sm">{p.what}</p>
-      <p className="mt-2 text-2xs text-cpx-grey">{p.basis}</p>
+      <p className="mt-2 text-2xs text-cpx-grey-500">{p.basis}</p>
     </div>
   );
 }

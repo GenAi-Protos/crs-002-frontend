@@ -56,7 +56,7 @@ But the run itself must be openable. CPX asked for this three times on 2 Septemb
 
 **5. Role filtering happens in the payload, never the DOM.** One predicate in `lib/access.ts`. **Sales must never receive raw IOC or analyst-level data** - that is a written CPX requirement with its own success indicator. Withhold at assembly and render the count: `14 indicators, withheld at this access level`.
 
-**6. Brand is CPX 2026.** Dark Purple `#1E1847`, CPX Green `#4CEE76`, Near Black `#040405`. **Zero occurrences of `#FDB913`, `#EA661F`, `#FFC72C` or `#F59E0B`.** That last one is a Tailwind default amber sitting under 5 degrees of hue from the retired CPX yellow. Tokens in `docs/03`. Type is CPX Unbounded for `h1`, `h2`, the wordmark and KPI numbers, Inter for everything else, self-hosted from `app/fonts/`; sizes come from the eight-step scale only, never `text-[Npx]`. Type is CPX Unbounded for `h1`, `h2`, the wordmark and KPI numbers, Inter for everything else, self-hosted from `app/fonts/`; sizes come from the eight-step scale only, never `text-[Npx]`.
+**6. Brand is CPX 2026, styled like the other CPX consoles.** Dark Purple `#1E1847`, CPX Green `#4CEE76`, Near Black `#040405`, plus the shared 50 to 900 tint scales. **Zero occurrences of `#FDB913`, `#EA661F`, `#FFC72C` or `#F59E0B`.** That last one is a Tailwind default amber sitting under 5 degrees of hue from the retired CPX yellow. Tokens in `docs/03`; the visual reference is the CSD-007 style guide (`CSD-007/csd-007-frontend/docs/FRONTEND-STYLE-GUIDE.md`): white shell, green for the active and selected state, 4px corners, soft tinted status pills, no `black/N` opacity greys. Type is CPX Unbounded for `h1`, `h2`, the wordmark and KPI numbers, Inter for everything else, self-hosted from `app/fonts/`; sizes come from the eight-step scale only, never `text-[Npx]`.
 
 **7. UK English. No em dashes.** Use a spaced hyphen, a comma or a colon. All times GST. No `AI-XX` identifiers, no "TBC", no hedging on any screen.
 
@@ -113,8 +113,7 @@ Everyone lands on `/`. The Dashboard resolves its content from the role.
 - Where the screen shows agent output, the run behind it is openable: workflow, agents invoked, evidence, status
 - No credential value is displayed or accepted anywhere on it
 - Text sizes from the eight-step scale only; buttons via `Button` or `buttonClass`; overlays via `Dialog` or `Drawer`
-- While a fetch is in flight `SkeletonRows` holds the geometry; when it fell back to fixtures `OfflineNote` is visible
-- Text sizes from the eight-step scale only; buttons via `Button` or `buttonClass`; overlays via `Dialog` or `Drawer`
+- Colours from the `cpx-*` tokens and scales only: no `black/N` greys, no hex in a component
 - While a fetch is in flight `SkeletonRows` holds the geometry; when it fell back to fixtures `OfflineNote` is visible
 
 ---

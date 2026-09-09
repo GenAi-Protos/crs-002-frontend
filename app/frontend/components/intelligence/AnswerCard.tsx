@@ -44,7 +44,7 @@ function linkEntities(
       <button
         key={`${ent.id}-${i}`}
         onClick={() => onEntity(ent.id)}
-        className="text-link underline underline-offset-2 hover:text-cpx-purple"
+        className="text-link underline underline-offset-2 hover:text-cpx-blue-800"
       >
         {part}
       </button>
@@ -82,12 +82,12 @@ function answerExportJson(a: Answer): string {
 
 export function AnswerSkeleton() {
   return (
-    <div className="border border-black/10 bg-white p-5">
-      <div className="mb-3 h-4 w-2/3 animate-pulse bg-black/10" />
-      <div className="mb-2 h-3 w-full animate-pulse bg-black/5" />
-      <div className="mb-2 h-3 w-11/12 animate-pulse bg-black/5" />
-      <div className="mb-2 h-3 w-4/5 animate-pulse bg-black/5" />
-      <div className="mt-4 h-3 w-40 animate-pulse bg-black/5" />
+    <div className="border border-cpx-grey-100 bg-white p-5">
+      <div className="mb-3 h-4 w-2/3 animate-pulse bg-cpx-grey-100" />
+      <div className="mb-2 h-3 w-full animate-pulse bg-cpx-grey-50" />
+      <div className="mb-2 h-3 w-11/12 animate-pulse bg-cpx-grey-50" />
+      <div className="mb-2 h-3 w-4/5 animate-pulse bg-cpx-grey-50" />
+      <div className="mt-4 h-3 w-40 animate-pulse bg-cpx-grey-50" />
     </div>
   );
 }
@@ -103,7 +103,7 @@ export function TurnView({
   return (
     <div className="space-y-3">
       <div className="flex items-start gap-2.5">
-        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-black/10 text-2xs font-medium">
+        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-cpx-grey-100 text-2xs font-medium">
           Q
         </span>
         <p className="pt-0.5 text-base font-medium">{turn.question}</p>
@@ -128,7 +128,7 @@ function AnswerBody({
   const [copied, setCopied] = useState(false);
 
   return (
-    <div className="border border-black/10 bg-white">
+    <div className="border border-cpx-grey-100 bg-white">
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-2.5">
@@ -136,7 +136,7 @@ function AnswerBody({
               <NestorMarkReverse size={16} />
             </span>
             {a.title && (
-              <h2 className="pt-0.5 text-md font-medium tracking-tightish">
+              <h2 className="pt-0.5 text-md font-semibold tracking-tightish">
                 {a.title}
               </h2>
             )}
@@ -149,7 +149,7 @@ function AnswerBody({
                 setCopied(true);
                 setTimeout(() => setCopied(false), 1200);
               }}
-              className="flex h-7 w-7 items-center justify-center text-black/40 hover:bg-black/5 hover:text-cpx-black"
+              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
             >
               <IconCopy />
             </button>
@@ -165,12 +165,12 @@ function AnswerBody({
                 el.click();
                 URL.revokeObjectURL(el.href);
               }}
-              className="flex h-7 w-7 items-center justify-center text-black/40 hover:bg-black/5 hover:text-cpx-black"
+              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
             >
               <IconExport />
             </button>
             {copied && (
-              <span className="text-2xs text-cpx-grey">Copied</span>
+              <span className="text-2xs text-cpx-grey-500">Copied</span>
             )}
           </div>
         </div>
@@ -251,7 +251,7 @@ function AnswerBody({
             {a.classificationSettled ? (
               <TlpBadge tlp={a.tlp} />
             ) : (
-              <span className="inline-flex h-5 items-center bg-black/5 px-1.5 text-2xs text-cpx-grey">
+              <span className="inline-flex h-5 items-center bg-cpx-grey-50 px-1.5 text-2xs text-cpx-grey-500">
                 Classification pending
               </span>
             )}
@@ -269,11 +269,11 @@ function AnswerBody({
 
       <button
         onClick={() => setSourcesOpen(!sourcesOpen)}
-        className="flex w-full items-center justify-between border-t border-black/10 px-5 py-2 text-xs text-cpx-grey hover:bg-black/[0.02]"
+        className="flex w-full items-center justify-between border-t border-cpx-grey-100 px-5 py-2 text-xs text-cpx-grey-500 hover:bg-cpx-grey-50"
       >
         <span className="flex items-center gap-2">
           Sources
-          <span className="bg-black/5 px-1 text-2xs">{a.citations.length}</span>
+          <span className="bg-cpx-grey-50 px-1 text-2xs">{a.citations.length}</span>
           {a.egress && (
             <span className="inline-flex items-center gap-1 text-status-warn-ink">
               <IconEgress />
@@ -284,14 +284,14 @@ function AnswerBody({
         <IconChevronDown className={sourcesOpen ? "rotate-180" : ""} />
       </button>
       {sourcesOpen && (
-        <div className="border-t border-black/5 px-5 py-3">
+        <div className="border-t border-cpx-grey-100 px-5 py-3">
           <ul className="space-y-1.5">
             {a.citations.map((c) => (
               <li key={c.id} className="flex items-baseline gap-2 text-xs">
-                <span className="font-mono text-black/40">[{c.ref}]</span>
+                <span className="font-mono text-cpx-grey-400">[{c.ref}]</span>
                 <span className="">{c.label}</span>
                 <span className="font-medium">{recordCount(c.recordCount)}</span>
-                {c.url && <span className="font-mono text-2xs text-black/40 break-all">{defang(c.url)}</span>}
+                {c.url && <span className="font-mono text-2xs text-cpx-grey-400 break-all">{defang(c.url)}</span>}
               </li>
             ))}
           </ul>

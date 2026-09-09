@@ -108,7 +108,7 @@ function Steps({ current, hasTemplate }: { current: Step; hasTemplate: boolean }
     { key: "details", label: "Create" },
   ];
   return (
-    <span className="flex items-center gap-1.5 text-2xs text-cpx-grey">
+    <span className="flex items-center gap-1.5 text-2xs text-cpx-grey-500">
       {steps.map((s, i) => (
         <span key={s.key} className="flex items-center gap-1.5">
           <span className={current === s.key ? "font-medium text-cpx-black" : ""}>
@@ -132,26 +132,26 @@ function TypePicker({
 }) {
   return (
     <>
-      <p className="mt-3 text-xs text-cpx-grey">Report type</p>
-      <ul className="mt-2 border border-black/10">
+      <p className="mt-3 text-xs text-cpx-grey-500">Report type</p>
+      <ul className="mt-2 border border-cpx-grey-100">
         {REPORT_TYPES.map((t) => {
           const template = TEMPLATES[t];
           return (
-            <li key={t} className="border-b border-black/10 last:border-b-0">
+            <li key={t} className="border-b border-cpx-grey-100 last:border-b-0">
               <button
                 onClick={() => onPick(t)}
-                className="block w-full px-3 py-2.5 text-left hover:bg-black/[0.03]"
+                className="block w-full px-3 py-2.5 text-left hover:bg-cpx-grey-50"
               >
                 <span className="flex items-baseline gap-2">
-                  <span className="font-mono text-2xs text-cpx-grey">{t}</span>
+                  <span className="font-mono text-2xs text-cpx-grey-500">{t}</span>
                   <span className="text-sm font-medium">{template.name}</span>
-                  <span className="ml-auto bg-black/5 px-1.5 text-2xs">
+                  <span className="ml-auto bg-cpx-grey-50 px-1.5 text-2xs">
                     {template.workOrder
                       ? "Work order"
-                      : `${template.sections.length} sections`}
+                      : `${template.sections.length} ${template.sections.length === 1 ? "section" : "sections"}`}
                   </span>
                 </span>
-                <span className="mt-0.5 block text-xs text-cpx-grey">
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">
                   {template.purpose}
                 </span>
               </button>
@@ -191,48 +191,48 @@ function TitleForm({
 
   return (
     <>
-      <p className="mt-3 flex flex-wrap items-baseline gap-2 text-xs text-cpx-grey">
-        <span className="bg-black/5 px-1.5 text-2xs text-cpx-black">{type}</span>
+      <p className="mt-3 flex flex-wrap items-baseline gap-2 text-xs text-cpx-grey-500">
+        <span className="bg-cpx-grey-50 px-1.5 text-2xs text-cpx-black">{type}</span>
         {template.name}
       </p>
 
-      <div className="mt-3 border border-black/10 px-3 py-2">
-        <span className="text-2xs text-cpx-grey">Template</span>
+      <div className="mt-3 border border-cpx-grey-100 px-3 py-2">
+        <span className="text-2xs text-cpx-grey-500">Template</span>
         <span className="mt-0.5 block break-all text-sm font-medium">
           {choice.kind === "standard" ? "Standard template" : choice.name}
         </span>
-        <span className="mt-0.5 block text-xs text-cpx-grey">
+        <span className="mt-0.5 block text-xs text-cpx-grey-500">
           {choice.sections.length}{" "}
           {choice.sections.length === 1 ? "section" : "sections"} detected
         </span>
       </div>
 
       <label className="mt-4 block">
-        <span className="text-xs text-cpx-grey">Title</span>
+        <span className="text-xs text-cpx-grey-500">Title</span>
         <input
           autoFocus
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:border-cpx-purple focus:outline-none"
+          className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:border-cpx-green focus:outline-none"
         />
       </label>
 
-      <ol className="mt-3 max-h-44 overflow-y-auto border border-black/10">
+      <ol className="mt-3 max-h-44 overflow-y-auto border border-cpx-grey-100">
         {choice.sections.map((s, i) => (
           <li
             key={`${i}-${s.heading}`}
-            className="flex gap-2 border-b border-black/5 px-3 py-1.5 text-xs last:border-b-0"
+            className="flex gap-2 border-b border-cpx-grey-100 px-3 py-1.5 text-xs last:border-b-0"
           >
             {/* One number, this list's own: the heading arrived stripped of
                 whatever numbering its source document carried. */}
-            <span className="text-cpx-grey">{i + 1}.</span>
+            <span className="text-cpx-grey-500">{i + 1}.</span>
             <span className="">{s.heading}</span>
           </li>
         ))}
       </ol>
       {/* The CPX structure and its requirement references describe the standard
           format. They say nothing about a template someone else wrote. */}
-      <p className="mt-2 text-2xs text-cpx-grey">
+      <p className="mt-2 text-2xs text-cpx-grey-500">
         {choice.kind === "standard"
           ? template.basis
           : "Structure based on the uploaded custom template."}
@@ -249,7 +249,7 @@ function TitleForm({
         >
           Back
         </button>
-        <span className="text-2xs text-cpx-grey">
+        <span className="text-2xs text-cpx-grey-500">
           Creates a draft. A lead analyst approves before it reaches a client.
         </span>
         <div className="flex-1" />
@@ -303,34 +303,34 @@ function RfiForm({
 
   return (
     <>
-      <p className="mt-3 flex items-baseline gap-2 text-xs text-cpx-grey">
-        <span className="bg-black/5 px-1.5 text-2xs text-cpx-black">RFI</span>
+      <p className="mt-3 flex items-baseline gap-2 text-xs text-cpx-grey-500">
+        <span className="bg-cpx-grey-50 px-1.5 text-2xs text-cpx-black">RFI</span>
         Request for Information
       </p>
       <div className="mt-4 space-y-3">
         <label className="block">
-          <span className="text-xs text-cpx-grey">Requester</span>
+          <span className="text-xs text-cpx-grey-500">Requester</span>
           <input
             value={requester}
             onChange={(e) => setRequester(e.target.value)}
-            className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:border-cpx-purple focus:outline-none"
+            className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:border-cpx-green focus:outline-none"
           />
         </label>
         <label className="block">
-          <span className="text-xs text-cpx-grey">Question</span>
+          <span className="text-xs text-cpx-grey-500">Question</span>
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             rows={3}
-            className="mt-1 w-full border border-black/15 px-3 py-2 text-sm focus:border-cpx-purple focus:outline-none"
+            className="mt-1 w-full border border-cpx-grey-100 px-3 py-2 text-sm focus:border-cpx-green focus:outline-none"
           />
         </label>
         <label className="block">
-          <span className="text-xs text-cpx-grey">Client</span>
+          <span className="text-xs text-cpx-grey-500">Client</span>
           <select
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
-            className="mt-1 h-9 w-full border border-black/15 bg-white px-2 text-sm focus:outline-none"
+            className="mt-1 h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
           >
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
@@ -340,12 +340,12 @@ function RfiForm({
           </select>
         </label>
         <label className="block">
-          <span className="text-xs text-cpx-grey">Due date</span>
+          <span className="text-xs text-cpx-grey-500">Due date</span>
           <input
             type="date"
             value={due}
             onChange={(e) => setDue(e.target.value)}
-            className="mt-1 h-9 w-full border border-black/15 px-3 text-sm focus:outline-none"
+            className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:outline-none"
           />
         </label>
       </div>

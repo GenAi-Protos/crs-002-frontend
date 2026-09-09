@@ -124,12 +124,12 @@ export default function SourcePage({
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/collection?tab=sources"
-          className="text-xs text-cpx-grey underline underline-offset-2"
+          className="text-xs text-cpx-grey-500 underline underline-offset-2"
         >
           Sources
         </Link>
-        <span className="text-black/30">/</span>
-        <h1 className="text-xl font-medium tracking-tightish">{s.name}</h1>
+        <span className="text-cpx-grey-400">/</span>
+        <h1 className="text-xl font-semibold tracking-tightish">{s.name}</h1>
         <StatusPill {...st} />
         {offline && <OfflineNote />}
         <div className="flex-1" />
@@ -190,9 +190,9 @@ export default function SourcePage({
         <InertUrl url={s.url} />
       </p>
 
-      <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <div className="border border-black/10 bg-white p-4 xl:col-span-4">
-          <span className="text-xs text-cpx-grey">Facts</span>
+      <div className="mt-5 grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
+        <div className="border border-cpx-grey-100 bg-white p-4 xl:col-span-4">
+          <span className="text-xs text-cpx-grey-500">Facts</span>
           <dl className="mt-3 space-y-2.5 text-sm">
             <FactRow label="Sheet">{s.sheet}</FactRow>
             <FactRow label="Class">{s.collectorClass}</FactRow>
@@ -216,7 +216,7 @@ export default function SourcePage({
                   update((x) => ({ ...x, expectedRhythm: e.target.value as Rhythm }))
                 }
                 aria-label="Expected rhythm"
-                className="h-7 border border-black/10 bg-white px-1 text-xs focus:outline-none"
+                className="h-7 border border-cpx-grey-100 bg-white px-1 text-xs focus:outline-none"
               >
                 {RHYTHMS.map((r) => (
                   <option key={r}>{r}</option>
@@ -241,8 +241,8 @@ export default function SourcePage({
                       }
                       className={`px-1.5 py-0.5 text-2xs ${
                         on
-                          ? "bg-cpx-purple font-medium text-white"
-                          : "border border-black/15 text-cpx-grey"
+                          ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+                          : "border border-cpx-grey-100 text-cpx-grey-500"
                       }`}
                     >
                       {p.ref.replace("PIR", "")}
@@ -254,7 +254,7 @@ export default function SourcePage({
           </dl>
         </div>
 
-        <div className="border border-black/10 bg-white p-4 xl:col-span-8">
+        <div className="border border-cpx-grey-100 bg-white p-4 xl:col-span-8">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Stamp label="Last attempt" value={agoFromNow(s.lastAttempt)} sub={gstDateTime(s.lastAttempt)} />
             <Stamp label="Last success" value={agoFromNow(s.lastSuccess)} sub={gstDateTime(s.lastSuccess)} />
@@ -268,11 +268,11 @@ export default function SourcePage({
           <div className="mt-4 flex items-baseline gap-5 text-sm">
             <span>
               <span className="font-medium">{s.itemsLast30d}</span>{" "}
-              <span className="text-cpx-grey">items, 30 days</span>
+              <span className="text-cpx-grey-500">items, 30 days</span>
             </span>
             <span>
               <span className="font-medium">{s.consecutiveFailures}</span>{" "}
-              <span className="text-cpx-grey">consecutive failures</span>
+              <span className="text-cpx-grey-500">consecutive failures</span>
             </span>
           </div>
           <div className="mt-3">
@@ -281,9 +281,9 @@ export default function SourcePage({
         </div>
       </div>
 
-      <div className="mt-4 border border-black/10 bg-white p-4">
+      <div className="mt-4 border border-cpx-grey-100 bg-white p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs text-cpx-grey">Poll log</span>
+          <span className="text-xs text-cpx-grey-500">Poll log</span>
           <SearchBox value={logQuery} onChange={setLogQuery} className="w-64" />
           <div className="flex-1" />
           <ListMeta
@@ -363,7 +363,7 @@ function Center({ children }: { children: React.ReactNode }) {
 function FactRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3">
-      <dt className="w-24 shrink-0 pt-0.5 text-xs text-cpx-grey">
+      <dt className="w-24 shrink-0 pt-0.5 text-xs text-cpx-grey-500">
         {label}
       </dt>
       <dd className="min-w-0 flex-1">{children}</dd>
@@ -383,14 +383,14 @@ function Stamp({
   accent?: boolean;
 }) {
   return (
-    <div className={`border p-3 ${accent ? "border-status-warn-ink/30 bg-status-warn-fill" : "border-black/10"}`}>
-      <span className={`text-2xs ${accent ? "text-status-warn-ink" : "text-cpx-grey"}`}>
+    <div className={`border p-3 ${accent ? "border-status-warn-ink/30 bg-status-warn-fill" : "border-cpx-grey-100"}`}>
+      <span className={`text-2xs ${accent ? "text-status-warn-ink" : "text-cpx-grey-500"}`}>
         {label}
       </span>
       <span className={`mt-1 block text-lg font-display font-medium leading-none tracking-tightish ${accent ? "text-status-warn-ink" : ""}`}>
         {value}
       </span>
-      <span className={`mt-1 block text-2xs ${accent ? "text-status-warn-ink/80" : "text-cpx-grey"}`}>
+      <span className={`mt-1 block text-2xs ${accent ? "text-status-warn-ink/80" : "text-cpx-grey-500"}`}>
         {sub}
       </span>
     </div>
