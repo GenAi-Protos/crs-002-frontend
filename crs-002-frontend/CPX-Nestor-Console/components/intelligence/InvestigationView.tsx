@@ -1,0 +1,374 @@
+"use client";
+
+// Investigation. The chain around one observable, in the order an analyst
+// actually walks it:
+//
+//   Observable > infrastructure > malware > actor > campaign > TTPs > detection
+//
+// Lookup answers what this is. This answers what it is part of, and it is a
+// separate view because it is a separate question with a different cost.
+//
+// Two things this refuses to fake. A technique renders only when its id
+// resolves against the held ATT&CK table, and an id that does not resolve is
+// marked rather than given an invented name. And every stage renders its count
+// including zero, because a break in the chain is a finding: it says where our
+// coverage stops.
+
+import type { LookupRecord, ObservableKind } from "@/lib/types";
+import { KIND_LABEL, VERDICT_LABEL } from "@/lib/lookup";
+import { TACTICS, resolveTechnique } from "@/lib/mitre";
+import { IndicatorChip, StatusPill, TlpBadge, type StatusTone } from "@/components/ui";
+import { IconArrowRight } from "@/components/icons";
+import {
+  MonoValue,
+  T_FLUSH,
+  T_HEAD,
+  T_ROW,
+  T_TABLE,
+  T_TD,
+  T_TH,
+} from "@/components/table";
+import Link from "next/link";
+
+const VERDICT_TONE: Record<string, StatusTone> = {
+  malicious: "critical",
+  suspicious: "warn",
+  benign: "good",
+  unknown: "idle",
+};
+
+const DETECTION_LABEL = {
+  yara: "YARA",
+  sigma: "Sigma",
+  hunting: "Hunting query",
+} as const;
+
+export function InvestigationView({
+  record,
+  onBack,
+}: {
+  record: LookupRecord;
+  onBack: () => void;
+}) {
+  const g = record.investigation;
+
+  const stages = [
+    { key: "observable", label: "Observable", count: 1 },
+    { key: "infrastructure", label: "Infrastructure", count: g.infrastructure.length },
+    { key: "malware", label: "Malware", count: g.malware.length },
+    { key: "actors", label: "Threat actor", count: g.actors.length },
+    { key: "campaigns", label: "Campaign", count: g.campaigns.length },
+    { key: "techniques", label: "Techniques", count: g.techniques.length },
+    { key: "detections", label: "Detection content", count: g.detections.length },
+  ];
+
+  const broken = stages.find((s) => s.count === 0);
+
+  return (
+    <div className="py-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <button
+            onClick={onBack}
+            className="text-[12.5px] font-light text-cpx-grey hover:text-cpx-black"
+          >
+            Back to lookup
+          </button>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <h2 className="text-[20px] font-medium tracking-tightish">Investigation</h2>
+            <IndicatorChip value={record.observable} />
+            <span className="bg-black/5 px-1.5 text-[11px] font-light">
+              {KIND_LABEL[record.kind]}
+            </span>
+          </div>
+        </div>
+        <span className="flex shrink-0 items-center gap-2">
+          <TlpBadge tlp={record.tlp} />
+          <StatusPill
+            tone={VERDICT_TONE[record.verdict]}
+            label={VERDICT_LABEL[record.verdict]}
+          />
+        </span>
+      </div>
+
+      {/* The chain, with its counts. Reading it left to right is the point. */}
+      <div className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2 border border-black/10 bg-white px-3 py-2.5">
+        {stages.map((s, i) => (
+          <span key={s.key} className="flex items-center gap-1">
+            <a
+              href={`#stage-${s.key}`}
+              className={`flex items-baseline gap-1.5 px-1.5 py-0.5 text-[12px] hover:bg-black/5 ${
+                s.count === 0 ? "text-cpx-grey" : ""
+              }`}
+            >
+              {s.label}
+              <span
+                className={`px-1 text-[11px] ${
+                  s.count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-black/5"
+                }`}
+              >
+                {s.count}
+              </span>
+            </a>
+            {i < stages.length - 1 && (
+              <IconArrowRight className="shrink-0 text-black/25" />
+            )}
+          </span>
+        ))}
+      </div>
+
+      {broken && (
+        <p className="mt-2 text-[11.5px] font-light text-status-warn-ink">
+          The chain stops at {broken.label.toLowerCase()}: nothing is held. That is
+          a gap in our coverage, not a statement that none exists.
+        </p>
+      )}
+
+      <div className="mt-4 space-y-3">
+        <Stage
+          id="stage-observable"
+          index={1}
+          title="Observable"
+          count={1}
+          note={record.verdictReason}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <IndicatorChip value={record.observable} />
+            <span className="text-[12px] font-light text-cpx-grey">
+              risk {record.riskScore} of 100 · {record.recordCount} held records
+            </span>
+          </div>
+        </Stage>
+
+        <Stage
+          id="stage-infrastructure"
+          index={2}
+          title="Related addresses and domains"
+          count={g.infrastructure.length}
+          note="Infrastructure seen alongside this observable."
+        >
+          <ul className="space-y-2.5">
+            {g.infrastructure.map((i) => (
+              <li key={i.value} className="flex flex-wrap items-baseline gap-2">
+                <IndicatorChip value={i.value} />
+                <span className="bg-black/5 px-1.5 text-[11px] font-light">
+                  {KIND_LABEL[i.kind as ObservableKind]}
+                </span>
+                <span className="min-w-0 flex-1 text-[12.5px] font-light text-cpx-grey">
+                  {i.note}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Stage>
+
+        <Stage
+          id="stage-malware"
+          index={3}
+          title="Malware"
+          count={g.malware.length}
+          note="Families the infrastructure delivered or served."
+        >
+          <ul className="space-y-2.5">
+            {g.malware.map((m) => (
+              <li key={m.name}>
+                <span className="flex flex-wrap items-baseline gap-2">
+                  <span className="text-[13px] font-medium">{m.name}</span>
+                  <span className="bg-black/5 px-1.5 text-[11px] font-light">
+                    {m.family}
+                  </span>
+                </span>
+                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                  {m.note}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Stage>
+
+        <Stage
+          id="stage-actors"
+          index={4}
+          title="Threat actor"
+          count={g.actors.length}
+          note="Attribution carries its own confidence and is never asserted from infrastructure alone."
+        >
+          <ul className="space-y-2.5">
+            {g.actors.map((a) => (
+              <li key={a.name}>
+                <span className="flex flex-wrap items-baseline gap-2">
+                  <span className="text-[13px] font-medium">{a.name}</span>
+                  {a.aliases.map((alias) => (
+                    <span
+                      key={alias}
+                      className="bg-black/5 px-1.5 text-[11px] font-light"
+                    >
+                      {alias}
+                    </span>
+                  ))}
+                </span>
+                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                  {a.note}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Stage>
+
+        <Stage
+          id="stage-campaigns"
+          index={5}
+          title="Campaign"
+          count={g.campaigns.length}
+          note="What CPX has already issued on this activity."
+        >
+          <ul className="space-y-2.5">
+            {g.campaigns.map((c) => (
+              <li key={c.ref}>
+                <span className="flex flex-wrap items-baseline gap-2">
+                  <span className="text-[13px] font-medium">{c.name}</span>
+                  <Link
+                    href={`/reports/${c.ref}`}
+                    className="font-mono text-[11.5px] text-cat-4 underline underline-offset-2"
+                  >
+                    {c.ref}
+                  </Link>
+                </span>
+                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                  {c.note}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Stage>
+
+        <Stage
+          id="stage-techniques"
+          index={6}
+          title="Techniques"
+          count={g.techniques.length}
+          note="Enter the id, the name derives. An id that does not resolve is marked, never named."
+        >
+          <div className="overflow-x-auto">
+            <table className={`${T_TABLE} min-w-[34rem] text-[12.5px]`}>
+              <colgroup>
+                <col className="w-56" />
+                <col className="w-56" />
+                <col />
+              </colgroup>
+              <thead>
+                <tr className={T_HEAD}>
+                  <th scope="col" className={`${T_TH} ${T_FLUSH}`}>Technique</th>
+                  <th scope="col" className={`${T_TH} ${T_FLUSH}`}>Tactic</th>
+                  <th scope="col" className={`${T_TH} ${T_FLUSH}`}>Observed</th>
+                </tr>
+              </thead>
+              <tbody>
+                {g.techniques.map((t) => {
+                  const resolved = resolveTechnique(t.id);
+                  return (
+                    <tr key={t.id} className={T_ROW}>
+                      <td className={`${T_TD} ${T_FLUSH}`}>
+                        <MonoValue value={t.id} copy what="technique id" />
+                        <span className="mt-0.5 block font-medium">
+                          {resolved ? (
+                            resolved.name
+                          ) : (
+                            <span className="text-status-warn-ink">
+                              Does not resolve
+                            </span>
+                          )}
+                        </span>
+                      </td>
+                      <td className={`${T_TD} ${T_FLUSH} font-light text-cpx-grey`}>
+                        {resolved
+                          ? resolved.tactics.map((id) => TACTICS[id] ?? id).join(", ")
+                          : "-"}
+                      </td>
+                      <td className={`${T_TD} ${T_FLUSH} font-light`}>{t.observed}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {/* The heat map is a text table. Generated imagery is out of scope. */}
+        </Stage>
+
+        <Stage
+          id="stage-detections"
+          index={7}
+          title="Detection and hunting content"
+          count={g.detections.length}
+          note="What already covers this activity, and what it does not cover."
+        >
+          <ul className="space-y-2.5">
+            {g.detections.map((d) => (
+              <li key={d.ref}>
+                <span className="flex flex-wrap items-baseline gap-2">
+                  <span className="bg-black/5 px-1.5 text-[11px] font-light">
+                    {DETECTION_LABEL[d.kind]}
+                  </span>
+                  <span className="text-[13px] font-medium">{d.name}</span>
+                  <span className="font-mono text-[11.5px] text-cpx-grey">{d.ref}</span>
+                </span>
+                <span className="mt-0.5 block text-[12.5px] font-light text-cpx-grey">
+                  {d.note}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Stage>
+      </div>
+
+      <p className="mt-4 text-[11.5px] font-light text-cpx-grey">
+        Every relationship above comes from a held record. Nothing here is
+        inferred from the observable alone.
+      </p>
+    </div>
+  );
+}
+
+function Stage({
+  id,
+  index,
+  title,
+  count,
+  note,
+  children,
+}: {
+  id: string;
+  index: number;
+  title: string;
+  count: number;
+  note: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section id={id} className="scroll-mt-4 border border-black/10 bg-white">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-black/10 px-4 py-2.5">
+        <h3 className="flex items-baseline gap-2 text-[13px] font-medium tracking-tightish">
+          <span className="text-cpx-grey">{index}</span>
+          {title}
+          <span
+            className={`px-1 text-[11px] font-light ${
+              count === 0 ? "bg-status-warn-fill text-status-warn-ink" : "bg-black/5"
+            }`}
+          >
+            {count}
+          </span>
+        </h3>
+        <span className="text-[11.5px] font-light text-cpx-grey">{note}</span>
+      </div>
+      <div className="px-4 py-3">
+        {count === 0 ? (
+          <p className="text-[12.5px] font-light">
+            <span className="font-medium">0 held</span>. The chain stops here.
+          </p>
+        ) : (
+          children
+        )}
+      </div>
+    </section>
+  );
+}

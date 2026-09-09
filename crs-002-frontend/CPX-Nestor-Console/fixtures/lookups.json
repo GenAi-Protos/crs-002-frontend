@@ -1,0 +1,167 @@
+[
+  {
+    "kind": "ip",
+    "observable": "198.51.100.47",
+    "verdict": "malicious",
+    "riskScore": 88,
+    "verdictReason": "Three providers return a malicious verdict and the address served the wp2shell loader across two client incidents.",
+    "firstSeen": "2026-06-14T08:20:00Z",
+    "lastSeen": "2026-08-31T21:05:00Z",
+    "threatCategories": ["command-and-control", "malware-distribution", "web-shell"],
+    "tlp": "AMBER",
+    "recordCount": 34,
+    "country": "Reserved for documentation",
+    "asn": "AS64496",
+    "asnOrg": "Example Reserved Network",
+    "organisation": "Documentation range, TEST-NET-2",
+    "associatedDomains": ["fleet-update.example", "cdn-sync-node.example"],
+    "providers": [
+      { "provider": "virustotal", "status": "live", "verdict": "malicious", "score": 0.91, "categories": ["c2", "malware"], "error": null, "checkedAt": "2026-09-02T06:10:00Z" },
+      { "provider": "anomali", "status": "live", "verdict": "malicious", "score": 0.84, "categories": ["actor-infrastructure"], "error": null, "checkedAt": "2026-09-02T06:10:00Z" },
+      { "provider": "abuseipdb", "status": "live", "verdict": "suspicious", "score": 0.62, "categories": ["port-scan"], "error": null, "checkedAt": "2026-09-02T06:10:00Z" }
+    ],
+    "investigation": {
+      "infrastructure": [
+        { "value": "fleet-update.example", "kind": "domain", "note": "Resolved here for eleven weeks. Loader delivery." },
+        { "value": "cdn-sync-node.example", "kind": "domain", "note": "Second-stage beacon host. Same certificate." },
+        { "value": "198.51.100.52", "kind": "ip", "note": "Adjacent address in the same block, same TLS fingerprint." },
+        { "value": "203.0.113.19", "kind": "ip", "note": "Fallback beacon seen after the primary was sinkholed." }
+      ],
+      "malware": [
+        { "name": "wp2shell", "family": "Web shell", "note": "Deployed after exploitation of the public-facing application." },
+        { "name": "GreyFerry loader", "family": "Loader", "note": "Retrieved the second stage from this address." }
+      ],
+      "actors": [
+        { "name": "UNC-Harbor Fog", "aliases": ["Harbor Fog", "TA-4417"], "note": "Attribution held at moderate confidence. Two independent providers concur." }
+      ],
+      "campaigns": [
+        { "name": "Fleet software supply chain", "ref": "CPX-TIC-IA-2026-352", "note": "GCC logistics operators. Advisory published." }
+      ],
+      "techniques": [
+        { "id": "T1190", "observed": "Exploitation of the internet-facing fleet management portal." },
+        { "id": "T1505.003", "observed": "wp2shell written to the web root." },
+        { "id": "T1071", "observed": "HTTPS beacon to this address on a fixed interval." },
+        { "id": "T1041", "observed": "Archive staged and exfiltrated over the same channel." }
+      ],
+      "detections": [
+        { "kind": "sigma", "name": "Web shell written to web root", "ref": "SIG-CPX-0113", "note": "File creation in a served directory by the application service account." },
+        { "kind": "yara", "name": "wp2shell loader strings", "ref": "YAR-CPX-0044", "note": "Matches the loader on disk, not the beacon traffic." },
+        { "kind": "hunting", "name": "Fixed-interval HTTPS beacon", "ref": "HNT-CPX-0091", "note": "Outbound sessions with low jitter to a single destination." }
+      ]
+    }
+  },
+  {
+    "kind": "domain",
+    "observable": "fleet-update.example",
+    "verdict": "malicious",
+    "riskScore": 82,
+    "verdictReason": "Registered nine days before first use and resolved only to infrastructure already linked to the campaign.",
+    "firstSeen": "2026-06-14T09:02:00Z",
+    "lastSeen": "2026-09-01T04:40:00Z",
+    "threatCategories": ["malware-distribution", "impersonating-domain"],
+    "tlp": "AMBER",
+    "recordCount": 21,
+    "registrar": "Example Registrar (documentation record)",
+    "createdAt": "2026-06-05T00:00:00Z",
+    "classification": "Impersonating a fleet management vendor update host",
+    "dnsRecords": [
+      { "type": "A", "value": "198.51.100.47", "ttl": 300 },
+      { "type": "A", "value": "198.51.100.52", "ttl": 300 },
+      { "type": "MX", "value": "mail.fleet-update.example", "ttl": 3600 },
+      { "type": "TXT", "value": "v=spf1 -all", "ttl": 3600 },
+      { "type": "NS", "value": "ns1.example-dns.example", "ttl": 86400 }
+    ],
+    "associatedIps": ["198.51.100.47", "198.51.100.52"],
+    "relatedDomains": ["cdn-sync-node.example", "fleet-updates.example", "fleetupdate-cdn.example"],
+    "providers": [
+      { "provider": "virustotal", "status": "live", "verdict": "malicious", "score": 0.87, "categories": ["malware", "phishing"], "error": null, "checkedAt": "2026-09-02T06:11:00Z" },
+      { "provider": "anomali", "status": "live", "verdict": "malicious", "score": 0.79, "categories": ["actor-infrastructure"], "error": null, "checkedAt": "2026-09-02T06:11:00Z" },
+      { "provider": "abuseipdb", "status": "missing-credentials", "verdict": null, "score": null, "categories": [], "error": "provider key is not configured", "checkedAt": null }
+    ],
+    "investigation": {
+      "infrastructure": [
+        { "value": "198.51.100.47", "kind": "ip", "note": "Primary A record for eleven weeks." },
+        { "value": "198.51.100.52", "kind": "ip", "note": "Second A record. Same TLS fingerprint." },
+        { "value": "cdn-sync-node.example", "kind": "domain", "note": "Sibling domain, registered the same day by the same registrar." }
+      ],
+      "malware": [
+        { "name": "GreyFerry loader", "family": "Loader", "note": "Served from /updates/agent on this host." },
+        { "name": "wp2shell", "family": "Web shell", "note": "Second stage retrieved after the loader ran." }
+      ],
+      "actors": [
+        { "name": "UNC-Harbor Fog", "aliases": ["Harbor Fog", "TA-4417"], "note": "Registration pattern matches four earlier domains attributed to the group." }
+      ],
+      "campaigns": [
+        { "name": "Fleet software supply chain", "ref": "CPX-TIC-IA-2026-352", "note": "GCC logistics operators. Advisory published." }
+      ],
+      "techniques": [
+        { "id": "T1195.002", "observed": "Update host impersonated to deliver a trojanised agent." },
+        { "id": "T1566", "observed": "Domain used in the lure sent to operations staff." },
+        { "id": "T1071", "observed": "Beacon traffic to the same host after installation." }
+      ],
+      "detections": [
+        { "kind": "sigma", "name": "Update fetched from an unapproved host", "ref": "SIG-CPX-0117", "note": "Agent update requests to a domain outside the vendor allow list." },
+        { "kind": "hunting", "name": "Newly registered domain in proxy logs", "ref": "HNT-CPX-0088", "note": "First-contact domains registered inside 30 days." }
+      ]
+    }
+  },
+  {
+    "kind": "hash",
+    "observable": "3f2a1c9b7e4d5068a1b2c3d4e5f60718293a4b5c6d7e8f9012a3b4c5d6e7f801",
+    "verdict": "malicious",
+    "riskScore": 94,
+    "verdictReason": "Fifty-eight of sixty-eight engines detect it and the sample matches the GreyFerry loader family held in the repository.",
+    "firstSeen": "2026-06-16T11:47:00Z",
+    "lastSeen": "2026-08-29T15:12:00Z",
+    "threatCategories": ["loader", "supply-chain", "credential-access"],
+    "tlp": "AMBER+STRICT",
+    "recordCount": 12,
+    "detectionRatio": { "detected": 58, "total": 68 },
+    "fileName": "fleet-agent-update.msi",
+    "fileType": "Windows Installer (MSI)",
+    "fileSize": 4718592,
+    "malwareFamily": "GreyFerry",
+    "behaviours": [
+      "Writes a signed-looking service binary to ProgramData and registers it for autorun",
+      "Disables the endpoint agent service before the second stage is retrieved",
+      "Reads browser credential stores and stages an archive in the user temp directory",
+      "Beacons over HTTPS on a fixed 300 second interval with low jitter"
+    ],
+    "providers": [
+      { "provider": "virustotal", "status": "live", "verdict": "malicious", "score": 0.96, "categories": ["loader", "trojan"], "error": null, "checkedAt": "2026-09-02T06:12:00Z" },
+      { "provider": "anomali", "status": "live", "verdict": "malicious", "score": 0.9, "categories": ["greyferry"], "error": null, "checkedAt": "2026-09-02T06:12:00Z" },
+      { "provider": "abuseipdb", "status": "failed", "verdict": null, "score": null, "categories": [], "error": "provider does not accept file hashes", "checkedAt": "2026-09-02T06:12:00Z" }
+    ],
+    "investigation": {
+      "infrastructure": [
+        { "value": "fleet-update.example", "kind": "domain", "note": "Download origin recorded in the installer log." },
+        { "value": "198.51.100.47", "kind": "ip", "note": "Beacon destination after installation." },
+        { "value": "203.0.113.19", "kind": "ip", "note": "Fallback beacon compiled into the sample." }
+      ],
+      "malware": [
+        { "name": "GreyFerry loader", "family": "Loader", "note": "This sample. Second variant seen in the campaign." },
+        { "name": "wp2shell", "family": "Web shell", "note": "Retrieved as the second stage on two of five hosts." }
+      ],
+      "actors": [
+        { "name": "UNC-Harbor Fog", "aliases": ["Harbor Fog", "TA-4417"], "note": "Loader is exclusive to this group in held reporting." }
+      ],
+      "campaigns": [
+        { "name": "Fleet software supply chain", "ref": "CPX-TIC-IA-2026-352", "note": "GCC logistics operators. Advisory published." }
+      ],
+      "techniques": [
+        { "id": "T1195.002", "observed": "Delivered as a trojanised vendor agent update." },
+        { "id": "T1059", "observed": "Installer custom action launches a scripted stage." },
+        { "id": "T1562.001", "observed": "Endpoint agent service stopped before stage two." },
+        { "id": "T1555", "observed": "Browser credential stores read and staged." },
+        { "id": "T1071", "observed": "Fixed-interval HTTPS beacon." },
+        { "id": "T1041", "observed": "Staged archive sent over the beacon channel." }
+      ],
+      "detections": [
+        { "kind": "yara", "name": "GreyFerry loader", "ref": "YAR-CPX-0044", "note": "Matches both variants of the loader on disk." },
+        { "kind": "sigma", "name": "Endpoint agent service stopped by installer", "ref": "SIG-CPX-0121", "note": "Service stop originating from an MSI custom action." },
+        { "kind": "sigma", "name": "Credential store read by a non-browser process", "ref": "SIG-CPX-0122", "note": "Covers the credential access step, not the loader itself." },
+        { "kind": "hunting", "name": "MSI executed from a user download path", "ref": "HNT-CPX-0093", "note": "Installer runs outside the managed deployment path." }
+      ]
+    }
+  }
+]

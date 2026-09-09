@@ -1,0 +1,53 @@
+[
+  {
+    "id": "u-analyst",
+    "name": "Rajesh Menon",
+    "role": "analyst",
+    "clientScope": "all",
+    "seesRawIocs": true,
+    "canApprove": false
+  },
+  {
+    "id": "u-lead",
+    "name": "Sara Haddad",
+    "role": "lead-analyst",
+    "clientScope": "all",
+    "seesRawIocs": true,
+    "canApprove": true
+  },
+  {
+    "id": "u-ir",
+    "name": "Omar Khalid",
+    "role": "incident-responder",
+    "clientScope": "all",
+    "seesRawIocs": true,
+    "canApprove": false
+  },
+  {
+    "id": "u-leadership",
+    "name": "Helena Marques",
+    "role": "leadership",
+    "clientScope": "all",
+    "seesRawIocs": false,
+    "canApprove": false
+  },
+  {
+    "id": "u-exec",
+    "name": "Amina Rashid",
+    "role": "executive",
+    "clientScope": "all",
+    "seesRawIocs": false,
+    "canApprove": false
+  },
+  {
+    "id": "u-sales",
+    "name": "Daniel Okafor",
+    "role": "sales",
+    "clientScope": [
+      "CLT-003",
+      "CLT-027"
+    ],
+    "seesRawIocs": false,
+    "canApprove": false
+  }
+]

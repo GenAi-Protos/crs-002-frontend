@@ -1,0 +1,259 @@
+# Screens
+
+Five destinations. Two detail routes. Read the layouts, not the prose.
+
+**Shell:** slim 56px top bar, collapsible 240px left rail (64px icons below 1100px).
+Top bar: CPX reverse logo · Nestor mark and wordmark · search · role switcher (dev only) · profile.
+
+**Every list:** search box · stated default sort · cursor pagination with an honest total (`Showing 50 of 431`) · CSV export.
+
+**Every screen's states:**
+
+| State | Rule |
+|---|---|
+| Loading | Skeleton at final geometry. No layout shift. Never a bare spinner. |
+| Empty | Distinguish three: nothing matched · not connected · not permitted. Different copy, different action. |
+| Partial | A source was down. Say so in one line. Never fail the whole thing. |
+| Zero | Render the count. `0 records` in bold. Never silence, never an illustration. |
+| Error | One sentence naming the thing and the fix. |
+
+---
+
+## 1 · Dashboard `/`
+
+Everyone lands here. Content resolves from the role. **Maximum four blocks per role.** Each block is a number with a trend, or one chart, or one short list. Not a gallery.
+
+Every view carries an `as of HH:MM GST` stamp so it is an addressable, refreshable object rather than a frozen snapshot. Leadership and Sales views carry `Export this view`.
+
+```
+┌──────┬────────────────────────────────────────────────────┐
+│ Dash◄│  Dashboard                        as of 08:15 GST  │
+│ Int  │  ┌──────────────────┐ ┌───────────────────────────┐│
+│ Rep  │  │ Waiting on you   │ │ Fired today by PIR        ││
+│ Cli  │  │        7         │ │ Enterprise         12     ││
+│ Col  │  │   → Reports      │ │ Vulnerabilities     8     ││
+│      │  └──────────────────┘ │ Deep and Dark Web   3     ││
+│      │                       └───────────────────────────┘│
+│      │  ┌────────────────────────────────────────────────┐│
+│      │  │ Relevant today                                 ││
+│      │  │  wp2shell RCE          CLT-027  PIR13  92%  →  ││
+│      │  │  DPRK supply chain     CLT-014  PIR08  87%  →  ││
+│      │  └────────────────────────────────────────────────┘│
+│      │  ⚠ 4 sources silent                   → Collection │
+└──────┴────────────────────────────────────────────────────┘
+```
+
+| Role | Blocks |
+|---|---|
+| Analyst, Lead | Waiting on you · Fired today by PIR · Relevant today · Collection health **only when something is silent** |
+| Leadership | Published this period · Client coverage · Time to publish · Export |
+| CEO | Posture in one sentence · Regional versus global · Sector exposure |
+| Sales | Delivered to my clients · Cadence by month · Sector benchmark · Export |
+
+**Charts on the leadership, CEO and sales views are deferred.** Ship the number tiles and the as-at stamp. See `CLAUDE.md` build order.
+
+**Row action on Relevant today:** `Draft advisory` pre-fills the Intelligence composer. Without it the analyst reads a hit then retypes its subject, which is the dead end that made the last design unusable.
+
+**Empty:** `Nothing waiting.` Nothing else.
+
+---
+
+## 2 · Intelligence `/intelligence`
+
+The composer and the scrollback. **This layout is copied from the Anomali Copilot screenshots CPX sent us as the benchmark.** No tabs, no session list, no filter chips, no facets.
+
+```
+┌──────┬────────────────────────────────────────────────────┐
+│ Dash │           centred column, max 880px                │
+│ Int◄ │  ┌──────────────────────────────────────────────┐  │
+│ Rep  │  │ ◉  your question                             │  │
+│ Cli  │  └──────────────────────────────────────────────┘  │
+│ Col  │  ┌──────────────────────────────────────────────┐  │
+│      │  │ ◈  Title, only if the answer is document-    │  │
+│      │  │    shaped                                 ⧉  │  │
+│      │  │                                              │  │
+│      │  │    Prose, H2 sections, lists, tables.        │  │
+│      │  │    Entity links blue underlined.             │  │
+│      │  │    Indicators as grey monospace chips.       │  │
+│      │  │    secur32 strings: 0 records                │  │
+│      │  │                                              │  │
+│      │  │    Source: CrowdStrike Falcon X, Actors      │  │
+│      │  │ ──────────────────────────────────────────── │  │
+│      │  │  Sources                                  ⌄  │  │
+│      │  └──────────────────────────────────────────────┘  │
+│      │  ┌──────────────────────────────────────────────┐  │
+│      │  │ Ask a question                           [→] │  │
+│      │  └──────────────────────────────────────────────┘  │
+└──────┴────────────────────────────────────────────────────┘
+      entity click → 480px right drawer, page does not change
+```
+
+**Two text treatments carry all the semantics.** Blue underline is a navigable entity. Grey monospace chip is a defanged observable: inert, never an anchor, never prefetched. TLP and severity are bullets in the answer body, not chrome.
+
+**Multi-turn context is real and invisible.** "What about secur32.dll?" resolves against the previous turns. There is no thread UI, no branch switcher, no regenerate-mode selector.
+
+**The user never chooses where the answer comes from, and the routing is never named.** Held corpus, live lookup and public keyword search are the system's decision. Attribution is per fact, in the prose. The whole provenance apparatus is one collapsed `Sources` row.
+
+**One exception:** a query that left the UAE region carries a small egress marker in the `Sources` row. Residency is a written compliance requirement, not a curiosity.
+
+**When sources were down:** one line, same weight as a zero count. `Produced with 4 of 13 sources unavailable.`
+
+**Chrome on an answer:** copy, and export JSON. Nothing else.
+**"Create an intelligence advisory for X"** is a prompt, not a destination. It returns the draft in the same card with one `Open in Reports` link.
+
+**Empty:** a row of starter prompts above the composer. Nothing else. **Not** a six-section board - that is the Dashboard's job.
+
+`/intelligence/[id]` exists so a conversation can be linked from an RFI row. It is never navigated to and there is no list of them.
+
+---
+
+## 3 · Reports `/reports`
+
+```
+┌──────┬────────────────────────────────────────────────────┐
+│ Dash │  Reports                            [+ New report] │
+│ Int  │  ┌ Needs review │ Drafts │ Published │ All ──────┐ │
+│ Rep◄ │  │ Search ▢                    2026 ▾  IA VA DG │ │
+│ Cli  │  ├──────────────────────────────────────────────┤ │
+│ Col  │  │ Ref          Type Title        Owner   State │ │
+│      │  │ IA-2026-352  IA   DPRK supp…   Rajesh  Review│ │
+│      │  │ VA-2026-102  VA   wp2shell     Praveen Publ. │ │
+│      │  │ DG-2026-0802 DG   Daily digest  -      Publ. │ │
+│      │  │ rfi-001      RFI  In progress, 2 of 3 done   │ │
+│      │  └──────────────────────────────────────────────┘ │
+└──────┴────────────────────────────────────────────────────┘
+```
+
+Default tab **Needs review**. Search and a year selector are not optional: the digest alone is 365 rows a year.
+
+**Owner column and an `Assign to me` control on the draft.** Praveen does dark and deep web, Rajesh does actors and vulnerabilities. Without an owner two analysts draft the same advisory.
+
+**A digest row is created by the schedule, not by success**, so a failed run renders as `Did not run` rather than being invisible by absence.
+
+**RFI is a work order, not a fourth document type.** One row reading `In progress, 2 of 3 done`, expanding to three lines, terminating in an ordinary Intelligence Advisory. `+ New report` for an RFI is a dialog: requester, question, client, due date.
+
+### `/reports/[ref]`
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ IA-2026-352 · TLP:AMBER · v1 · PIR13 · Rajesh   [Assign] │ 56px sticky
+├──────────────────────────────────────────────────────────┤
+│ All checks passed.                                       │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│        the document, single editable column, 720px       │
+│        fixed heading list per type, bodies free          │
+│        MITRE row: enter the technique ID, name derives   │
+│        CVSS row: score + authority, both required        │
+│                                                          │
+├──────────────────────────────────────────────────────────┤
+│  [Approve & publish]  [Send back]  [Override]            │
+└──────────────────────────────────────────────────────────┘
+```
+
+**The document is the page.** No side panels, no agent narration, no validation panel.
+
+**Checks are one line, not a panel.** Clean: `All checks passed.` Defective: `3 links have no target.` and `CVSS: prose follows WPScan; CISA-ADP ranks these CVEs in the opposite order.` Each is an anchor into the offending block. Blocking checks disable Approve and name themselves. The CVSS conflict **warns, never blocks** - that is an analyst's decision.
+
+**Structure the MITRE and CVSS fields rather than accepting prose.** Three of the four defects in CPX's own published advisories become unrepresentable if you do: an invented technique name, a technique with no ID, and a tactic filed under the wrong heading.
+
+**Published state** adds: the version banner, one line if superseded (`Superseded by CPX-TIC-IA-2027-118.`), the delivery record, and `Issue an update`. **A published document is immutable**; a correction is a new version.
+
+**Send back requires a reason** from a fixed list. **Approve requires that every live citation is snapshotted** - if a source purges after publication the citation must still resolve.
+
+**The Daily Threat Digest has no approval control anywhere.** CPX contracted it as fully agentic with a target of 100% automation and a machine-generated disclaimer. A review gate would fail the metric.
+
+---
+
+## 4 · Clients `/clients`
+
+```
+┌──────┬─────────────┬────────────────────────────────────┐
+│ Dash │ Clients   + │ CLT-027                     [Edit] │
+│ Int  │ ┌─────────┐ │ Energy · UAE · 6 products · 4 PIRs │
+│ Rep  │ │ CLT-003 │ ├────────────────────────────────────┤
+│ Cli◄ │ │ CLT-014 │ │ Open against this client           │
+│ Col  │ │ CLT-027◄│ │  Impersonating domain      triaged │
+│      │ │ CLT-041 │ │  Leaked credential         new     │
+│      │ └─────────┘ ├────────────────────────────────────┤
+│      │   320px     │ [ Profile ]  [ Sent ]              │
+│      │             │                                    │
+│      │             │ Sector    Energy               ▾   │
+│      │             │ Region    UAE                  ▾   │
+│      │             │ Products  WordPress, Exchange  +   │
+│      │             │ PIRs      ☑1 ☐3 ☑13 ☑14 ☑16 …    │
+└──────┴─────────────┴────────────────────────────────────┘
+```
+
+Two tabs only. **Profile** is the per-client facts that decide relevance: sector, region, products, and the PIR tick list. **Sent** is the delivery ledger, each row naming the exact advisory version that went out. That ledger is what makes the no-client-login decision auditable.
+
+**No create-client wizard, no PIR editor, no subscription builder.** CPX excluded client onboarding and PIR definition in writing.
+
+**No Requirements tab.** The 24 PIRs read-only on every client record is the old `/pirs` screen wearing a tab. The client-specific part is the tick list, already on Profile. A PIR chip anywhere expands to its verbatim question.
+
+The **Open against this client** block is digital risk protection: leaked credentials, impersonating domains, phishing. **Never render a credential value**, not even masked. A hash and a discovery reference only.
+
+**Empty:** `No clients yet.` Nothing about procurement.
+
+---
+
+## 5 · Collection `/collection`
+
+Four tabs. Default **Connectors**.
+
+```
+┌──────┬────────────────────────────────────────────────────┐
+│ Dash │  Collection                                        │
+│ Int  │  [Connectors] [Sources 185] [Watches 7] [Requests 2]│
+│ Rep  │  ┌──────────┐┌──────────┐┌──────────┐┌──────────┐ │
+│ Cli  │  │CrowdStrike││ Anomali  ││Google TI ││ Sekoia   │ │
+│ Col◄ │  │Held       ││Live · ⚠  ││Both      ││Held      │ │
+│      │  │Not conn.  ││Not conn. ││Not conn. ││Not conn. │ │
+│      │  │Egress     ││Egress    ││Egress    ││Egress    │ │
+│      │  └──────────┘└──────────┘└──────────┘└──────────┘ │
+│      │  … VirusTotal · Shodan · AbuseIPDB                 │
+│      │  … NVD · CISA KEV · EPSS · MITRE  (our proposal)   │
+│      │  … SOC feeds · CTEM · spiderSilk  (no route yet)   │
+└──────┴────────────────────────────────────────────────────┘
+```
+
+**Connector card, four facts, nothing more:**
+
+1. Name
+2. **Held / Live / Both** - derived, read-only. It is what breaks when the connector goes down: Held means no new data but old answers still work, Live means questions using it fail now.
+3. Connection state, or last new item if connected
+4. In region or egress
+
+**Draw every commercial connector as `Not connected`.** None has a key. Mohanasundaram, 31 July, verbatim: *"we can provide the API keys at a later stage during development."* Anomali additionally carries `UNVERIFIED` because its tool inventory and rate limits are published nowhere and there is no tenant.
+
+**No transport label.** MCP versus REST changes nothing a human sets. **No credential field.** **No cron field.**
+
+### Tab · Sources
+
+The 185-row table plus the health heatmap. Columns: `Source | Sheet | Class | Rhythm | Last item | State`.
+
+**Four states, not three:** healthy · silent but expected · **silent unexplained** · failing. The third is the dangerous one and auto-escalates.
+
+**`Last item` is `lastNewItemAt`, not `lastSuccess`.** A source returning HTTP 200 with no new items for nine days has a fresh `lastSuccess` and looks perfectly healthy on any other field. That is the failure mode that hides.
+
+**One editable field: `Expected rhythm`**, four values (Continuous, Hourly, Daily, Weekly). **It does not control polling.** It tells the alarm what normal quiet looks like: a weekly CERT blog silent for nine days is fine, an IOC blocklist silent for six hours is broken. Seeded from the class, replaced by measured behaviour once there is history.
+
+**Keep the heatmap:** 185 sources by day over 30, grouped by class, virtualised, with a 45-degree hatch for `attempted, zero items`. A silent failure appears as a horizontal grey stripe with a start date. **185 collectors cannot be supervised as a list**, and the state column is a filter, not a replacement.
+
+**URLs render as inert plain text.** Never anchors. One row carries an embedded API key.
+
+### Tab · Keyword watches
+
+Full create, edit, delete. This is where real per-row analyst judgement lives, and it deserves more UI than all 185 sources combined.
+
+Fields: name · terms · language · region · PIRs served · cadence. Detail shows the last run with counts per source, **including zero**.
+
+Seed from PIR17, PIR18 and PIR19 - the three requirements with no feed behind them.
+
+### Tab · Requests
+
+**One path for adding a source, not two.** Everything files a request: URL, why, which PIR it serves. A request for a source with a feed in its URL auto-approves and goes live within the poll cycle, and the row says so. Everything else queues.
+
+This is deliberate. A button that instantly builds a collector is a connector builder, which is the thing we are not building. And on MKT-001 the instant-add button existed, the source still could not be added because it needed CPX network approval, and it cost a UAT sign-off. A visible queue is honest about that.
+
+**A source that starts returning 401 or 403** moves to `blocked, needs credential` and routes into the same queue.

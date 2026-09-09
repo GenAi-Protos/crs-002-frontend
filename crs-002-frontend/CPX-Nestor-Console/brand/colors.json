@@ -1,0 +1,75 @@
+{
+  "_meta": {
+    "source": "CPX 2026 rebrand - Colors-RGB.pdf / Colors-Pantone.pdf / Colors-CMYK.pdf (PMS swatches). Replaces the 2024/25 yellow identity.",
+    "colour_role_mapping": "Evanssion interpretation - CONFIRM with CPX: Dark Purple = primary/hero dark; CPX Green = signature accent (the eye-catcher, replaces the old yellow); Bright Purple = secondary; Accent Blue / Accent Red = tertiary.",
+    "tints_note": "The 2026 kit supplies base colours only (no tint ramps). A neutral ramp is retained for UI surfaces; brand-colour tint ramps await an official spec - do not fabricate brand tints.",
+    "logo_note": "The 2026 mark was extracted from Colors-CMYK.pdf (pages 1-2) into assets/logos/2026/ (svg + png; primary / reverse / on-purple). It is a NEW design: lowercase 'cpx' with the x as a double-chevron, left chevron CPX Green #4CEE76, rest Near Black #040405. The old assets/logos/svg + png (yellow CP) are PRE-2026 - history only."
+  },
+  "primary": {
+    "dark_purple": { "hex": "#1E1847", "rgb": "29, 23, 70",   "pms": "275 C",        "personality": ["Primary brand", "Deep", "Trustworthy", "Premium"] },
+    "near_black":  { "hex": "#040405", "rgb": "4, 4, 5",       "pms": "Black 6 C/U",  "personality": ["Text", "Powerful", "Modern"] },
+    "white":       { "hex": "#FFFFFF", "rgb": "255, 255, 255", "personality": ["Calm", "Clear"] }
+  },
+  "signature": {
+    "green": { "hex": "#4CEE76", "rgb": "76, 238, 118", "pms": "7479 C", "_note": "The eye-catcher accent - replaces the old yellow. Use sparingly for emphasis / CTAs / highlights." }
+  },
+  "secondary": {
+    "bright_purple": { "hex": "#5C5CC0", "rgb": "98, 95, 170", "pms": "2725 C" },
+    "just_grey":     { "hex": "#333333", "rgb": "51, 51, 51",  "pms": "447 C" }
+  },
+  "accent": {
+    "blue": { "hex": "#3AC2FF", "rgb": "58, 194, 255", "pms": "298 C" },
+    "red":  { "hex": "#FF3666", "rgb": "255, 54, 102", "pms": "191 C" }
+  },
+  "tints": {
+    "_note": "Brand-colour tint ramps await the official 2026 spec - do not fabricate. Neutral ramp retained for UI surfaces.",
+    "neutral": {
+      "0":    "#040405",
+      "12_5": "#202020",
+      "25":   "#404040",
+      "37_5": "#606060",
+      "50":   "#808080",
+      "62_5": "#9F9F9F",
+      "75":   "#BFBFBF",
+      "87_5": "#DFDFDF",
+      "100":  "#F2F2F2"
+    }
+  },
+  "typography": {
+    "latin_display": {
+      "family": "CPX Unbounded",
+      "weights": [200, 300, 400, 500, 700, 900],
+      "weight_names": { "200": "ExtraLight", "300": "Light", "400": "Regular", "500": "Medium", "700": "Bold", "900": "Black" },
+      "recommendation": { "display": 900, "headlines": 700 },
+      "note": "Brand display / headings font. Bundled in assets/fonts/CPX-Unbounded (ttf + woff2)."
+    },
+    "latin_body": {
+      "family": "Inter",
+      "weights": [400],
+      "recommendation": { "body": 400 },
+      "note": "Body / UI copy. Bundled in assets/fonts/Inter."
+    },
+    "arabic": {
+      "family": "IBM Plex Sans Arabic",
+      "weights": [300, 400, 500, 600, 700],
+      "recommendation": { "headlines": 600, "body": 400 },
+      "note": "Bundled in assets/fonts/IBM-Plex-Sans-Arabic."
+    },
+    "system_fallback": {
+      "family": "Arial",
+      "note": "Reserved for desktop apps (Word, PowerPoint) only. NEVER use Arial on the web - use CPX Unbounded (headings) / Inter (body)."
+    }
+  },
+  "logo": {
+    "min_width_print_mm": 20,
+    "min_width_web_px": 80,
+    "clear_space_rule": "Maintain clear space around the brandmark equal to the height of the 'C' in CPX on all sides.",
+    "_note": "Official 2026 mark in assets/logos/2026/ (extracted from Colors-CMYK.pdf). New design - lowercase 'cpx', x as a double-chevron, left chevron CPX Green #4CEE76, rest Near Black #040405.",
+    "variants_2026": {
+      "primary":     "assets/logos/2026/cpx-logo-primary.svg|png - dark mark on light backgrounds (transparent).",
+      "reverse":     "assets/logos/2026/cpx-logo-reverse.svg|png - white mark + green chevron on dark backgrounds (transparent).",
+      "on_purple":   "assets/logos/2026/cpx-logo-on-purple.svg|png - white + green on the Dark Purple #1E1847 brand background."
+    },
+    "legacy": "assets/logos/svg + png hold the PRE-2026 yellow 'CP + arrow' mark - history only; do not use."
+  }
+}

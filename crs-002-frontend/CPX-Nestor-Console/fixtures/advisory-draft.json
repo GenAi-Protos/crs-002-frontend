@@ -1,0 +1,394 @@
+[
+  {
+    "ref": "CPX-TIC-IA-2026-352",
+    "type": "IA",
+    "version": 1,
+    "title": "DPRK supply chain campaign against logistics software",
+    "tlp": "AMBER",
+    "status": "in-review",
+    "owner": "Rajesh Menon",
+    "pirRefs": [
+      "PIR8"
+    ],
+    "clientIds": [
+      "CLT-014"
+    ],
+    "sections": [
+      {
+        "id": "sec-exec",
+        "heading": "Executive Summary",
+        "body": "A DPRK-attributed cluster is compromising logistics software vendors to reach downstream operators. One UAE logistics operator is a confirmed downstream consumer of the trojanised update channel. CPX assesses follow-on intrusion attempts within the next two weeks as likely.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-d1",
+            "ref": 1,
+            "label": "CrowdStrike Falcon X, Reports",
+            "recordCount": 3,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-tic",
+        "heading": "TIC Analysis",
+        "body": "Overlaps with tracked Lazarus subgroup tooling: matching loader export hashes, shared C2 certificate issuer, and a packing routine seen in two prior campaigns. Victimology is consistent with revenue generation rather than espionage. Source: CrowdStrike Falcon X, Actors.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-d2",
+            "ref": 2,
+            "label": "CrowdStrike Falcon X, Actors",
+            "recordCount": 5,
+            "urlSafe": false
+          },
+          {
+            "id": "cit-d3",
+            "ref": 3,
+            "label": "Held corpus, campaign records",
+            "recordCount": 8,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-campaign",
+        "heading": "Campaign Overview",
+        "body": "The campaign trojanises a fleet management suite's update package. Installations fetch the package over plain HTTP, and the actor substitutes a signed but stale certificate. Three vendors are confirmed affected; one supplies two GCC logistics groups.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-d4",
+            "ref": 4,
+            "label": "Sekoia, Campaign notes",
+            "recordCount": 2,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-chain",
+        "heading": "Attack Chain Overview",
+        "body": "Initial access through the poisoned update, a staged loader with a five day sleep, then credential theft from the fleet telemetry database and lateral movement over RDP toward finance systems.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-d5",
+            "ref": 5,
+            "label": "Held corpus, incident writeups",
+            "recordCount": 4,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-ttps",
+        "heading": "TTPs Mapping",
+        "body": "Techniques observed in this campaign are mapped in the table below.",
+        "generated": true,
+        "derivedFrom": "validator",
+        "citations": []
+      },
+      {
+        "id": "sec-indicators",
+        "heading": "Indicators",
+        "body": "update.fleetsync-cdn.com\n45.148.10.77\nd41d8cd98f00b204e9800998ecf8427e\ninvoice-relay.net\n185.220.101.34\ntelemetry.fleetsync-cdn.com",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-d6",
+            "ref": 6,
+            "label": "Held corpus, indicator extraction",
+            "recordCount": 6,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-reco",
+        "heading": "Recommendations",
+        "body": "Block the listed infrastructure, verify the integrity of fleet management software updates against vendor checksums, and hunt for the loader's scheduled task names across the estate.",
+        "generated": true,
+        "derivedFrom": "template",
+        "citations": []
+      }
+    ],
+    "techniques": [
+      {
+        "tacticId": "TA0001",
+        "techniqueId": "T1195.002",
+        "techniqueName": "Compromise Software Supply Chain",
+        "resolved": true,
+        "observedActivity": "Trojanised fleet management update package"
+      },
+      {
+        "tacticId": "TA0006",
+        "techniqueId": "T1555",
+        "techniqueName": "Credentials from Password Stores",
+        "resolved": true,
+        "observedActivity": "Telemetry database credential theft"
+      },
+      {
+        "tacticId": "TA0008",
+        "techniqueId": "T1021.001",
+        "techniqueName": "Remote Desktop Protocol",
+        "resolved": true,
+        "observedActivity": "Lateral movement toward finance systems"
+      }
+    ],
+    "cvss": [],
+    "checks": [
+      {
+        "id": "chk-links",
+        "label": "All links resolve",
+        "passed": true,
+        "blocking": true
+      },
+      {
+        "id": "chk-mitre",
+        "label": "MITRE techniques resolve",
+        "passed": true,
+        "blocking": true
+      },
+      {
+        "id": "chk-citations",
+        "label": "Every generated section cites or declares derivation",
+        "passed": true,
+        "blocking": true
+      },
+      {
+        "id": "chk-snapshot",
+        "label": "Live citations snapshotted",
+        "passed": true,
+        "blocking": true
+      }
+    ],
+    "sendBacks": [],
+    "createdAt": "2026-08-02T02:40:00Z"
+  },
+  {
+    "ref": "CPX-TIC-VA-2026-118",
+    "type": "VA",
+    "version": 1,
+    "title": "wp2shell follow-on: two further WordPress theme flaws",
+    "tlp": "GREEN",
+    "status": "in-review",
+    "owner": "Praveen Kumar",
+    "pirRefs": [
+      "PIR13",
+      "PIR14"
+    ],
+    "clientIds": [
+      "CLT-014",
+      "CLT-027"
+    ],
+    "sections": [
+      {
+        "id": "sec-exec",
+        "heading": "Executive Summary",
+        "body": "Two further vulnerabilities in the theme framework abused by the wp2shell campaign are now public. One is exploited in the wild; the second has proof-of-concept code circulating. Prose in this advisory follows the WPScan severity ordering.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-v1",
+            "ref": 1,
+            "label": "WPScan advisory pair",
+            "recordCount": 2,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-impact",
+        "heading": "Impact",
+        "body": "Successful exploitation yields unauthenticated remote code execution in the web server context on the higher ranked flaw, and authenticated arbitrary file read on the second.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-v2",
+            "ref": 2,
+            "label": "Held corpus, exploitation notes",
+            "recordCount": 3,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-cvss",
+        "heading": "CVSS v3 Base Score",
+        "body": "Scores and their authorities are recorded in the score table. The two authorities rank these CVEs in the opposite order.",
+        "generated": true,
+        "derivedFrom": "validator",
+        "citations": []
+      },
+      {
+        "id": "sec-affected",
+        "heading": "Affected Products and Versions",
+        "body": "Theme framework versions 4.2.0 through 4.6.1 across all bundled themes. Version 4.6.2 fixes both flaws.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-v3",
+            "ref": 3,
+            "label": "Vendor release notes",
+            "recordCount": 1,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-exploit-exist",
+        "heading": "Existence of Public Exploit",
+        "body": "Public exploit code exists for CVE-2026-31042. Proof-of-concept only for CVE-2026-31055.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-v4",
+            "ref": 4,
+            "label": "Exploit repository observation",
+            "recordCount": 2,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-exploit-status",
+        "heading": "Exploit Status",
+        "body": "CVE-2026-31042 is exploited in the wild against unpatched sites. No in-the-wild exploitation observed for CVE-2026-31055.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-v5",
+            "ref": 5,
+            "label": "Held corpus, sensor reports",
+            "recordCount": 4,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-ttps",
+        "heading": "TTPs Mapping",
+        "body": "Techniques observed in exploitation of these flaws are mapped in the table below.",
+        "generated": true,
+        "derivedFrom": "validator",
+        "citations": []
+      },
+      {
+        "id": "sec-indicators",
+        "heading": "Indicators",
+        "body": "wp2shell-stage2.com\n91.92.240.11\n5e884898da28047151d0e56f8dc62927\nthemes-update-cdn.net",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-v6",
+            "ref": 6,
+            "label": "Held corpus, indicator extraction",
+            "recordCount": 4,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-detect",
+        "heading": "Detection and Hunting",
+        "body": "Hunt for POST requests to theme preview endpoints followed by PHP file writes under wp-content/uploads. Detection logic for the loader is referenced in the campaign advisory.",
+        "generated": true,
+        "citations": [
+          {
+            "id": "cit-v7",
+            "ref": 7,
+            "label": "Campaign advisory detection pack",
+            "recordCount": 1,
+            "urlSafe": false
+          }
+        ]
+      },
+      {
+        "id": "sec-mitigation",
+        "heading": "Mitigation and Recommendation",
+        "body": "Update the theme framework to 4.6.2, restrict write access to wp-content, and review upload directories for recently created PHP files.",
+        "generated": true,
+        "derivedFrom": "template",
+        "citations": []
+      }
+    ],
+    "techniques": [
+      {
+        "tacticId": "TA0001",
+        "techniqueId": "T1190",
+        "techniqueName": "Exploit Public-Facing Application",
+        "resolved": true,
+        "observedActivity": "Unauthenticated RCE against theme preview endpoint"
+      },
+      {
+        "tacticId": "TA0003",
+        "techniqueId": "T1505.003",
+        "techniqueName": "Web Shell",
+        "resolved": true,
+        "observedActivity": "PHP web shell written under wp-content/uploads"
+      }
+    ],
+    "cvss": [
+      {
+        "cveId": "CVE-2026-31042",
+        "value": 9.8,
+        "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        "source": "WPScan",
+        "authorityClass": "vendor",
+        "assessedAt": "2026-07-31T09:00:00Z"
+      },
+      {
+        "cveId": "CVE-2026-31042",
+        "value": 7.5,
+        "source": "CISA-ADP",
+        "authorityClass": "adp",
+        "assessedAt": "2026-08-01T09:00:00Z"
+      },
+      {
+        "cveId": "CVE-2026-31055",
+        "value": 7.2,
+        "source": "WPScan",
+        "authorityClass": "vendor",
+        "assessedAt": "2026-07-31T09:00:00Z"
+      },
+      {
+        "cveId": "CVE-2026-31055",
+        "value": 9.1,
+        "source": "CISA-ADP",
+        "authorityClass": "adp",
+        "assessedAt": "2026-08-01T09:00:00Z"
+      }
+    ],
+    "checks": [
+      {
+        "id": "chk-links",
+        "label": "3 links have no target",
+        "passed": false,
+        "blocking": true,
+        "anchorSectionId": "sec-detect"
+      },
+      {
+        "id": "chk-mitre",
+        "label": "MITRE techniques resolve",
+        "passed": true,
+        "blocking": true
+      },
+      {
+        "id": "chk-citations",
+        "label": "Every generated section cites or declares derivation",
+        "passed": true,
+        "blocking": true
+      },
+      {
+        "id": "chk-cvss",
+        "label": "CVSS: prose follows WPScan; CISA-ADP ranks these CVEs in the opposite order",
+        "passed": false,
+        "blocking": false,
+        "anchorSectionId": "sec-cvss"
+      }
+    ],
+    "sendBacks": [],
+    "createdAt": "2026-08-02T01:55:00Z"
+  }
+]

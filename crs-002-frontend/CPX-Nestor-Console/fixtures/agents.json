@@ -1,0 +1,385 @@
+[
+  {
+    "id": "agt-supervisor",
+    "name": "Supervisor",
+    "kind": "supervisor",
+    "purpose": "Breaks a request into steps, dispatches the specialists it needs, and checks every material statement against the evidence they returned before the answer is shown.",
+    "dispatches": [
+      "agt-query",
+      "agt-osint",
+      "agt-ioc",
+      "agt-geopolitical",
+      "agt-soc",
+      "agt-commercial",
+      "agt-ctem",
+      "agt-spidersilk",
+      "agt-messaging",
+      "agt-drafting",
+      "agt-infographic"
+    ],
+    "skills": [
+      { "name": "Request decomposition", "description": "Turns a plain-language request into the steps a workflow requires." },
+      { "name": "Workflow selection", "description": "Chooses the workflow from the CPX libraries that matches the request." },
+      { "name": "Coverage assessment", "description": "Names any area no specialist could cover, rather than returning a quiet partial answer." },
+      { "name": "Grounding verification", "description": "Refuses a statement the retrieval log does not support, and records every search that returned nothing." }
+    ],
+    "tools": [
+      { "name": "search_corpus", "purpose": "Search collected records, advisories, PIR hits and STIX objects.", "egress": false }
+    ],
+    "sourceRefs": ["held-corpus"],
+    "workflowRefs": ["wf-query", "wf-deep-dive", "wf-actor", "wf-digest"],
+    "permissions": ["Read the repository", "Dispatch specialists", "Hold an answer for review"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Decompose the request, dispatch only the specialists the workflow requires, and consolidate their findings. Verify every material statement against returned evidence before releasing an answer. Where a specialist had no source for its area, name the area as omitted coverage. Never publish."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-QRY-02, FR-RFI-02, FR-RFI-04, AC-13; Praveen Singh, 2 September 2026, 31:45"
+  },
+  {
+    "id": "agt-query",
+    "name": "Query",
+    "kind": "specialist",
+    "purpose": "Answers a question from the held repository and cites the records the answer came from.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Grounded answering", "description": "Answers only from retrieved passages, and states what it could not find." },
+      { "name": "Citation reconciliation", "description": "Drops any citation the retrieval log does not contain." },
+      { "name": "Negative results", "description": "Reports a search that returned nothing, with its count." }
+    ],
+    "tools": [
+      { "name": "search_corpus", "purpose": "Search collected records, advisories, PIR hits and STIX objects.", "egress": false },
+      { "name": "client_exposure", "purpose": "Which clients a matched finding affects.", "egress": false },
+      { "name": "client_profile", "purpose": "A client's sector, region, products and subscribed PIRs.", "egress": false },
+      { "name": "similar_advisories", "purpose": "Advisories CPX has already issued on a subject.", "egress": false },
+      { "name": "validate_technique", "purpose": "Resolve a MITRE ATT&CK technique id against the held table.", "egress": false },
+      { "name": "reputation_lookup", "purpose": "Check an observable against the configured reputation providers.", "egress": true }
+    ],
+    "sourceRefs": ["held-corpus"],
+    "workflowRefs": ["wf-query", "wf-exposure"],
+    "permissions": ["Read the repository", "Run a reputation lookup"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-08-26T09:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Answer from the held corpus. Cite what you used. Where nothing is held, return a counted negative result rather than an assumed answer. Never assert a reputation verdict a named provider did not give."
+    },
+    "updateCount": 0,
+    "status": "active",
+    "lastRunAt": null,
+    "basis": "FR-QRY-01 to FR-QRY-07"
+  },
+  {
+    "id": "agt-drafting",
+    "name": "Advisory drafting",
+    "kind": "specialist",
+    "purpose": "Turns held evidence into a draft Intelligence or Vulnerability Advisory, assigned for review.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Advisory structure", "description": "Produces the mandatory element set for the advisory type." },
+      { "name": "Derivation marking", "description": "Stamps each section as drawn from a citation, a template or model knowledge." },
+      { "name": "MITRE resolution", "description": "Resolves every technique id against the held table before the quality gate sees it." },
+      { "name": "CVSS authority handling", "description": "Records each score with its scoring authority and keeps both where authorities disagree." }
+    ],
+    "tools": [
+      { "name": "search_corpus", "purpose": "Search the held corpus for supporting evidence.", "egress": false },
+      { "name": "validate_technique", "purpose": "Resolve a MITRE ATT&CK technique id against the held table.", "egress": false },
+      { "name": "similar_advisories", "purpose": "Check whether the subject is already covered before drafting a second one.", "egress": false },
+      { "name": "client_exposure", "purpose": "Which clients the advisory subject affects.", "egress": false }
+    ],
+    "sourceRefs": ["held-corpus"],
+    "workflowRefs": ["wf-advisory", "wf-vuln-advisory", "wf-digest"],
+    "permissions": ["Read the repository", "Create a draft", "Assign for review"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-08-26T09:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Draft to the CPX template. Mark every section with how it was derived. Never publish and never release: a lead analyst approves."
+    },
+    "updateCount": 0,
+    "status": "active",
+    "lastRunAt": null,
+    "basis": "FR-ADV-01 to FR-ADV-06, FR-VUL-01 to FR-VUL-04"
+  },
+  {
+    "id": "agt-osint",
+    "name": "OSINT",
+    "kind": "specialist",
+    "purpose": "Covers the open-source inventory, separating a reportable finding from routine security news.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Inventory collection", "description": "Collects across the confirmed open-source list, one collector class per URL pattern." },
+      { "name": "Source reliability", "description": "Weights a finding by how the source has behaved, not by how recently it posted." },
+      { "name": "Entity extraction", "description": "Pulls actors, campaigns, malware, products and CVEs from unstructured text." },
+      { "name": "Signal separation", "description": "Distinguishes a reportable finding from routine news before anything becomes a candidate." }
+    ],
+    "tools": [
+      { "name": "collect_feed", "purpose": "Poll an inventory source and store the exact response received.", "egress": true },
+      { "name": "extract_entities", "purpose": "Pull actors, campaigns, malware, products and CVEs from collected text.", "egress": false },
+      { "name": "preserve_evidence", "purpose": "Write the raw payload once, addressed by its SHA-256.", "egress": false },
+      { "name": "search_corpus", "purpose": "Check a finding against what is already held.", "egress": false }
+    ],
+    "sourceRefs": ["osint", "held-corpus"],
+    "workflowRefs": ["wf-deep-dive", "wf-actor", "wf-digest"],
+    "permissions": ["Read the open-source inventory", "Write a collection record"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Collect across the confirmed inventory. Preserve the raw payload before extracting anything from it. Name any area you could not cover rather than returning a quiet partial result."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-ING-01, FR-ING-04, FR-RFI-02"
+  },
+  {
+    "id": "agt-ioc",
+    "name": "IOC enrichment",
+    "kind": "specialist",
+    "purpose": "Normalises, deduplicates and enriches indicators from the indicator feeds, and answers a reputation question on one observable.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Indicator normalisation", "description": "Maps every indicator to the canonical type vocabulary." },
+      { "name": "Cross-feed deduplication", "description": "Collapses the same indicator from several feeds into one record, keeping every contributing source." },
+      { "name": "Confidence scoring", "description": "Refuses an indicator below the threshold. An expiry is set only where the provider states one." },
+      { "name": "Provider panelling", "description": "Reports each provider's verdict separately, and never merges disagreement into one number." }
+    ],
+    "tools": [
+      { "name": "collect_feed", "purpose": "Retrieve the current indicator list. An unchanged feed returns 304 and writes nothing.", "egress": true },
+      { "name": "normalize_indicator", "purpose": "Map an indicator to the canonical type vocabulary and defang it for rendering.", "egress": false },
+      { "name": "reputation_lookup", "purpose": "Check an observable against the configured reputation providers.", "egress": true },
+      { "name": "search_corpus", "purpose": "Retrieve the threat activity already linked to an indicator.", "egress": false }
+    ],
+    "sourceRefs": ["ioc", "held-corpus"],
+    "workflowRefs": ["wf-ioc-enrich", "wf-query", "wf-deep-dive"],
+    "permissions": ["Read the indicator feeds", "Run a reputation lookup", "Write an indicator record"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Normalise before you deduplicate, and keep every contributing source on the surviving record. State each provider's verdict separately. A zero result means nothing is held on the observable, never that it is clean."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-NRM-01 to FR-NRM-04, FR-ENR-01, FR-LUP-01 to FR-LUP-04. Reputation conflict rule outstanding at open item N1"
+  },
+  {
+    "id": "agt-geopolitical",
+    "name": "Geopolitical",
+    "kind": "specialist",
+    "purpose": "Watches geopolitical reporting and separates an event with a cyber consequence from general news.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Keyword and topic research", "description": "Runs the keyword and topic set CPX provides across the tagged feeds." },
+      { "name": "Event extraction", "description": "Pulls the event, the actors and the locations involved." },
+      { "name": "Security relevance", "description": "Separates a geopolitical event with a cyber consequence from general reporting." },
+      { "name": "Activity correlation", "description": "Links an event to actors and campaigns already held." }
+    ],
+    "tools": [
+      { "name": "collect_feed", "purpose": "Watch the tagged geopolitical feeds and run the keyword set.", "egress": true },
+      { "name": "extract_entities", "purpose": "Pull events, actors and locations from the reporting.", "egress": false },
+      { "name": "search_corpus", "purpose": "Link an event to actors and campaigns already held.", "egress": false }
+    ],
+    "sourceRefs": ["geopolitical", "held-corpus"],
+    "workflowRefs": ["wf-geopolitical", "wf-deep-dive"],
+    "permissions": ["Read the tagged geopolitical sources", "Read the keyword and topic set"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Report an event only where a cyber consequence is stated or evidenced. Do not infer intent, attribution or a nation-state actor from geography alone."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-ING-04, FR-COR-02, PIR category Geopolitical Threat and Events. CPX tagged five sources geopolitical; none are in the set loaded here"
+  },
+  {
+    "id": "agt-soc",
+    "name": "SOC feeds",
+    "kind": "specialist",
+    "purpose": "Reads incidents and detections across the managed estate and turns them into reusable detection content.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Tenant-scoped collection", "description": "Reads indicators, incidents and alerts tenant by tenant, never across tenants at once." },
+      { "name": "TTP extraction", "description": "Pulls the techniques and tooling observed in an incident." },
+      { "name": "ATT&CK mapping", "description": "Resolves each technique against the held table. An id that does not resolve is not used." },
+      { "name": "Detection content", "description": "Separates Sigma, YARA and hunting queries from narrative, and validates each before it can be published." }
+    ],
+    "tools": [
+      { "name": "collect_soc", "purpose": "Read indicators, incidents and alerts for one managed tenant.", "egress": false },
+      { "name": "validate_technique", "purpose": "Resolve a MITRE ATT&CK technique id against the held table.", "egress": false },
+      { "name": "validate_detection", "purpose": "Parse and validate a Sigma rule, YARA rule or hunting query before it is stored.", "egress": false }
+    ],
+    "sourceRefs": ["soc", "held-corpus"],
+    "workflowRefs": ["wf-actor", "wf-deep-dive"],
+    "permissions": ["Read the managed-tenant SOC feed", "Write detection content for review"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Keep tenant scope absolute: one client's incident data never appears in another client's output. Publish no detection rule that has not parsed and validated. A technique id that does not resolve is dropped, not guessed."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-ING-02, FR-COR-01, NFR-SEC-03. Read access across the managed-client base is outstanding at open item M1"
+  },
+  {
+    "id": "agt-commercial",
+    "name": "Commercial feeds",
+    "kind": "specialist",
+    "purpose": "Correlates the commercial providers against what is already held, and records where they disagree.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Vendor correlation", "description": "Links a vendor's view to held records and deduplicates the overlap." },
+      { "name": "STIX and TAXII handling", "description": "Maps STIX and TAXII by field, and parses bespoke vendor formats per source." },
+      { "name": "Entitlement awareness", "description": "Collects only what the subscription entitles, and says when a request exceeded it." },
+      { "name": "Confidence scoring", "description": "Keeps each vendor's own confidence rather than averaging vendors into one figure." }
+    ],
+    "tools": [
+      { "name": "commercial_fetch", "purpose": "Retrieve reporting, indicators and actor profiles from a subscribed provider. MCP is preferred over API where the vendor offers it.", "egress": true },
+      { "name": "normalize_stix", "purpose": "Map STIX and TAXII objects to the held schema by field.", "egress": false },
+      { "name": "search_corpus", "purpose": "Deduplicate the vendor view against what is already held.", "egress": false }
+    ],
+    "sourceRefs": ["commercial", "held-corpus"],
+    "workflowRefs": ["wf-actor", "wf-deep-dive", "wf-digest"],
+    "permissions": ["Read the subscribed commercial providers", "Write a correlated record"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Present a credential only from Key Vault; never handle a key value. Keep each provider's own confidence and name the provider on every claim. Where an MCP server exists, prefer it to the API."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-ING-02, FR-COR-01, NFR-SEC-02; Mohanasundaram Adaikkappan, 2 September 2026, 34:37. API keys outstanding at open item A3, Anomali overlap at R3"
+  },
+  {
+    "id": "agt-ctem",
+    "name": "CTEM",
+    "kind": "specialist",
+    "purpose": "Resolves exposure findings to the client and asset they concern, and links them to advisories already issued.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Exposure collection", "description": "Retrieves current exposure findings across the estate." },
+      { "name": "Asset resolution", "description": "Resolves each finding to the client and asset it concerns." },
+      { "name": "Severity provenance", "description": "Records severity with the source that assigned it, never with a score of its own." },
+      { "name": "Advisory correlation", "description": "Links an exposure to any advisory already covering it." }
+    ],
+    "tools": [
+      { "name": "ctem_fetch", "purpose": "Retrieve current exposure findings from the exposure-management platform.", "egress": false },
+      { "name": "client_profile", "purpose": "Resolve a finding to the client estate it belongs to.", "egress": false },
+      { "name": "similar_advisories", "purpose": "Find an advisory already covering the exposure.", "egress": false }
+    ],
+    "sourceRefs": ["ctem", "held-corpus"],
+    "workflowRefs": ["wf-exposure", "wf-vuln-advisory"],
+    "permissions": ["Read the exposure-management platform", "Write an exposure record"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Carry the severity the platform assigned and name it as theirs. Do not re-score. A finding that resolves to no client asset is reported as unresolved, not dropped."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-ING-02, FR-COR-03. No integration route agreed yet"
+  },
+  {
+    "id": "agt-spidersilk",
+    "name": "SpiderSilk",
+    "kind": "specialist",
+    "purpose": "Maps external attack surface and leaked-credential exposure to the client estate, holding the subject and never the value.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Attack-surface mapping", "description": "Retrieves external attack-surface findings for the client estate." },
+      { "name": "Credential redaction", "description": "Keeps the subject and drops the value. A credential value is never stored, not even masked." },
+      { "name": "Client resolution", "description": "Resolves each finding to the client whose estate it concerns." }
+    ],
+    "tools": [
+      { "name": "spidersilk_fetch", "purpose": "Retrieve attack-surface and leaked-credential findings.", "egress": true },
+      { "name": "redact_credential", "purpose": "Strip the credential value and retain only the subject and where it appeared.", "egress": false },
+      { "name": "client_profile", "purpose": "Resolve a finding to the client estate it belongs to.", "egress": false }
+    ],
+    "sourceRefs": ["spidersilk", "held-corpus"],
+    "workflowRefs": ["wf-exposure"],
+    "permissions": ["Read the attack-surface platform", "Write a redacted exposure record"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Redact before you store. A credential value never enters a record, a log, an error message or an export, masked or otherwise. Report the subject, the client and where it appeared."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-DRP-01, FR-SAF-02, NFR-SEC-02. Access grant and whether it consumes reviewed findings or the raw stream are outstanding at open items F1 and F2"
+  },
+  {
+    "id": "agt-messaging",
+    "name": "Telegram and messaging",
+    "kind": "specialist",
+    "purpose": "Covers the approved messaging channels, summarising in English alongside the original language.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Channel monitoring", "description": "Reads only the channels on the approved list." },
+      { "name": "Signal extraction", "description": "Pulls claims, named victims and indicators out of the traffic." },
+      { "name": "Translation and summary", "description": "Produces an English summary alongside the original language." }
+    ],
+    "tools": [
+      { "name": "channel_collect", "purpose": "Retrieve message metadata and content from an approved channel.", "egress": true },
+      { "name": "extract_entities", "purpose": "Pull claims, named victims and indicators from the traffic.", "egress": false },
+      { "name": "translate_text", "purpose": "Produce an English rendering beside the original language.", "egress": false }
+    ],
+    "sourceRefs": ["messaging"],
+    "workflowRefs": ["wf-deep-dive", "wf-actor"],
+    "permissions": ["Read the approved channel set"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Read only approved channels. Keep the original language beside the translation so a reviewer can check it. A claim made in a channel is reported as a claim, never as a finding."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-ING-03, FR-RFI-02. Collection route outstanding at open item E1, channel list at E2"
+  },
+  {
+    "id": "agt-infographic",
+    "name": "Infographic",
+    "kind": "specialist",
+    "purpose": "Produces the structured content that fills a fixed CPX-designed infographic template.",
+    "dispatches": [],
+    "skills": [
+      { "name": "Structured content", "description": "Extracts the fields a fixed template expects from a finished answer or report." },
+      { "name": "Figure integrity", "description": "Carries only figures the source artefact states. It computes no new metric." },
+      { "name": "TTP table rendering", "description": "Produces the heat map as a text table, because generated imagery is out of scope." }
+    ],
+    "tools": [
+      { "name": "read_artefact", "purpose": "Read a completed answer or approved report.", "egress": false },
+      { "name": "fill_template", "purpose": "Populate the fixed CPX template fields from that artefact.", "egress": false }
+    ],
+    "sourceRefs": ["held-corpus"],
+    "workflowRefs": ["wf-infographic"],
+    "permissions": ["Read a completed answer or report", "Write template content"],
+    "instruction": {
+      "version": 1,
+      "updatedAt": "2026-09-02T10:00:00Z",
+      "updatedBy": "u-lead",
+      "text": "Populate the fixed template only. Carry no figure the source artefact does not state, and generate no imagery. The TTP heat map is a text table."
+    },
+    "updateCount": 0,
+    "status": "specified",
+    "lastRunAt": null,
+    "basis": "FR-ADV-04, FR-OUT-05; Praveen Singh, 2 September 2026, 50:53. In scope subject to open item C7"
+  }
+]

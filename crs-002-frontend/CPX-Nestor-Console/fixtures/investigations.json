@@ -1,0 +1,265 @@
+[
+  {
+    "id": "inv-wp2shell",
+    "title": "wp2shell exploitation and estate exposure",
+    "createdAt": "2026-08-02T02:05:00Z",
+    "createdBy": "Rajesh Menon",
+    "turns": [
+      {
+        "id": "t-1",
+        "question": "What do we know about the wp2shell campaign and which clients are exposed?",
+        "status": "complete",
+        "answer": {
+          "title": "wp2shell: active exploitation of WordPress theme frameworks",
+          "blocks": [
+            {
+              "kind": "prose",
+              "text": "wp2shell is a mass exploitation campaign against a widely deployed WordPress theme framework, active since late July. Exploitation is unauthenticated and drops a PHP web shell, with follow-on deployment of a credential harvester on roughly one in five compromised sites. Source: Held corpus, campaign records.",
+              "attribution": "Held corpus, campaign records"
+            },
+            {
+              "kind": "prose",
+              "text": "Exploitation volume tripled in the last 72 hours and two regional hosting providers appear in victim telemetry. Source: CrowdStrike Falcon X, Reports.",
+              "attribution": "CrowdStrike Falcon X, Reports"
+            },
+            {
+              "kind": "table",
+              "headers": [
+                "Client",
+                "Exposure",
+                "Basis"
+              ],
+              "rows": [
+                [
+                  "CLT-027",
+                  "Exposed",
+                  "WordPress across the public web estate"
+                ],
+                [
+                  "CLT-014",
+                  "Exposed",
+                  "WordPress in the technology profile"
+                ],
+                [
+                  "CLT-003",
+                  "Not exposed",
+                  "No WordPress in the technology profile"
+                ]
+              ]
+            },
+            {
+              "kind": "indicators",
+              "values": [
+                "update.wp2shell-cdn.com",
+                "185.220.101.34",
+                "wp2shell-stage2.com",
+                "91.92.240.11"
+              ]
+            },
+            {
+              "kind": "prose",
+              "text": "Recommended next step: a vulnerability advisory for the exposed clients referencing the published fix.",
+              "attribution": "Held corpus"
+            }
+          ],
+          "entities": [
+            {
+              "id": "ent-wp2shell",
+              "name": "wp2shell",
+              "type": "campaign"
+            },
+            {
+              "id": "ent-clt027",
+              "name": "Meridian Energy Group",
+              "type": "client"
+            },
+            {
+              "id": "ent-clt014",
+              "name": "Al Dhafra Logistics",
+              "type": "client"
+            }
+          ],
+          "citations": [
+            {
+              "id": "c-1",
+              "ref": 1,
+              "label": "Held corpus, campaign records",
+              "recordCount": 11,
+              "urlSafe": false
+            },
+            {
+              "id": "c-2",
+              "ref": 2,
+              "label": "CrowdStrike Falcon X, Reports",
+              "recordCount": 3,
+              "urlSafe": false
+            }
+          ],
+          "negativeResults": [],
+          "sourcesUnavailable": [],
+          "tlp": "AMBER",
+          "classificationSettled": true,
+          "egress": false
+        }
+      },
+      {
+        "id": "t-2",
+        "question": "What about secur32.dll? Is the sideloading variant part of this campaign?",
+        "status": "complete",
+        "answer": {
+          "blocks": [
+            {
+              "kind": "prose",
+              "text": "No. The secur32.dll sideloading activity reported elsewhere is not linked to wp2shell in any held record. The loader chains differ and no shared infrastructure appears in either campaign's indicator set. Source: Held corpus.",
+              "attribution": "Held corpus"
+            }
+          ],
+          "entities": [],
+          "citations": [
+            {
+              "id": "c-3",
+              "ref": 1,
+              "label": "Held corpus, full text search",
+              "recordCount": 0,
+              "urlSafe": false
+            }
+          ],
+          "negativeResults": [
+            {
+              "query": "secur32 strings",
+              "recordCount": 0
+            },
+            {
+              "query": "wp2shell AND sideloading",
+              "recordCount": 0
+            }
+          ],
+          "sourcesUnavailable": [],
+          "tlp": "GREEN",
+          "classificationSettled": true,
+          "egress": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "inv-dprk",
+    "title": "DPRK supply chain reach into GCC logistics",
+    "createdAt": "2026-08-02T01:20:00Z",
+    "createdBy": "Rajesh Menon",
+    "turns": [
+      {
+        "id": "t-1",
+        "question": "Trace the DPRK fleet software supply chain campaign and its reach into GCC logistics operators.",
+        "status": "complete",
+        "answer": {
+          "title": "DPRK supply chain campaign: GCC logistics exposure",
+          "blocks": [
+            {
+              "kind": "prose",
+              "text": "A DPRK-attributed cluster has trojanised the update channel of a fleet management suite. Three software vendors are confirmed affected. One supplies two GCC logistics groups, of which one is a subscribed client. Source: CrowdStrike Falcon X, Actors.",
+              "attribution": "CrowdStrike Falcon X, Actors"
+            },
+            {
+              "kind": "list",
+              "items": [
+                "Initial access: poisoned update package, staged loader, five day sleep",
+                "Objective assessed as revenue generation, consistent with prior tracked activity",
+                "Follow-on intrusion attempts assessed likely within two weeks"
+              ]
+            },
+            {
+              "kind": "indicators",
+              "values": [
+                "update.fleetsync-cdn.com",
+                "45.148.10.77",
+                "telemetry.fleetsync-cdn.com"
+              ]
+            }
+          ],
+          "entities": [
+            {
+              "id": "ent-lazarus",
+              "name": "Lazarus subgroup",
+              "type": "actor"
+            },
+            {
+              "id": "ent-clt014",
+              "name": "Al Dhafra Logistics",
+              "type": "client"
+            }
+          ],
+          "citations": [
+            {
+              "id": "c-4",
+              "ref": 1,
+              "label": "CrowdStrike Falcon X, Actors",
+              "recordCount": 5,
+              "urlSafe": false
+            },
+            {
+              "id": "c-5",
+              "ref": 2,
+              "label": "Live lookup, VirusTotal",
+              "recordCount": 2,
+              "urlSafe": false
+            }
+          ],
+          "negativeResults": [],
+          "sourcesUnavailable": [
+            "Sekoia",
+            "Anomali ThreatStream",
+            "Group-IB Blog",
+            "Flashpoint Blog"
+          ],
+          "sourcesTotal": 13,
+          "tlp": "AMBER",
+          "classificationSettled": true,
+          "egress": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "inv-fortinet",
+    "title": "FortiOS SSL-VPN exploitation, advisory produced",
+    "createdAt": "2026-08-01T06:40:00Z",
+    "createdBy": "Praveen Kumar",
+    "turns": [
+      {
+        "id": "t-1",
+        "question": "Create an intelligence advisory for the DPRK fleet software supply chain campaign.",
+        "status": "complete",
+        "answer": {
+          "title": "Draft created: DPRK supply chain campaign against logistics software",
+          "blocks": [
+            {
+              "kind": "prose",
+              "text": "Draft CPX-TIC-IA-2026-352 has been created from the held campaign records and the two supporting actor reports. The draft carries all seven IA sections, three mapped techniques and six indicators, and is assigned for review.",
+              "attribution": "Held corpus"
+            }
+          ],
+          "entities": [],
+          "citations": [
+            {
+              "id": "c-6",
+              "ref": 1,
+              "label": "Held corpus, campaign records",
+              "recordCount": 8,
+              "urlSafe": false
+            }
+          ],
+          "negativeResults": [],
+          "sourcesUnavailable": [],
+          "tlp": "AMBER",
+          "classificationSettled": true,
+          "egress": false,
+          "producedArtefact": {
+            "ref": "CPX-TIC-IA-2026-352",
+            "type": "IA"
+          }
+        }
+      }
+    ]
+  }
+]

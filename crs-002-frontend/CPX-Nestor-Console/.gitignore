@@ -1,0 +1,15 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next
+/out
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+
+# local env files that carry secrets; .env.development is committed,
+# it only holds the dev-only role switcher flag
+.env*.local

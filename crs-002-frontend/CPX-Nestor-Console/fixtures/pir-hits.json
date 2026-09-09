@@ -1,0 +1,566 @@
+[
+  {
+    "id": "hit-001",
+    "pirRef": "PIR13",
+    "category": "Vulnerabilities",
+    "title": "wp2shell mass exploitation of WordPress themes",
+    "firedAt": "2026-08-01T23:27:00Z",
+    "confidence": 92,
+    "confidenceReason": "Vendor advisory corroborated by exploited-in-wild telemetry from two independent feeds",
+    "sourceIds": [
+      "src-023",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-027",
+      "CLT-014"
+    ],
+    "tlp": "AMBER",
+    "status": "new"
+  },
+  {
+    "id": "hit-002",
+    "pirRef": "PIR8",
+    "category": "Enterprise",
+    "title": "DPRK supply chain campaign against logistics software",
+    "firedAt": "2026-08-01T21:03:00Z",
+    "confidence": 87,
+    "confidenceReason": "Overlap with tracked Lazarus tooling across three reports",
+    "sourceIds": [
+      "src-045",
+      "src-171"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-014"
+    ],
+    "tlp": "AMBER",
+    "status": "new"
+  },
+  {
+    "id": "hit-003",
+    "pirRef": "PIR22",
+    "category": "Major Cyber Event",
+    "title": "Ransomware listing names a GCC industrial group",
+    "firedAt": "2026-08-02T00:39:00Z",
+    "confidence": 95,
+    "confidenceReason": "Victim named on the leak site itself",
+    "sourceIds": [
+      "src-004",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-027"
+    ],
+    "tlp": "RED",
+    "status": "escalated",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-004",
+    "pirRef": "PIR24",
+    "category": "Vulnerabilities",
+    "title": "Exchange zero-day gets emergency out-of-band patch",
+    "firedAt": "2026-08-01T22:15:00Z",
+    "confidence": 90,
+    "confidenceReason": "Vendor bulletin plus proof-of-concept circulating",
+    "sourceIds": [
+      "src-160",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-003",
+      "CLT-027"
+    ],
+    "tlp": "GREEN",
+    "status": "new"
+  },
+  {
+    "id": "hit-005",
+    "pirRef": "PIR7",
+    "category": "Enterprise",
+    "title": "Infostealer wave seeded through UAE job portals",
+    "firedAt": "2026-08-01T21:31:48Z",
+    "confidence": 74,
+    "confidenceReason": "Two sightings, sample not yet analysed",
+    "sourceIds": [
+      "src-023",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "AMBER",
+    "status": "new"
+  },
+  {
+    "id": "hit-006",
+    "pirRef": "PIR20",
+    "category": "Deep and Dark Web",
+    "title": "Credential set for regional banks offered on forum",
+    "firedAt": "2026-08-01T21:03:00Z",
+    "confidence": 81,
+    "confidenceReason": "Seller history checks out, sample headers match",
+    "sourceIds": [
+      "src-160",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-003"
+    ],
+    "tlp": "AMBER+STRICT",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-007",
+    "pirRef": "PIR17",
+    "category": "Global Threat and Events",
+    "title": "Undersea cable fault disrupts Gulf transit routes",
+    "firedAt": "2026-08-01T22:00:36Z",
+    "confidence": 68,
+    "confidenceReason": "Single press report, telecom confirmation pending",
+    "sourceIds": [
+      "src-160",
+      "src-088"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "CLEAR",
+    "status": "new"
+  },
+  {
+    "id": "hit-008",
+    "pirRef": "PIR14",
+    "category": "Vulnerabilities",
+    "title": "PAN-OS public exploit released for July advisory",
+    "firedAt": "2026-08-02T01:51:00Z",
+    "confidence": 88,
+    "confidenceReason": "Exploit code published and verified against the vendor advisory",
+    "sourceIds": [
+      "src-004",
+      "src-140"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-027"
+    ],
+    "tlp": "GREEN",
+    "status": "new"
+  },
+  {
+    "id": "hit-009",
+    "pirRef": "PIR1",
+    "category": "Enterprise",
+    "title": "Actor profile: Moonlit Sirocco targeting Gulf energy",
+    "firedAt": "2026-07-31T23:27:00Z",
+    "confidence": 78,
+    "confidenceReason": "Consistent victimology across four incident writeups",
+    "sourceIds": [
+      "src-101",
+      "src-088"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-027"
+    ],
+    "tlp": "AMBER",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-010",
+    "pirRef": "PIR22",
+    "category": "Major Cyber Event",
+    "title": "Hospital group in EU confirms encryption event",
+    "firedAt": "2026-07-31T18:39:00Z",
+    "confidence": 91,
+    "confidenceReason": "Operator statement and ransom note both public",
+    "sourceIds": [
+      "src-004",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "CLEAR",
+    "status": "triaged",
+    "assignedTo": "Rajesh Menon"
+  },
+  {
+    "id": "hit-011",
+    "pirRef": "PIR13",
+    "category": "Vulnerabilities",
+    "title": "FortiOS SSL-VPN flaw exploited, CVSS 8.6",
+    "firedAt": "2026-07-31T13:51:00Z",
+    "confidence": 89,
+    "confidenceReason": "Vendor PSIRT confirms exploitation of the July CVE",
+    "sourceIds": [
+      "src-152",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-003",
+      "CLT-027"
+    ],
+    "tlp": "GREEN",
+    "status": "escalated",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-012",
+    "pirRef": "PIR21",
+    "category": "Deep and Dark Web",
+    "title": "Marketing database of UAE retailer published",
+    "firedAt": "2026-07-30T23:27:00Z",
+    "confidence": 85,
+    "confidenceReason": "Dataset sampled and matches the retailer's schema",
+    "sourceIds": [
+      "src-045",
+      "src-140"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "AMBER",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-013",
+    "pirRef": "PIR9",
+    "category": "Enterprise",
+    "title": "Phishing campaign spoofs a federal service portal",
+    "firedAt": "2026-07-30T16:15:00Z",
+    "confidence": 83,
+    "confidenceReason": "Kit fingerprint matches an active tracked cluster",
+    "sourceIds": [
+      "src-045",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-003"
+    ],
+    "tlp": "AMBER",
+    "status": "new"
+  },
+  {
+    "id": "hit-014",
+    "pirRef": "PIR18",
+    "category": "Global Threat and Events",
+    "title": "Sanctions update touches regional shipping insurers",
+    "firedAt": "2026-07-30T01:51:00Z",
+    "confidence": 70,
+    "confidenceReason": "Legal analysis only, no operational reporting yet",
+    "sourceIds": [
+      "src-152",
+      "src-171"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-014"
+    ],
+    "tlp": "CLEAR",
+    "status": "dismissed"
+  },
+  {
+    "id": "hit-015",
+    "pirRef": "PIR6",
+    "category": "Enterprise",
+    "title": "RAT campaign delivered through trojanised invoices",
+    "firedAt": "2026-07-29T18:39:00Z",
+    "confidence": 76,
+    "confidenceReason": "Sandbox detonation confirms family, targets unverified",
+    "sourceIds": [
+      "src-152",
+      "src-171"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-014"
+    ],
+    "tlp": "AMBER",
+    "status": "triaged",
+    "assignedTo": "Rajesh Menon"
+  },
+  {
+    "id": "hit-016",
+    "pirRef": "PIR15",
+    "category": "Vulnerabilities",
+    "title": "Unauthenticated RCE chain reported in ESXi, no exploit",
+    "firedAt": "2026-07-29T09:03:00Z",
+    "confidence": 79,
+    "confidenceReason": "Researcher writeup, vendor acknowledgement received",
+    "sourceIds": [
+      "src-023",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-003",
+      "CLT-027"
+    ],
+    "tlp": "GREEN",
+    "status": "new"
+  },
+  {
+    "id": "hit-017",
+    "pirRef": "PIR23",
+    "category": "Major Cyber Event",
+    "title": "SOC-flagged campaign matches regional watering hole",
+    "firedAt": "2026-07-28T23:27:00Z",
+    "confidence": 82,
+    "confidenceReason": "Two SOC escalations correlate with held infrastructure",
+    "sourceIds": [
+      "src-004",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "AMBER+STRICT",
+    "status": "escalated",
+    "assignedTo": "Rajesh Menon"
+  },
+  {
+    "id": "hit-018",
+    "pirRef": "PIR2",
+    "category": "Enterprise",
+    "title": "Two actors resume activity after Eid pause",
+    "firedAt": "2026-07-28T13:51:00Z",
+    "confidence": 66,
+    "confidenceReason": "Cadence inference from feed volume, low direct evidence",
+    "sourceIds": [
+      "src-160",
+      "src-088"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "CLEAR",
+    "status": "dismissed"
+  },
+  {
+    "id": "hit-019",
+    "pirRef": "PIR10",
+    "category": "Enterprise",
+    "title": "Parcel-fee smishing surge across UAE numbers",
+    "firedAt": "2026-07-27T21:03:00Z",
+    "confidence": 84,
+    "confidenceReason": "Carrier abuse desk confirms volume spike",
+    "sourceIds": [
+      "src-045",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "CLEAR",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-020",
+    "pirRef": "PIR16",
+    "category": "Vulnerabilities",
+    "title": "Zero-day rumoured in a building management suite",
+    "firedAt": "2026-07-27T09:03:00Z",
+    "confidence": 58,
+    "confidenceReason": "Single dark-web claim, no sample, treat as unconfirmed",
+    "sourceIds": [
+      "src-023",
+      "src-088"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-027"
+    ],
+    "tlp": "AMBER",
+    "status": "new"
+  },
+  {
+    "id": "hit-021",
+    "pirRef": "PIR22",
+    "category": "Major Cyber Event",
+    "title": "Logistics operator listed then delisted within hours",
+    "firedAt": "2026-07-26T18:39:00Z",
+    "confidence": 73,
+    "confidenceReason": "Listing captured before removal, negotiation likely",
+    "sourceIds": [
+      "src-045",
+      "src-140"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-014"
+    ],
+    "tlp": "AMBER",
+    "status": "triaged",
+    "assignedTo": "Rajesh Menon"
+  },
+  {
+    "id": "hit-022",
+    "pirRef": "PIR4",
+    "category": "Enterprise",
+    "title": "New lateral movement pattern in GCC intrusions",
+    "firedAt": "2026-07-25T23:27:00Z",
+    "confidence": 77,
+    "confidenceReason": "Repeated across two unrelated incident responses",
+    "sourceIds": [
+      "src-011",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "AMBER",
+    "status": "triaged",
+    "assignedTo": "Rajesh Menon"
+  },
+  {
+    "id": "hit-023",
+    "pirRef": "PIR12",
+    "category": "Industry Threat and Events",
+    "title": "Water utility sector probed by known scanning cluster",
+    "firedAt": "2026-07-25T01:51:00Z",
+    "confidence": 71,
+    "confidenceReason": "Honeypot telemetry, no follow-on activity observed",
+    "sourceIds": [
+      "src-152",
+      "src-088"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "GREEN",
+    "status": "dismissed"
+  },
+  {
+    "id": "hit-024",
+    "pirRef": "PIR19",
+    "category": "Geopolitical Threat and Events",
+    "title": "Hacktivist op announced over regional court ruling",
+    "firedAt": "2026-07-24T06:39:00Z",
+    "confidence": 69,
+    "confidenceReason": "Telegram announcement, capability historically low",
+    "sourceIds": [
+      "src-152",
+      "src-088"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "CLEAR",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-025",
+    "pirRef": "PIR13",
+    "category": "Vulnerabilities",
+    "title": "Exchange ProxyNotShell variant back in scanning data",
+    "firedAt": "2026-07-23T13:51:00Z",
+    "confidence": 80,
+    "confidenceReason": "Scanning volume tripled against held baseline",
+    "sourceIds": [
+      "src-004",
+      "src-140"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-003"
+    ],
+    "tlp": "GREEN",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-026",
+    "pirRef": "PIR5",
+    "category": "Enterprise",
+    "title": "Tracked actor adopts EDR-killer tooling",
+    "firedAt": "2026-07-22T18:39:00Z",
+    "confidence": 75,
+    "confidenceReason": "Tool overlap confirmed in one incident, second unverified",
+    "sourceIds": [
+      "src-045",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "AMBER",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-027",
+    "pirRef": "PIR11",
+    "category": "Enterprise",
+    "title": "Campaign infrastructure re-registered after takedown",
+    "firedAt": "2026-07-21T23:27:00Z",
+    "confidence": 72,
+    "confidenceReason": "Registrant pattern matches the prior wave",
+    "sourceIds": [
+      "src-023",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "GREEN",
+    "status": "false-positive"
+  },
+  {
+    "id": "hit-028",
+    "pirRef": "PIR17",
+    "category": "Global Threat and Events",
+    "title": "Global outage traced to CDN configuration error",
+    "firedAt": "2026-07-21T01:51:00Z",
+    "confidence": 86,
+    "confidenceReason": "Provider postmortem published, no threat actor involved",
+    "sourceIds": [
+      "src-011",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [],
+    "tlp": "CLEAR",
+    "status": "dismissed"
+  },
+  {
+    "id": "hit-029",
+    "pirRef": "PIR20",
+    "category": "Deep and Dark Web",
+    "title": "Contractor badge data surfaced in combolist",
+    "firedAt": "2026-07-20T09:03:00Z",
+    "confidence": 67,
+    "confidenceReason": "Partial match against known historic breach corpus",
+    "sourceIds": [
+      "src-011",
+      "src-007"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-041"
+    ],
+    "tlp": "AMBER",
+    "status": "triaged",
+    "assignedTo": "Praveen Kumar"
+  },
+  {
+    "id": "hit-030",
+    "pirRef": "PIR14",
+    "category": "Vulnerabilities",
+    "title": "Public exploit for SAP NetWeaver flaw weaponised",
+    "firedAt": "2026-07-19T16:15:00Z",
+    "confidence": 88,
+    "confidenceReason": "Exploit merged into a commodity framework",
+    "sourceIds": [
+      "src-004",
+      "src-033"
+    ],
+    "entityIds": [],
+    "affectedClients": [
+      "CLT-014"
+    ],
+    "tlp": "GREEN",
+    "status": "escalated",
+    "assignedTo": "Praveen Kumar"
+  }
+]

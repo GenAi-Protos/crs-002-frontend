@@ -1,0 +1,109 @@
+[
+  {
+    "id": "kw-01",
+    "name": "Major global cyber events",
+    "terms": [
+      "ransomware",
+      "zero-day",
+      "data breach",
+      "supply chain attack"
+    ],
+    "language": "English",
+    "region": "Global",
+    "pirRefs": [
+      "PIR17"
+    ],
+    "cadence": "hourly",
+    "lastRun": {
+      "at": "2026-08-02T03:33:00Z",
+      "results": [
+        {
+          "sourceName": "Reuters World News",
+          "count": 3
+        },
+        {
+          "sourceName": "AP Top News",
+          "count": 2
+        },
+        {
+          "sourceName": "BBC Middle East",
+          "count": 0
+        },
+        {
+          "sourceName": "The Record",
+          "count": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": "kw-02",
+    "name": "Middle East impact monitor",
+    "terms": [
+      "UAE",
+      "GCC",
+      "Gulf",
+      "critical infrastructure"
+    ],
+    "language": "English and Arabic",
+    "region": "Middle East",
+    "pirRefs": [
+      "PIR18"
+    ],
+    "cadence": "hourly",
+    "lastRun": {
+      "at": "2026-08-02T03:20:00Z",
+      "results": [
+        {
+          "sourceName": "Al Jazeera English",
+          "count": 2
+        },
+        {
+          "sourceName": "The National",
+          "count": 1
+        },
+        {
+          "sourceName": "Gulf News",
+          "count": 0
+        },
+        {
+          "sourceName": "Khaleej Times",
+          "count": 0
+        }
+      ]
+    }
+  },
+  {
+    "id": "kw-03",
+    "name": "Geopolitical cyber nexus",
+    "terms": [
+      "hacktivist",
+      "sanctions",
+      "state-sponsored",
+      "retaliation"
+    ],
+    "language": "English",
+    "region": "Middle East",
+    "pirRefs": [
+      "PIR19"
+    ],
+    "cadence": "daily",
+    "lastRun": {
+      "at": "2026-08-02T01:00:00Z",
+      "results": [
+        {
+          "sourceName": "Foreign Policy",
+          "count": 0
+        },
+        {
+          "sourceName": "War on the Rocks",
+          "count": 0
+        },
+        {
+          "sourceName": "Carnegie Middle East Center",
+          "count": 0
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,242 @@
+[
+  {
+    "ref": "PIR1",
+    "category": "Enterprise",
+    "question": "What threat actors are previously [6 months] or actively targeting [Client]'s industry?",
+    "coverage": "Threat Actors",
+    "stixNative": true,
+    "parameters": [
+      "client"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR2",
+    "category": "Enterprise",
+    "question": "What threat actors are previously [6 months] or active in the UAE or GCC region?",
+    "coverage": "Threat Actors",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR3",
+    "category": "Enterprise",
+    "question": "What tools, technology, and processes are malicious actors using (or intend or likely to use) to maliciously affect [Client]'s assets or systems?",
+    "coverage": "TTPs",
+    "stixNative": true,
+    "parameters": [
+      "client"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR4",
+    "category": "Enterprise",
+    "question": "What tactics, techniques, and procedures are emerging for use against GCC region or UAE-based targets?",
+    "coverage": "TTPs",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR5",
+    "category": "Enterprise",
+    "question": "What tactics, techniques, and procedures are emerging for threat actors known to previously target the Middle East?",
+    "coverage": "TTPs",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR6",
+    "category": "Enterprise",
+    "question": "What malware/ransomware/RAT/Botnet/Infostealer is actively being used to target the [Client]'s industry?",
+    "coverage": "Malware/Ransomware",
+    "stixNative": true,
+    "parameters": [
+      "client"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR7",
+    "category": "Enterprise",
+    "question": "Which malware family has impacted or is emerging in the GCC region or in the UAE?",
+    "coverage": "Malware/Ransomware",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR8",
+    "category": "Enterprise",
+    "question": "Which malicious campaigns are active against [Client]'s industry?",
+    "coverage": "Campaigns",
+    "stixNative": true,
+    "parameters": [
+      "client"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR9",
+    "category": "Enterprise",
+    "question": "Which campaigns have directly targeted the GCC region or UAE-based organisations/individuals?",
+    "coverage": "Campaigns",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR10",
+    "category": "Enterprise",
+    "question": "What are the scam campaigns happening in the UAE?",
+    "coverage": "Campaigns",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR11",
+    "category": "Enterprise",
+    "question": "What are emerging campaigns of threat actors known to previously target the Middle East?",
+    "coverage": "Campaigns",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR12",
+    "category": "Industry Threat and Events",
+    "question": "Which industry sectors categorised by the UAE as critical infrastructure have been targeted or are being targeted by a specific campaign?",
+    "coverage": "Campaigns",
+    "stixNative": true,
+    "parameters": [
+      "industry"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR13",
+    "category": "Vulnerabilities",
+    "question": "What are the new vulnerabilities in widely-used technologies of [Client]'s with a CVSS score of 7.0 & above and being exploited in the wild",
+    "coverage": "Technology Stack",
+    "stixNative": true,
+    "parameters": [
+      "client",
+      "techStack"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR14",
+    "category": "Vulnerabilities",
+    "question": "What are the new vulnerabilities in widely-used technologies of [Client]'s with a CVSS score of 7.0 & above with public exploit(s)",
+    "coverage": "Technology Stack",
+    "stixNative": true,
+    "parameters": [
+      "client",
+      "techStack"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR15",
+    "category": "Vulnerabilities",
+    "question": "What are the new vulnerabilities in widely-used technologies of [Client]'s with a CVSS score of 9.0 & above not exploited in the wild, with no public exploit, but leading to RCE",
+    "coverage": "Technology Stack",
+    "stixNative": true,
+    "parameters": [
+      "client",
+      "techStack"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR16",
+    "category": "Vulnerabilities",
+    "question": "What zero-day vulnerabilities could affect systems or applications in use by [Client]?",
+    "coverage": "Technology Stack",
+    "stixNative": true,
+    "parameters": [
+      "client",
+      "techStack"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR17",
+    "category": "Global Threat and Events",
+    "question": "What are the major cyber events that have occurred across the global? (Major = Extensive media coverage, new type of attack, significant victim, etc.)",
+    "coverage": "Global Events",
+    "stixNative": false,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR18",
+    "category": "Global Threat and Events",
+    "question": "What are the most recent global issues that concerns or may impact the Middle East, GCC, or the UAE?",
+    "coverage": "Global Events",
+    "stixNative": false,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR19",
+    "category": "Geopolitical Threat and Events",
+    "question": "Which geopolitical or other significant events pose a cyber-security interest or threat to [Client] (e.g., hacktivist campaign emerging from an insider trading corruption scandal)?",
+    "coverage": "Geopolitical",
+    "stixNative": false,
+    "parameters": [
+      "client"
+    ],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR20",
+    "category": "Deep and Dark Web",
+    "question": "What data, regardless of the volume, that would be sensitive to UAE-based organisations or group of individuals have been exposed unintentionally to the public?",
+    "coverage": "Data Leaks",
+    "stixNative": false,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR21",
+    "category": "Deep and Dark Web",
+    "question": "What sensitive data, acquired from exposed databases related to UAE organisations or individuals, have been published for public consumption?",
+    "coverage": "Data Leaks",
+    "stixNative": false,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR22",
+    "category": "Major Cyber Event",
+    "question": "Ransomware attack or listing, or critical cyber attacks that has came out in wild",
+    "coverage": "Cyber Security Event",
+    "stixNative": false,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR23",
+    "category": "Major Cyber Event",
+    "question": "Threat campaign discovered by our SOC and has regional presence",
+    "coverage": "Cyber Security Event",
+    "stixNative": false,
+    "parameters": [],
+    "parametersUnverified": true
+  },
+  {
+    "ref": "PIR24",
+    "category": "Vulnerabilities",
+    "question": "HIGH or CRITICAL newly discovered vulnerabilities including zero days which has got media attention or is every where on internet",
+    "coverage": "Vulnerabilities",
+    "stixNative": true,
+    "parameters": [],
+    "parametersUnverified": false
+  }
+]

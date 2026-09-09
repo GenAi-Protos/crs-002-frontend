@@ -1,0 +1,308 @@
+{
+  "generatedAt": "2026-08-02T04:15:00Z",
+  "window": { "days": 30, "from": "2026-07-03T00:00:00Z", "to": "2026-08-02T04:15:00Z" },
+  "threatLevel": {
+    "level": "elevated",
+    "reason": "A supply chain campaign is active against GCC logistics operators and three CPX clients are in scope.",
+    "changedAt": "2026-07-22T09:00:00Z"
+  },
+  "findings": [
+    {
+      "id": "f-01",
+      "title": "Trojanised fleet management agent update served from an impersonating host",
+      "severity": "critical",
+      "category": "Industry Threat and Events",
+      "sectors": ["Logistics and shipping"],
+      "regions": ["UAE", "GCC"],
+      "clientCount": 3,
+      "firstSeen": "2026-07-22T09:14:00Z",
+      "campaignId": "c-fleet",
+      "actorId": "a-harbor-fog",
+      "techniqueIds": ["T1195.002", "T1059", "T1071"],
+      "status": "reported",
+      "businessImpact": "Operational technology in three logistics clients could be reached through a trusted vendor update path."
+    },
+    {
+      "id": "f-02",
+      "title": "Unauthenticated remote code execution in a fleet management portal, exploited in the wild",
+      "severity": "critical",
+      "category": "Vulnerabilities",
+      "sectors": ["Logistics and shipping", "Energy"],
+      "regions": ["UAE"],
+      "clientCount": 3,
+      "firstSeen": "2026-07-29T06:30:00Z",
+      "campaignId": "c-fleet",
+      "techniqueIds": ["T1190", "T1505.003"],
+      "status": "investigating",
+      "businessImpact": "An internet-facing system used by three clients can be taken over without credentials."
+    },
+    {
+      "id": "f-03",
+      "title": "Ransomware leak site names a regional logistics operator",
+      "severity": "critical",
+      "category": "Deep and Dark Web",
+      "sectors": ["Logistics and shipping"],
+      "regions": ["GCC"],
+      "clientCount": 2,
+      "firstSeen": "2026-07-30T22:05:00Z",
+      "campaignId": "c-onyx",
+      "actorId": "a-onyx-jackal",
+      "techniqueIds": ["T1486"],
+      "status": "triaged",
+      "businessImpact": "A peer organisation has been named publicly, raising the likelihood of similar targeting."
+    },
+    {
+      "id": "f-04",
+      "title": "Credential harvesting pages impersonating a regional bank",
+      "severity": "high",
+      "category": "Enterprise",
+      "sectors": ["Banking and finance"],
+      "regions": ["UAE", "GCC"],
+      "clientCount": 2,
+      "firstSeen": "2026-07-25T11:40:00Z",
+      "actorId": "a-sable-kite",
+      "techniqueIds": ["T1566"],
+      "status": "reported",
+      "businessImpact": "Customers of a banking client may be deceived into disclosing credentials."
+    },
+    {
+      "id": "f-05",
+      "title": "Exposed management interface on a client edge device",
+      "severity": "high",
+      "category": "Vulnerabilities",
+      "sectors": ["Energy"],
+      "regions": ["UAE"],
+      "clientCount": 1,
+      "firstSeen": "2026-07-19T08:20:00Z",
+      "techniqueIds": ["T1190"],
+      "status": "investigating",
+      "businessImpact": "A remotely reachable administrative interface increases the chance of an unassisted intrusion."
+    },
+    {
+      "id": "f-06",
+      "title": "Regional escalation raises the likelihood of disruptive activity against energy operators",
+      "severity": "high",
+      "category": "Geopolitical Threat and Events",
+      "sectors": ["Energy", "Government"],
+      "regions": ["MENA"],
+      "clientCount": 2,
+      "firstSeen": "2026-07-17T14:00:00Z",
+      "techniqueIds": [],
+      "status": "reported",
+      "businessImpact": "Regional tension has historically been followed by disruptive activity against energy infrastructure."
+    },
+    {
+      "id": "f-07",
+      "title": "Commodity loader observed in a managed client estate",
+      "severity": "medium",
+      "category": "Enterprise",
+      "sectors": ["Telecom"],
+      "regions": ["UAE"],
+      "clientCount": 1,
+      "firstSeen": "2026-07-21T03:55:00Z",
+      "techniqueIds": ["T1059", "T1562.001"],
+      "status": "closed",
+      "businessImpact": "Contained before any data was affected."
+    },
+    {
+      "id": "f-08",
+      "title": "New CVE affects a product on two client technology stacks",
+      "severity": "medium",
+      "category": "Vulnerabilities",
+      "sectors": ["Banking and finance", "Healthcare"],
+      "regions": ["UAE"],
+      "clientCount": 2,
+      "firstSeen": "2026-08-01T05:10:00Z",
+      "techniqueIds": ["T1190"],
+      "status": "new",
+      "businessImpact": "A patch is available and two clients run the affected version."
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "c-fleet",
+      "name": "Fleet software supply chain",
+      "actorId": "a-harbor-fog",
+      "status": "active",
+      "severity": "critical",
+      "firstSeen": "2026-06-14T08:20:00Z",
+      "lastActivity": "2026-08-01T21:05:00Z",
+      "sectors": ["Logistics and shipping", "Energy"],
+      "regions": ["UAE", "GCC"],
+      "clientCount": 3,
+      "attackChain": [
+        "Impersonating update host serves a trojanised vendor agent",
+        "Installer stops the endpoint agent and runs a scripted stage",
+        "Web shell written to the web root of the fleet portal",
+        "Fixed-interval HTTPS beacon to attacker infrastructure",
+        "Credential stores read and staged for exfiltration"
+      ],
+      "techniqueIds": ["T1195.002", "T1059", "T1562.001", "T1505.003", "T1555", "T1071", "T1041"],
+      "summary": "A supplier's software update channel is being impersonated to reach logistics operators. Three CPX clients use the affected product.",
+      "advisoryRef": "CPX-TIC-IA-2026-352"
+    },
+    {
+      "id": "c-onyx",
+      "name": "Onyx Jackal extortion",
+      "actorId": "a-onyx-jackal",
+      "status": "active",
+      "severity": "high",
+      "firstSeen": "2026-05-02T00:00:00Z",
+      "lastActivity": "2026-07-30T22:05:00Z",
+      "sectors": ["Logistics and shipping", "Healthcare"],
+      "regions": ["GCC", "MENA"],
+      "clientCount": 2,
+      "attackChain": [
+        "Access purchased from an initial access broker",
+        "Lateral movement over remote desktop",
+        "Data staged and exfiltrated before encryption",
+        "Encryption and a leak-site listing"
+      ],
+      "techniqueIds": ["T1021.001", "T1567.002", "T1486"],
+      "summary": "An extortion group publishing victims on a leak site has begun naming organisations in the region.",
+      "advisoryRef": "CPX-TIC-IA-2026-349"
+    },
+    {
+      "id": "c-sable",
+      "name": "Sable Kite banking lures",
+      "actorId": "a-sable-kite",
+      "status": "monitoring",
+      "severity": "medium",
+      "firstSeen": "2026-06-28T00:00:00Z",
+      "lastActivity": "2026-07-25T11:40:00Z",
+      "sectors": ["Banking and finance"],
+      "regions": ["UAE"],
+      "clientCount": 2,
+      "attackChain": [
+        "Lure message impersonating a bank",
+        "Credential harvesting page hosted on a lookalike domain"
+      ],
+      "techniqueIds": ["T1566"],
+      "summary": "Phishing pages imitating regional banks. No client compromise observed.",
+      "advisoryRef": "CPX-TIC-IA-2026-351"
+    }
+  ],
+  "actors": [
+    {
+      "id": "a-harbor-fog",
+      "name": "UNC-Harbor Fog",
+      "aliases": ["Harbor Fog", "TA-4417"],
+      "records": 34,
+      "clientsAffected": 3,
+      "lastSeen": "2026-08-01T21:05:00Z",
+      "topTechniqueId": "T1195.002",
+      "motivation": "Espionage, with an interest in logistics and shipping operations"
+    },
+    {
+      "id": "a-onyx-jackal",
+      "name": "Onyx Jackal",
+      "aliases": ["TA-2290"],
+      "records": 21,
+      "clientsAffected": 2,
+      "lastSeen": "2026-07-30T08:40:00Z",
+      "topTechniqueId": "T1486",
+      "motivation": "Financial, through extortion"
+    },
+    {
+      "id": "a-portal-drift",
+      "name": "Portal Drift",
+      "aliases": [],
+      "records": 12,
+      "clientsAffected": 1,
+      "lastSeen": "2026-07-27T14:12:00Z",
+      "topTechniqueId": "T1190",
+      "motivation": "Opportunistic exploitation of internet-facing systems"
+    },
+    {
+      "id": "a-sable-kite",
+      "name": "Sable Kite",
+      "aliases": ["TA-1188"],
+      "records": 8,
+      "clientsAffected": 2,
+      "lastSeen": "2026-07-24T06:55:00Z",
+      "topTechniqueId": "T1566",
+      "motivation": "Financial, through credential theft"
+    }
+  ],
+  "indicators": [
+    { "value": "198.51.100.47", "type": "ipv4", "firstSeen": "2026-06-14T08:20:00Z", "confidence": 91, "campaignId": "c-fleet", "note": "Loader delivery and beacon destination" },
+    { "value": "198.51.100.52", "type": "ipv4", "firstSeen": "2026-06-18T10:02:00Z", "confidence": 84, "campaignId": "c-fleet", "note": "Second address, same TLS fingerprint" },
+    { "value": "203.0.113.19", "type": "ipv4", "firstSeen": "2026-07-02T16:45:00Z", "confidence": 78, "campaignId": "c-fleet", "note": "Fallback beacon compiled into the sample" },
+    { "value": "fleet-update.example", "type": "domain", "firstSeen": "2026-06-14T09:02:00Z", "confidence": 87, "campaignId": "c-fleet", "note": "Impersonating vendor update host" },
+    { "value": "cdn-sync-node.example", "type": "domain", "firstSeen": "2026-06-14T09:05:00Z", "confidence": 80, "campaignId": "c-fleet", "note": "Second-stage beacon host" },
+    { "value": "secure-bank-verify.example", "type": "domain", "firstSeen": "2026-07-25T11:40:00Z", "confidence": 76, "campaignId": "c-sable", "note": "Credential harvesting page" },
+    { "value": "3f2a1c9b7e4d5068a1b2c3d4e5f60718293a4b5c6d7e8f9012a3b4c5d6e7f801", "type": "sha256", "firstSeen": "2026-06-16T11:47:00Z", "confidence": 96, "campaignId": "c-fleet", "note": "GreyFerry loader, trojanised MSI" },
+    { "value": "9c1d4e7a2b5f8036c1d2e3f405162738495a6b7c8d9e0f1123a4b5c6d7e8f902", "type": "sha256", "firstSeen": "2026-07-04T02:11:00Z", "confidence": 88, "campaignId": "c-fleet", "note": "Second loader variant" }
+  ],
+  "malware": [
+    { "name": "GreyFerry loader", "family": "Loader", "firstSeen": "2026-06-16T11:47:00Z", "campaignId": "c-fleet", "behaviour": "Stops the endpoint agent, then retrieves a second stage over HTTPS" },
+    { "name": "wp2shell", "family": "Web shell", "firstSeen": "2026-06-20T04:30:00Z", "campaignId": "c-fleet", "behaviour": "Written to the web root of the fleet portal and used for command execution" },
+    { "name": "Onyx locker", "family": "Ransomware", "firstSeen": "2026-05-02T00:00:00Z", "campaignId": "c-onyx", "behaviour": "Exfiltrates before encrypting, then lists the victim on a leak site" }
+  ],
+  "detections": [
+    { "kind": "sigma", "name": "Web shell written to web root", "ref": "SIG-CPX-0113", "coverage": "File creation in a served directory by the application service account", "techniqueIds": ["T1505.003"] },
+    { "kind": "sigma", "name": "Endpoint agent service stopped by installer", "ref": "SIG-CPX-0121", "coverage": "Service stop originating from an MSI custom action", "techniqueIds": ["T1562.001"] },
+    { "kind": "sigma", "name": "Credential store read by a non-browser process", "ref": "SIG-CPX-0122", "coverage": "Credential access step, not the loader itself", "techniqueIds": ["T1555"] },
+    { "kind": "yara", "name": "GreyFerry loader", "ref": "YAR-CPX-0044", "coverage": "Both loader variants on disk. Does not match beacon traffic", "techniqueIds": ["T1195.002"] },
+    { "kind": "hunting", "name": "Fixed-interval HTTPS beacon", "ref": "HNT-CPX-0091", "coverage": "Outbound sessions with low jitter to a single destination", "techniqueIds": ["T1071"] },
+    { "kind": "hunting", "name": "MSI executed from a user download path", "ref": "HNT-CPX-0093", "coverage": "Installer runs outside the managed deployment path", "techniqueIds": ["T1195.002"] }
+  ],
+  "advisories": [
+    { "ref": "CPX-TIC-IA-2026-352", "title": "DPRK fleet software supply chain campaign", "type": "IA", "status": "in-review", "severity": "critical", "owner": "R. Menon", "updatedAt": "2026-08-02T03:10:00Z", "clientCount": 4, "sectors": ["Logistics and shipping", "Energy"] },
+    { "ref": "CPX-TIC-VA-2026-118", "title": "Unauthenticated RCE in fleet management portal", "type": "VA", "status": "in-review", "severity": "critical", "owner": "A. Haddad", "updatedAt": "2026-08-02T01:45:00Z", "clientCount": 3, "sectors": ["Logistics and shipping"] },
+    { "ref": "CPX-TIC-IA-2026-351", "title": "Banking credential harvesting in the UAE", "type": "IA", "status": "published", "severity": "high", "owner": "R. Menon", "updatedAt": "2026-07-28T09:00:00Z", "clientCount": 2, "sectors": ["Banking and finance"] },
+    { "ref": "CPX-TIC-IA-2026-349", "title": "Onyx Jackal extortion activity in the GCC", "type": "IA", "status": "published", "severity": "high", "owner": "S. Idris", "updatedAt": "2026-07-26T12:20:00Z", "clientCount": 2, "sectors": ["Logistics and shipping", "Healthcare"] },
+    { "ref": "CPX-TIC-DG-2026-0802", "title": "Daily threat digest", "type": "DG", "status": "draft", "severity": "medium", "owner": "CPX Automation", "updatedAt": "2026-08-02T04:00:00Z", "clientCount": 4, "sectors": [] }
+  ],
+  "investigations": [
+    { "id": "inv-1", "title": "Scope of the fleet agent compromise across client estates", "status": "in-progress", "owner": "A. Haddad", "openedAt": "2026-07-29T07:00:00Z", "findingId": "f-02" },
+    { "id": "inv-2", "title": "Confirm whether the named operator is a CPX client", "status": "awaiting-review", "owner": "S. Idris", "openedAt": "2026-07-31T06:15:00Z", "findingId": "f-03" },
+    { "id": "inv-3", "title": "Exposure check on the edge device management interface", "status": "in-progress", "owner": "R. Menon", "openedAt": "2026-07-20T09:30:00Z", "findingId": "f-05" },
+    { "id": "inv-4", "title": "Commodity loader containment review", "status": "closed", "owner": "A. Haddad", "openedAt": "2026-07-21T05:00:00Z", "findingId": "f-07" }
+  ],
+  "sectors": [
+    { "sector": "Logistics and shipping", "findings": 4, "clients": 3, "criticalFindings": 3 },
+    { "sector": "Energy", "findings": 3, "clients": 2, "criticalFindings": 1 },
+    { "sector": "Banking and finance", "findings": 2, "clients": 2, "criticalFindings": 0 },
+    { "sector": "Government", "findings": 1, "clients": 1, "criticalFindings": 0 },
+    { "sector": "Healthcare", "findings": 1, "clients": 1, "criticalFindings": 0 },
+    { "sector": "Telecom", "findings": 1, "clients": 1, "criticalFindings": 0 }
+  ],
+  "regions": [
+    { "label": "UAE", "value": 6 },
+    { "label": "GCC", "value": 4 },
+    { "label": "MENA", "value": 2 }
+  ],
+  "trend": [
+    { "date": "2026-07-04", "detections": 12, "indicators": 141 },
+    { "date": "2026-07-07", "detections": 9, "indicators": 128 },
+    { "date": "2026-07-10", "detections": 14, "indicators": 166 },
+    { "date": "2026-07-13", "detections": 11, "indicators": 152 },
+    { "date": "2026-07-16", "detections": 17, "indicators": 189 },
+    { "date": "2026-07-19", "detections": 15, "indicators": 174 },
+    { "date": "2026-07-22", "detections": 22, "indicators": 231 },
+    { "date": "2026-07-25", "detections": 19, "indicators": 208 },
+    { "date": "2026-07-28", "detections": 26, "indicators": 262 },
+    { "date": "2026-07-31", "detections": 24, "indicators": 244 },
+    { "date": "2026-08-02", "detections": 29, "indicators": 287 }
+  ],
+  "emergingThreats": [
+    { "title": "Vendor update channels used as an access route", "note": "Second regional case in eight weeks. Affects any client that accepts unsigned vendor updates.", "severity": "critical", "firstSeen": "2026-07-22T09:14:00Z" },
+    { "title": "Extortion groups naming GCC organisations publicly", "note": "Listing activity in the region has risen for three consecutive weeks.", "severity": "high", "firstSeen": "2026-07-14T00:00:00Z" },
+    { "title": "Edge management interfaces reachable from the internet", "note": "Found on one client estate; the same product is in use at two others.", "severity": "medium", "firstSeen": "2026-07-19T08:20:00Z" }
+  ],
+  "activity": [
+    { "at": "2026-08-02T03:10:00Z", "actor": "R. Menon", "action": "Submitted for review", "ref": "CPX-TIC-IA-2026-352" },
+    { "at": "2026-08-02T01:45:00Z", "actor": "A. Haddad", "action": "Submitted for review", "ref": "CPX-TIC-VA-2026-118" },
+    { "at": "2026-08-01T18:20:00Z", "actor": "S. Idris", "action": "Opened an investigation", "ref": "inv-2" },
+    { "at": "2026-07-31T15:05:00Z", "actor": "A. Haddad", "action": "Triaged 6 PIR hits" },
+    { "at": "2026-07-30T10:40:00Z", "actor": "R. Menon", "action": "Published", "ref": "CPX-TIC-IA-2026-351" }
+  ],
+  "sourceHealth": {
+    "total": 193,
+    "enabled": 182,
+    "failing": 4,
+    "silentUnexplained": 5,
+    "lastCollection": "2026-08-02T03:40:00Z"
+  }
+}

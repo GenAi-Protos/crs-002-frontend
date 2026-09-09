@@ -1,0 +1,75 @@
+[
+  {
+    "id": "CLT-003",
+    "name": "Gulf Capital Bank",
+    "sector": "Banking",
+    "region": "UAE",
+    "products": [
+      "Microsoft Exchange",
+      "Fortinet FortiOS 7.4",
+      "Oracle FLEXCUBE",
+      "VMware ESXi"
+    ],
+    "subscribedPirRefs": [
+      "PIR1",
+      "PIR6",
+      "PIR13",
+      "PIR14",
+      "PIR20",
+      "PIR22"
+    ],
+    "profileComplete": true
+  },
+  {
+    "id": "CLT-014",
+    "name": "Al Dhafra Logistics",
+    "sector": "Transport",
+    "region": "UAE",
+    "products": [
+      "SAP S/4HANA",
+      "Cisco IOS XE",
+      "WordPress"
+    ],
+    "subscribedPirRefs": [
+      "PIR3",
+      "PIR8",
+      "PIR13",
+      "PIR16",
+      "PIR22"
+    ],
+    "profileComplete": true
+  },
+  {
+    "id": "CLT-027",
+    "name": "Meridian Energy Group",
+    "sector": "Energy",
+    "region": "UAE",
+    "products": [
+      "WordPress",
+      "Microsoft Exchange",
+      "Fortinet FortiOS 7.4",
+      "Schneider EcoStruxure",
+      "VMware ESXi",
+      "Palo Alto PAN-OS"
+    ],
+    "subscribedPirRefs": [
+      "PIR1",
+      "PIR13",
+      "PIR14",
+      "PIR16"
+    ],
+    "profileComplete": true
+  },
+  {
+    "id": "CLT-041",
+    "name": "Falcon Aviation Services",
+    "sector": "Aviation",
+    "region": "GCC",
+    "products": [],
+    "subscribedPirRefs": [
+      "PIR1",
+      "PIR22"
+    ],
+    "profileComplete": false
+  }
+]

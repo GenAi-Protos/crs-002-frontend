@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme {
+  /* CPX 2026 core */
+  --color-cpx-purple: #1e1847;
+  --color-cpx-green: #4cee76;
+  --color-cpx-black: #040405;
+  --color-cpx-bright: #5c5cc0;
+  --color-cpx-grey: #333333;
+  --color-cpx-red: #ff3666;
+
+  /* Status: no amber exists in this palette */
+  --color-status-warn-fill: #ffd9e2;
+  --color-status-warn-ink: #c41e45;
+  --color-status-idle: #9f9f9f;
+  --color-green-contrast: #00873d;
+
+  /* Categorical chart slots, fixed order */
+  --color-cat-1: #5c5cc0;
+  --color-cat-2: #00873d;
+  --color-cat-3: #b5299e;
+  --color-cat-4: #2a78d6;
+  --color-cat-5: #d03b3b;
+  --color-cat-6: #0f9baf;
+
+  /* Sequential ramp on Dark Purple */
+  --color-seq-1: #edebf7;
+  --color-seq-2: #d5d1ee;
+  --color-seq-3: #b8b2e2;
+  --color-seq-4: #9a92d5;
+  --color-seq-5: #7c72c8;
+  --color-seq-6: #5c5cc0;
+  --color-seq-7: #46409b;
+  --color-seq-8: #2f2b72;
+  --color-seq-9: #1e1847;
+
+  --tracking-tightish: -0.01em;
+}
+
+@theme inline {
+  --font-sans: var(--font-unbounded), sans-serif;
+  --font-arabic: var(--font-plex-arabic), sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+html {
+  font-size: 15px;
+}
+
+body {
+  color: var(--color-cpx-black);
+  background: #fafafa;
+  font-weight: 300;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: var(--color-cpx-green);
+  color: var(--color-cpx-black);
+}
+
+/* Keyboard focus is always visible, in the secondary brand colour so it
+   never competes with the green CTA. */
+:focus-visible {
+  outline: 2px solid var(--color-cpx-bright);
+  outline-offset: 2px;
+}
+
+
+/* Preview is the PDF path: the browser writes the file from the previewed
+   markup, so what is checked and what is exported cannot drift apart. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-root,
+  .print-root * {
+    visibility: visible;
+  }
+  .print-root {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* CPX house radius: 2px everywhere, on everything. The console is a square
+   design and stays one; this softens the corner without rounding anything into
+   a pill. It sits in the base layer, so a deliberate utility still wins - the
+   rail markers and list bullets keep rounded-full. */
+@layer base {
+  button,
+  input,
+  select,
+  textarea,
+  dialog,
+  [role="menu"],
+  [role="dialog"] {
+    border-radius: 2px;
+  }
+
+  /* Cards, panels, dropdowns and dialogs are bordered surfaces. Matching the
+     bare `border` token catches them all without touching a single component. */
+  [class~="border"] {
+    border-radius: 2px;
+  }
+}

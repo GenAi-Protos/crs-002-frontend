@@ -1,0 +1,468 @@
+"use client";
+
+// Judge a client-facing artefact and release it. Default tab: Needs review.
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useConsoleUser } from "@/lib/role-context";
+import { assembleAdvisories, canSee, canWriteReports } from "@/lib/access";
+import { ADVISORIES } from "@/lib/fixtures";
+import type { Advisory, Client } from "@/lib/types";
+import {
+  downloadCsv,
+  ListMeta,
+  PageHeader,
+  SearchBox,
+  StatusPill,
+  Tabs,
+  type StatusTone,
+} from "@/components/ui";
+import { IconChevronDown, IconPlus } from "@/components/icons";
+import {
+  Clipped,
+  TypeBadge,
+  T_HEAD,
+  T_ROW,
+  T_TABLE,
+  T_TD,
+  T_TH,
+} from "@/components/table";
+import { gstDate } from "@/lib/format";
+import { archiveReport, createReport, createRfi, getDashboardData, getReports } from "@/lib/api";
+import { NewReportDialog } from "@/components/reports/NewReportDialog";
+import { RowActions } from "@/components/reports/RowActions";
+import { ReportPreview } from "@/components/reports/ReportPreview";
+import { exportReport, exportTemplate } from "@/lib/report-export";
+import { sectionsFrom, type ReportType } from "@/lib/report-templates";
+
+type TabKey = "review" | "drafts" | "published" | "all";
+
+const STATE_LABEL: Record<Advisory["status"], { label: string; tone: StatusTone }> = {
+  draft: { label: "Draft", tone: "idle" },
+  "in-review": { label: "In review", tone: "warn" },
+  published: { label: "Published", tone: "good" },
+  superseded: { label: "Superseded", tone: "idle" },
+  withdrawn: { label: "Withdrawn", tone: "idle" },
+  abandoned: { label: "Abandoned", tone: "idle" },
+  retracted: { label: "Retracted", tone: "critical" },
+  "did-not-run": { label: "Did not run", tone: "critical" },
+  archived: { label: "Archived", tone: "idle" },
+};
+
+// The badge is two letters; the tooltip is what they stand for.
+const TYPE_TITLE: Record<string, string> = {
+  IA: "Intelligence Advisory",
+  VA: "Vulnerability Advisory",
+  DG: "Daily Digest",
+  RFI: "Request for Information",
+};
+
+const yearOf = (a: Advisory) => new Date(a.createdAt).getUTCFullYear();
+
+export default function ReportsPage() {
+  const { user } = useConsoleUser();
+  const router = useRouter();
+  const [tab, setTab] = useState<TabKey>("review");
+  const [q, setQ] = useState("");
+  const [year, setYear] = useState("2026");
+  const [types, setTypes] = useState<Set<string>>(
+    new Set(["IA", "VA", "TAP", "DG", "RFI"]),
+  );
+  const [openRfi, setOpenRfi] = useState<string | null>(null);
+  const [showNew, setShowNew] = useState(false);
+  const [shown, setShown] = useState(50);
+  const [apiRows, setApiRows] = useState<Advisory[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  // Preview opens over the list as well as inside a report: judging a draft
+  // often means checking how it reads before opening it at all.
+  const [preview, setPreview] = useState<Advisory | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const writable = canWriteReports(user.role);
+
+  // Client names come from /dashboard, not /clients: Clients is a lead-analyst
+  // destination and an analyst reading Reports would be refused there.
+  useEffect(() => {
+    getReports(user.id).then(setApiRows).catch(() => setApiRows(ADVISORIES));
+    getDashboardData(user.id).then((d) => setClients(d.clients)).catch(() => setClients([]));
+  }, [user.id]);
+
+  const rows = useMemo(() => {
+    const assembled = assembleAdvisories(apiRows, user);
+    return assembled.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  }, [user, apiRows]);
+
+  // Duplicate creates a fresh draft carrying the same structure and content.
+  // The server issues the reference and resets the gate: a copy of a published
+  // advisory is not itself published.
+  const duplicate = async (a: Advisory) => {
+    try {
+      const created = await createReport(user.id, {
+        type: a.type as "IA" | "VA" | "DG" | "TAP",
+        title: `${a.title} (copy)`,
+        sections: a.sections,
+        template: a.template,
+      });
+      setApiRows((r) => [created, ...r]);
+      setNotice(`${created.ref} created as a draft.`);
+    } catch (e) {
+      setNotice((e as Error).message);
+    }
+  };
+
+  const archive = async (a: Advisory) => {
+    try {
+      await archiveReport(user.id, a.ref);
+      setApiRows((r) =>
+        r.map((x) => (x.ref === a.ref ? { ...x, status: "archived" } : x)),
+      );
+      setNotice(`${a.ref} archived.`);
+    } catch (e) {
+      setNotice((e as Error).message);
+    }
+  };
+
+  if (!canSee(user.role, "reports")) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
+        <p className="text-[14px] font-light">Not permitted at this access level.</p>
+        <Link href="/" className="text-[13px] text-cat-4 underline underline-offset-2">
+          Dashboard
+        </Link>
+      </div>
+    );
+  }
+
+  const byTab: Record<TabKey, (a: Advisory) => boolean> = {
+    review: (a) => a.status === "in-review",
+    drafts: (a) => a.status === "draft",
+    published: (a) =>
+      ["published", "superseded", "retracted", "did-not-run"].includes(a.status),
+    all: () => true,
+  };
+
+  const filtered = rows.filter(
+    (a) =>
+      byTab[tab](a) &&
+      String(yearOf(a)) === year &&
+      types.has(a.type) &&
+      (q === "" ||
+        a.title.toLowerCase().includes(q.toLowerCase()) ||
+        a.ref.toLowerCase().includes(q.toLowerCase())),
+  );
+  const visible = filtered.slice(0, shown);
+
+  const tabCount = (k: TabKey) =>
+    rows.filter((a) => byTab[k](a) && String(yearOf(a)) === year && types.has(a.type)).length;
+
+  const years = [...new Set(rows.map((a) => String(yearOf(a))))].sort().reverse();
+
+  return (
+    <div className="mx-auto max-w-[1400px] px-8 py-6">
+      <PageHeader
+        title="Reports"
+        action={
+          writable ? (
+            <button
+              onClick={() => setShowNew(true)}
+              className="flex h-8 items-center gap-1.5 bg-cpx-green px-3 text-[13px] font-medium text-cpx-black hover:brightness-95"
+            >
+              <IconPlus />
+              New report
+            </button>
+          ) : undefined
+        }
+      />
+
+      {!(user.role === "sales" || user.role === "leadership" || user.role === "incident-responder") ? (
+        <Tabs<TabKey>
+          tabs={[
+            { key: "review", label: "Needs review", count: tabCount("review") },
+            { key: "drafts", label: "Drafts", count: tabCount("drafts") },
+            { key: "published", label: "Published", count: tabCount("published") },
+            { key: "all", label: "All", count: tabCount("all") },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
+      ) : (
+        <PublishedOnlyTab onSelect={() => setTab("published")} />
+      )}
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <SearchBox value={q} onChange={setQ} className="w-72" />
+        <select
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+          aria-label="Year"
+          className="h-8 border border-black/15 bg-white px-2 text-[13px] font-light focus:outline-none"
+        >
+          {years.map((y) => (
+            <option key={y}>{y}</option>
+          ))}
+        </select>
+        <div className="flex gap-1">
+          {(["IA", "VA", "TAP", "DG", "RFI"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => {
+                const next = new Set(types);
+                if (next.has(t)) next.delete(t);
+                else next.add(t);
+                setTypes(next);
+              }}
+              className={`h-8 px-2.5 text-[12px] ${
+                types.has(t)
+                  ? "bg-cpx-purple font-medium text-white"
+                  : "border border-black/15 font-light text-cpx-grey"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <div className="flex-1" />
+        <ListMeta
+          shown={visible.length}
+          total={filtered.length}
+          sort="Newest first"
+          onExport={() =>
+            downloadCsv(
+              "reports.csv",
+              ["Ref", "Type", "Title", "Owner", "State", "Created"],
+              filtered.map((a) => [
+                a.ref,
+                a.type,
+                a.title,
+                a.owner ?? "",
+                a.status,
+                gstDate(a.createdAt),
+              ]),
+            )
+          }
+        />
+      </div>
+
+      <div className="mt-4 overflow-x-auto">
+      <table className={`${T_TABLE} min-w-[52rem] bg-white text-[13px]`}>
+        <colgroup>
+          <col className="w-52" />
+          <col className="w-24" />
+          <col />
+          <col className="w-32" />
+          <col className="w-36" />
+          <col className="w-10" />
+        </colgroup>
+        <thead>
+          <tr className={T_HEAD}>
+            <th scope="col" className={T_TH}>Ref</th>
+            <th scope="col" className={T_TH}>Type</th>
+            <th scope="col" className={T_TH}>Title</th>
+            <th scope="col" className={T_TH}>Owner</th>
+            <th scope="col" className={T_TH}>State</th>
+            <th className={T_TH}>
+              <span className="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {visible.length === 0 && (
+            <tr>
+              <td colSpan={6} className="px-3 py-8 text-center font-light">
+                <span className="font-medium">0 reports</span> matched
+              </td>
+            </tr>
+          )}
+          {visible.map((a) => {
+            const ghost = ["withdrawn", "abandoned"].includes(a.status);
+            const st = STATE_LABEL[a.status];
+            const rfiOpen = openRfi === a.ref;
+            return (
+              <RowGroup key={a.ref}>
+                <tr
+                  onClick={() =>
+                    a.type === "RFI"
+                      ? setOpenRfi(rfiOpen ? null : a.ref)
+                      : router.push(`/reports/${encodeURIComponent(a.ref)}`)
+                  }
+                  className={`${T_ROW} cursor-pointer ${ghost ? "opacity-45" : ""}`}
+                >
+                  <td className={`${T_TD} whitespace-nowrap font-mono text-[12px]`}>
+                    {a.type === "RFI" ? (
+                      <button
+                        onClick={() => setOpenRfi(rfiOpen ? null : a.ref)}
+                        className="flex items-center gap-1"
+                      >
+                        {a.ref}
+                        <IconChevronDown className={rfiOpen ? "rotate-180" : ""} />
+                      </button>
+                    ) : (
+                      <Link
+                        href={`/reports/${encodeURIComponent(a.ref)}`}
+                        className="text-cat-4 underline underline-offset-2"
+                      >
+                        {a.ref}
+                      </Link>
+                    )}
+                  </td>
+                  <td className={T_TD}>
+                    <TypeBadge label={a.type} title={TYPE_TITLE[a.type] ?? a.type} />
+                  </td>
+                  {/* One line, with the whole title in the tooltip. */}
+                  <td className={`${T_TD} max-w-0 font-light`}>
+                    <Clipped
+                      text={
+                        ghost
+                          ? `${a.title} (${a.withdrawnReason ?? a.status})`
+                          : a.title
+                      }
+                    />
+                  </td>
+                  <td className={`${T_TD} font-light`}>
+                    <Clipped text={a.owner ?? "-"} />
+                  </td>
+                  <td className={T_TD}>
+                    {a.type === "RFI" && a.rfi && a.status !== "published" ? (
+                      <span className="font-light">
+                        In progress, {a.rfi.steps.filter((s) => s.done).length} of{" "}
+                        {a.rfi.steps.length} done
+                      </span>
+                    ) : (
+                      <StatusPill tone={st.tone} label={st.label} />
+                    )}
+                  </td>
+                  <td
+                    className={`${T_TD} py-1`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <RowActions
+                      advisory={a}
+                      writable={writable}
+                      onView={() => router.push(`/reports/${encodeURIComponent(a.ref)}`)}
+                      onEdit={() => router.push(`/reports/${encodeURIComponent(a.ref)}`)}
+                      onPreview={() => setPreview(a)}
+                      onDuplicate={() => duplicate(a)}
+                      onExportReport={(f) =>
+                        exportReport(a, f, () => setPreview(a))
+                      }
+                      onExportTemplate={(f) =>
+                        exportTemplate(a.type as ReportType, f, () => setPreview(a))
+                      }
+                      onArchive={() => archive(a)}
+                    />
+                  </td>
+                </tr>
+                {a.type === "RFI" && rfiOpen && a.rfi && (
+                  <tr className="border-b border-black/5 bg-black/[0.02]">
+                    <td colSpan={6} className="px-6 py-3">
+                      <p className="text-[12px] font-light text-cpx-grey">
+                        {a.rfi.requester} · due {gstDate(a.rfi.dueAt)} ·{" "}
+                        {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
+                      </p>
+                      <p className="mt-1 text-[13px] font-light">{a.rfi.question}</p>
+                      <ul className="mt-2 space-y-1">
+                        {a.rfi.steps.map((s) => (
+                          <li key={s.label} className="flex items-center gap-2 text-[12.5px]">
+                            <span
+                              className={`flex h-4 w-4 items-center justify-center text-[10px] ${s.done ? "bg-green-contrast text-white" : "border border-black/20"}`}
+                            >
+                              {s.done ? "✓" : ""}
+                            </span>
+                            <span className="font-light">{s.label}</span>
+                            {s.investigationId && (
+                              <Link
+                                href={`/intelligence/${s.investigationId}`}
+                                className="text-cat-4 underline underline-offset-2"
+                              >
+                                Conversation
+                              </Link>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                  </tr>
+                )}
+              </RowGroup>
+            );
+          })}
+        </tbody>
+      </table>
+      </div>
+      {filtered.length > shown && (
+        <button
+          onClick={() => setShown(shown + 50)}
+          className="mt-3 border border-black/15 px-3 py-1.5 text-[12px] font-light hover:bg-black/5"
+        >
+          Show more
+        </button>
+      )}
+
+      {showNew && (
+        <NewReportDialog
+          clients={clients}
+          onClose={() => setShowNew(false)}
+          onCreateRfi={async (draft) => {
+            // The server issues the ref, sets the status and attaches the gate.
+            const filed = await createRfi(user.id, draft);
+            setApiRows((r) => [filed, ...r]);
+            setShowNew(false);
+          }}
+          onCreateReport={async (type, title, choice) => {
+            // The template was chosen and previewed a step earlier; the sections
+            // come from whichever one it was, standard or uploaded.
+            const created = await createReport(user.id, {
+              type: type as "IA" | "VA" | "DG" | "TAP",
+              title,
+              sections: sectionsFrom(choice.sections),
+              template: { kind: choice.kind, name: choice.name },
+            });
+            setApiRows((r) => [created, ...r]);
+            setShowNew(false);
+            router.push(`/reports/${encodeURIComponent(created.ref)}`);
+          }}
+        />
+      )}
+
+      {preview && (
+        <ReportPreview
+          advisory={preview}
+          onClose={() => setPreview(null)}
+          onPrint={() => window.print()}
+        />
+      )}
+
+      {notice && (
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-black/10 bg-white px-4 py-2 text-[12.5px] font-light shadow-sm">
+          {notice}
+          <button
+            onClick={() => setNotice(null)}
+            className="ml-3 text-cpx-grey hover:text-cpx-black"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RowGroup({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
+
+function PublishedOnlyTab({ onSelect }: { onSelect: () => void }) {
+  // Published-only roles get a single fixed tab; the payload is already filtered.
+  useEffect(() => {
+    onSelect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <div className="flex items-end gap-1 border-b border-black/10">
+      <span className="-mb-px border-b-2 border-cpx-purple px-3 py-2 text-[13px] font-medium text-cpx-purple">
+        Published
+      </span>
+    </div>
+  );
+}

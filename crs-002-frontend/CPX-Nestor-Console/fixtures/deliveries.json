@@ -1,0 +1,162 @@
+[
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-322",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-03-03T10:41:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-330",
+    "advisoryVersion": 1,
+    "clientId": "CLT-014",
+    "sentAt": "2026-03-28T09:32:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-336",
+    "advisoryVersion": 1,
+    "clientId": "CLT-003",
+    "sentAt": "2026-04-22T11:25:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-340",
+    "advisoryVersion": 1,
+    "clientId": "CLT-003",
+    "sentAt": "2026-05-17T10:53:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-340",
+    "advisoryVersion": 1,
+    "clientId": "CLT-014",
+    "sentAt": "2026-05-17T10:16:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-340",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-05-17T09:34:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-344",
+    "advisoryVersion": 1,
+    "clientId": "CLT-003",
+    "sentAt": "2026-06-11T10:06:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-344",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-06-11T10:32:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2026-347",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-07-26T11:40:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-VA-2026-095",
+    "advisoryVersion": 1,
+    "clientId": "CLT-003",
+    "sentAt": "2026-03-16T11:33:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-VA-2026-095",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-03-16T09:39:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-VA-2026-102",
+    "advisoryVersion": 1,
+    "clientId": "CLT-014",
+    "sentAt": "2026-05-30T09:33:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-VA-2026-102",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-05-30T10:06:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-VA-2026-106",
+    "advisoryVersion": 1,
+    "clientId": "CLT-003",
+    "sentAt": "2026-06-24T09:29:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-VA-2026-106",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-06-24T11:32:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-VA-2026-110",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-08-01T10:34:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2025-233",
+    "advisoryVersion": 2,
+    "clientId": "CLT-003",
+    "sentAt": "2025-07-20T11:27:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-IA-2025-259",
+    "advisoryVersion": 1,
+    "clientId": "CLT-014",
+    "sentAt": "2025-08-18T09:25:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-DG-2026-0801",
+    "advisoryVersion": 1,
+    "clientId": "CLT-003",
+    "sentAt": "2026-08-01T03:30:00Z",
+    "channel": "CPX secure mail",
+    "format": "pdf"
+  },
+  {
+    "advisoryRef": "CPX-TIC-DG-2026-0801",
+    "advisoryVersion": 1,
+    "clientId": "CLT-027",
+    "sentAt": "2026-08-01T03:30:00Z",
+    "channel": "CPX secure mail",
+    "format": "json"
+  }
+]

@@ -1,0 +1,6074 @@
+[
+ {
+  "ref": "CPX-TIC-TAP-2026-001",
+  "type": "TAP",
+  "version": 1,
+  "title": "Moonlit Sirocco",
+  "tlp": "AMBER",
+  "status": "in-review",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR1",
+   "PIR9"
+  ],
+  "clientIds": [
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Moonlit Sirocco is tracked against intrusions into Gulf energy operators. This profile consolidates what CPX holds on the actor's objectives, tradecraft, infrastructure and targeting, and states where the picture is incomplete.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-threat-actor-overview",
+    "heading": "Threat Actor Overview",
+    "body": "Tracked by CPX as Moonlit Sirocco. Aliases carried by vendors differ and are recorded with the vendor that assigned each; no two vendor names are merged automatically. Attribution is assessed at moderate confidence on overlapping infrastructure and tooling, not on a state claim.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-objectives",
+    "heading": "Objectives",
+    "body": "Assessed as collection against operational technology programmes in the regional energy sector. Motivation beyond collection is not evidenced in what CPX holds and is not asserted here.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-modus-operandi",
+    "heading": "Modus Operandi",
+    "body": "Initial access through internet-facing application exploitation and targeted phishing. Execution through scripting interpreters, then credential access and lateral movement toward engineering workstations. Activity has been observed in short, dense windows rather than continuous presence.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-capabilities",
+    "heading": "Capabilities",
+    "body": "Commodity loaders paired with a bespoke backdoor observed in the reported activity window. Living-off-the-land execution is preferred over dropped tooling once access is held.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-infrastructure",
+    "heading": "Infrastructure",
+    "body": "Staging over rented virtual hosts with short lifetimes, and command-and-control over domains registered days before use. Indicators are held raw and render defanged.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-targeted-industries-and-victims",
+    "heading": "Targeted Industries and Victims",
+    "body": "Energy and utilities across the Gulf region, with observed victims in the UAE. Sectors named without an observed victim are a targeting signal drawn from actor tooling and lures, and are labelled as such rather than reported as compromise.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-diamond-model-analysis",
+    "heading": "Diamond Model Analysis",
+    "body": "The four vertices and the relationships between them, from the evidence held at the time of writing.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-mitre-att-ck-mapping",
+    "heading": "MITRE ATT&CK Mapping",
+    "body": "Techniques observed in the reported activity window, resolved against the held ATT&CK table.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-key-findings-and-assessment",
+    "heading": "Key Findings and Assessment",
+    "body": "The actor's infrastructure turnover is faster than its tooling turnover, so detection built on tooling has held longer than detection built on indicators. Assessed at moderate confidence.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Prioritise patching of internet-facing applications in the estate. Hunt for scripting-interpreter execution on engineering workstations. Treat the indicator set as short-lived and prefer behavioural detection.",
+    "generated": true,
+    "derivedFrom": "citation",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0003",
+    "techniqueId": "T1505.003",
+    "techniqueName": "Web Shell",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "diamond": {
+   "adversary": "Moonlit Sirocco. Attribution assessed at moderate confidence on infrastructure and tooling overlap. No state sponsor is asserted.",
+   "capability": "Commodity loaders, a bespoke backdoor, and living-off-the-land execution once access is held.",
+   "infrastructure": "Short-lifetime rented virtual hosts for staging; command-and-control domains registered days before use.",
+   "victim": "Energy and utilities operators in the Gulf region, with observed victims in the UAE.",
+   "edges": [
+    {
+     "source": "adversary",
+     "target": "capability",
+     "label": "The bespoke backdoor has been seen only in activity attributed to this actor."
+    },
+    {
+     "source": "capability",
+     "target": "infrastructure",
+     "label": "The backdoor beacons to the short-lived domains rather than to fixed addresses."
+    },
+    {
+     "source": "infrastructure",
+     "target": "victim",
+     "label": "Staging hosts were reached from victim engineering networks during the activity window."
+    },
+    {
+     "source": "adversary",
+     "target": "victim",
+     "label": "Targeting of regional energy operators is consistent across every intrusion held."
+    }
+   ]
+  },
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": false,
+    "blocking": true,
+    "anchorSectionId": "sec-key-findings-and-assessment"
+   }
+  ],
+  "sendBacks": [],
+  "template": {
+   "kind": "standard",
+   "name": "Threat Actor Profile"
+  },
+  "createdAt": "2026-08-03T07:20:00Z"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0802",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 2 Aug 2026",
+  "tlp": "GREEN",
+  "status": "published",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-1",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 25,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-02T09:00:00Z"
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-08-02T05:00:00Z",
+  "publishedAt": "2026-08-02T09:00:00Z",
+  "approvedAt": "2026-08-02T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0801",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 1 Aug 2026",
+  "tlp": "GREEN",
+  "status": "published",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-2",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 22,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-08-01T05:00:00Z",
+  "publishedAt": "2026-08-01T09:00:00Z",
+  "approvedAt": "2026-08-01T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0731",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 31 Jul 2026",
+  "tlp": "GREEN",
+  "status": "published",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-3",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 24,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-31T09:00:00Z"
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-31T05:00:00Z",
+  "publishedAt": "2026-07-31T09:00:00Z",
+  "approvedAt": "2026-07-31T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0730",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 30 Jul 2026",
+  "tlp": "GREEN",
+  "status": "published",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-4",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 21,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-30T09:00:00Z"
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-30T05:00:00Z",
+  "publishedAt": "2026-07-30T09:00:00Z",
+  "approvedAt": "2026-07-30T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0729",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 29 Jul 2026",
+  "tlp": "GREEN",
+  "status": "did-not-run",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-5",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 17,
+      "urlSafe": false
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-29T05:00:00Z"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0728",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 28 Jul 2026",
+  "tlp": "GREEN",
+  "status": "published",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-6",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 29,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-28T09:00:00Z"
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-28T05:00:00Z",
+  "publishedAt": "2026-07-28T09:00:00Z",
+  "approvedAt": "2026-07-28T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0727",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 27 Jul 2026",
+  "tlp": "GREEN",
+  "status": "published",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-7",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 51,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-27T09:00:00Z"
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-27T05:00:00Z",
+  "publishedAt": "2026-07-27T09:00:00Z",
+  "approvedAt": "2026-07-27T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-DG-2026-0726",
+  "type": "DG",
+  "version": 1,
+  "title": "Daily Threat Digest, 26 Jul 2026",
+  "tlp": "GREEN",
+  "status": "published",
+  "pirRefs": [
+   "PIR17",
+   "PIR22",
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027",
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-digest",
+    "heading": "Daily Threat Digest",
+    "body": "Machine-generated digest of the last 24 hours of held reporting, grouped by PIR category. This document is produced without analyst review.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": [
+     {
+      "id": "cit-8",
+      "ref": 1,
+      "label": "Held corpus, last 24 hours",
+      "recordCount": 19,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-26T09:00:00Z"
+     }
+    ]
+   }
+  ],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-26T05:00:00Z",
+  "publishedAt": "2026-07-26T09:00:00Z",
+  "approvedAt": "2026-07-26T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-322",
+  "type": "IA",
+  "version": 1,
+  "title": "Moonlit Sirocco intrusions against Gulf energy operators",
+  "tlp": "RED",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR1",
+   "PIR9"
+  ],
+  "clientIds": [
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Moonlit Sirocco intrusions against Gulf energy operators. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-9",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-03T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-10",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-03T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-11",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-03T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-12",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-03T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "update.wp2shell-cdn.com\nportal-update.ae-gov-services.com\n112.83.167.44\n28b624ff67c5ab9082ec8fd41fc9a84d\nvpn-fortigate-patch.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-13",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-03T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0003",
+    "techniqueId": "T1505.003",
+    "techniqueName": "Web Shell",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-02-28T05:00:00Z",
+  "publishedAt": "2026-03-03T09:00:00Z",
+  "approvedAt": "2026-03-03T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-330",
+  "type": "IA",
+  "version": 1,
+  "title": "Trojanised invoice campaign delivering AsyncRAT",
+  "tlp": "GREEN",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR6"
+  ],
+  "clientIds": [
+   "CLT-014"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Trojanised invoice campaign delivering AsyncRAT. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-14",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-28T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-15",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-28T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-16",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-28T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-17",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-28T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "69.152.148.162\n235c9ab79231ea846f951af28b09d8b2\ndocs-share.gulfcap-verify.net\nassets.dhafra-tracking.com\n91.104.183.229\ncdn.invoice-relay.net\n157.116.35.92\nportal-update.ae-gov-services.com\n172.68.200.103\nvpn-fortigate-patch.com\nmail.gulfcap-secure.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-18",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 11,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-28T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-03-25T05:00:00Z",
+  "publishedAt": "2026-03-28T09:00:00Z",
+  "approvedAt": "2026-03-28T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-336",
+  "type": "IA",
+  "version": 1,
+  "title": "Credential marketplace activity naming regional banks",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR20",
+   "PIR21"
+  ],
+  "clientIds": [
+   "CLT-003"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Credential marketplace activity naming regional banks. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-19",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-04-22T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-20",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2026-04-22T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-21",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2026-04-22T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-22",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2026-04-22T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "vpn-fortigate-patch.com\nupdate.wp2shell-cdn.com\n055ca7e801d09aac9302e7f23be904db\n168.194.167.105\ntelemetry.fleetsync-cdn.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-23",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2026-04-22T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-04-19T05:00:00Z",
+  "publishedAt": "2026-04-22T09:00:00Z",
+  "approvedAt": "2026-04-22T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-340",
+  "type": "IA",
+  "version": 1,
+  "title": "Watering hole cluster on regional news portals",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR23"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-014",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Watering hole cluster on regional news portals. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-24",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-17T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-25",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-17T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-26",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-17T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-27",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-17T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "docs-share.gulfcap-verify.net\ncheckout-meridian.support\ncdn.invoice-relay.net\n128.118.30.227\nassets.dhafra-tracking.com\nb83064d0dd24d69361bcaa166bcd804f\nmail.gulfcap-secure.com\n74.137.82.207\ncec90ff2ea1114f7660d86ccc11add1d",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-28",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 9,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-17T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-05-14T05:00:00Z",
+  "publishedAt": "2026-05-17T09:00:00Z",
+  "approvedAt": "2026-05-17T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-344",
+  "type": "IA",
+  "version": 1,
+  "title": "Hacktivist DDoS wave announced against Gulf targets",
+  "tlp": "RED",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR19"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Hacktivist DDoS wave announced against Gulf targets. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-29",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-11T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-30",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-11T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-31",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-11T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-32",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-11T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "164.14.80.45\nassets.dhafra-tracking.com\ncheckout-meridian.support\n7224b073a5735802df69c6a5559660db\n189.180.198.244\n165.113.97.64",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-33",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-11T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-06-08T05:00:00Z",
+  "publishedAt": "2026-06-11T09:00:00Z",
+  "approvedAt": "2026-06-11T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-347",
+  "type": "IA",
+  "version": 1,
+  "title": "Ransomware listing of a GCC industrial group",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR22"
+  ],
+  "clientIds": [
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Ransomware listing of a GCC industrial group. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-34",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-26T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-35",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-26T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-36",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-26T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-37",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-26T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "172.137.125.48\n182.146.8.177\n167.162.9.44\n37a0bd6e8d9e02953800fe16054e125b\n88.80.65.84\ndocs-share.gulfcap-verify.net\nmail.gulfcap-secure.com\na8e8bf995e4abd41f9f3c4283148cdbf\nvpn-fortigate-patch.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-38",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 9,
+      "urlSafe": false,
+      "snapshotAt": "2026-07-26T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0003",
+    "techniqueId": "T1505.003",
+    "techniqueName": "Web Shell",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0005",
+    "techniqueId": "T1562.001",
+    "techniqueName": "Disable or Modify Tools",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-24T05:00:00Z",
+  "publishedAt": "2026-07-26T09:00:00Z",
+  "approvedAt": "2026-07-26T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-348",
+  "type": "IA",
+  "version": 1,
+  "title": "Smishing surge impersonating parcel carriers",
+  "tlp": "AMBER",
+  "status": "in-review",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR10"
+  ],
+  "clientIds": [
+   "CLT-003"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Smishing surge impersonating parcel carriers. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-39",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-40",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-41",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-42",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "567ff5915948eadaa2b2c771aebb15f7\nf28edaa817f462661edc51a16141d184\n49.73.12.42\nupdate.wp2shell-cdn.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-43",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 4,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-27T05:00:00Z"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-349",
+  "type": "IA",
+  "version": 1,
+  "title": "Duplicate: ransomware listing of a GCC industrial group",
+  "tlp": "AMBER",
+  "status": "withdrawn",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR22"
+  ],
+  "clientIds": [
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Duplicate: ransomware listing of a GCC industrial group. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-44",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-45",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-46",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-47",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "c980f033a4cda6b8370c7f399ab0655d\n6a3b5740fece0fce466b321b383088aa\ntelemetry.fleetsync-cdn.com\nmail.gulfcap-secure.com\n53.217.210.213\nupdate.wp2shell-cdn.com\ncdn.invoice-relay.net\n88.97.170.140\n103.187.201.136\n193.14.180.167",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-48",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 10,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-25T05:00:00Z",
+  "withdrawnReason": "Duplicate of CPX-TIC-IA-2026-347"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-350",
+  "type": "IA",
+  "version": 1,
+  "title": "EDR-killer tooling adopted by tracked regional actor",
+  "tlp": "GREEN",
+  "status": "in-review",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR5"
+  ],
+  "clientIds": [
+   "CLT-014",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "EDR-killer tooling adopted by tracked regional actor. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-49",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-50",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-51",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-52",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "f81cd9c504889d5130747ffa47a7f86d\nbb59709c3b973c4613c422c113072b6e\n53.38.213.44\ncheckout-meridian.support\nupdate.wp2shell-cdn.com\n5804b075cb41b06c1661f7dc60d54037",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-53",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 6,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [
+   {
+    "at": "2026-07-31T11:00:00Z",
+    "by": "Sara Haddad",
+    "reason": "missing-citation"
+   }
+  ],
+  "createdAt": "2026-07-29T05:00:00Z"
+ },
+ {
+  "ref": "CPX-TIC-IA-2026-351",
+  "type": "IA",
+  "version": 1,
+  "title": "Infostealer wave seeded through UAE job portals",
+  "tlp": "AMBER",
+  "status": "draft",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR7"
+  ],
+  "clientIds": [],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Infostealer wave seeded through UAE job portals. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-54",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-55",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-56",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-57",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "vpn-fortigate-patch.com\n317d1e1be91aa551319085b73c9ff420\ntelemetry.fleetsync-cdn.com\n380391b93f38754635a0605714e930a8",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-58",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 4,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-08-01T05:00:00Z"
+ },
+ {
+  "ref": "CPX-TIC-VA-2026-095",
+  "type": "VA",
+  "version": 1,
+  "title": "FortiOS SSL-VPN heap overflow exploited in the wild",
+  "tlp": "RED",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR13"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "FortiOS SSL-VPN heap overflow exploited in the wild. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-59",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-16T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-60",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-16T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-61",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-16T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-62",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-16T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-63",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-16T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "portal-update.ae-gov-services.com\n8675cccc2ded6a1b8168479dde0f1faa\n78.177.28.100\n397b93dc2dd9f2503f454c5e037ce726\n155.15.140.164\ntelemetry.fleetsync-cdn.com\n144.83.32.229\nb627c664bfb6fbb324dfd103170f064e\n57.198.44.60\n2256d5e03f58155db2ce54518aca3599\n5fe5d8037a2c1db3d025b87498078355\n22dab075a1371cfbae5d779585554cc8",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-64",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 12,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-16T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-65",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2026-03-16T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2026-24771",
+    "value": 8.6,
+    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:L",
+    "source": "Fortinet PSIRT",
+    "authorityClass": "cna",
+    "assessedAt": "2026-07-03T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-03-15T05:00:00Z",
+  "publishedAt": "2026-03-16T09:00:00Z",
+  "approvedAt": "2026-03-16T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2026-102",
+  "type": "VA",
+  "version": 1,
+  "title": "wp2shell remote code execution in WordPress themes",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR13",
+   "PIR14"
+  ],
+  "clientIds": [
+   "CLT-014",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "wp2shell remote code execution in WordPress themes. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-66",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-67",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-68",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-69",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 9,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-70",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "60.112.40.175\nassets.dhafra-tracking.com\n91.28.210.53\n191.37.191.207\nportal-update.ae-gov-services.com\n116.18.135.121\ncdn.invoice-relay.net\n83.194.198.182\n85ccaccf93e4a39986c31c0856f8d963\n97.194.77.78\nmail.gulfcap-secure.com\n184.141.54.238\naab37dc0e298a38ab6b99c47e088d62c\n825ba83d5e227b934e47d0bd4ae56091",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-71",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 14,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-72",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2026-05-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2026-30991",
+    "value": 9.8,
+    "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "source": "WPScan",
+    "authorityClass": "vendor",
+    "assessedAt": "2026-07-13T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-05-29T05:00:00Z",
+  "publishedAt": "2026-05-30T09:00:00Z",
+  "approvedAt": "2026-05-30T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2026-106",
+  "type": "VA",
+  "version": 1,
+  "title": "Exchange out-of-band patch for actively exploited flaw",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR24"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Exchange out-of-band patch for actively exploited flaw. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-73",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-24T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-74",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-24T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-75",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-24T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-76",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-24T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-77",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-24T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "106.132.35.231\n167.26.230.20\nportal-update.ae-gov-services.com\nmail.gulfcap-secure.com\nassets.dhafra-tracking.com\nupdate.wp2shell-cdn.com\ncheckout-meridian.support\n2cdc0e23af7e7e7dde8636f7aa308f2c\ndc92eaf244ae85dbde153a4757aee622\ndocs-share.gulfcap-verify.net",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-78",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 10,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-24T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-79",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2026-06-24T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2026-31414",
+    "value": 9.1,
+    "source": "MSRC",
+    "authorityClass": "cna",
+    "assessedAt": "2026-07-18T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-06-23T05:00:00Z",
+  "publishedAt": "2026-06-24T09:00:00Z",
+  "approvedAt": "2026-06-24T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2026-110",
+  "type": "VA",
+  "version": 1,
+  "title": "PAN-OS management interface authentication bypass",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR14"
+  ],
+  "clientIds": [
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "PAN-OS management interface authentication bypass. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-80",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-81",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-82",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-83",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-84",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "cdn.invoice-relay.net\ncheckout-meridian.support\n2538646e8394e4fc493b086824a1d262\nvpn-fortigate-patch.com\n174.130.131.21",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-85",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-86",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2026-08-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2026-32155",
+    "value": 8.8,
+    "source": "Palo Alto PSIRT",
+    "authorityClass": "cna",
+    "assessedAt": "2026-07-22T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-31T05:00:00Z",
+  "publishedAt": "2026-08-01T09:00:00Z",
+  "approvedAt": "2026-08-01T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2026-114",
+  "type": "VA",
+  "version": 1,
+  "title": "SAP NetWeaver deserialisation flaw weaponised",
+  "tlp": "GREEN",
+  "status": "in-review",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR14"
+  ],
+  "clientIds": [
+   "CLT-014"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "SAP NetWeaver deserialisation flaw weaponised. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-87",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-88",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-89",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-90",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-91",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "72.151.185.242\n28e66713375654dba68471bab13f3f0d\ncheckout-meridian.support\n162.76.5.22\n80fe3bac320292d80fda0f3ce1d841b0\nassets.dhafra-tracking.com\n4e499ffb1fd9413e810c446d5e4aeb20\n190.159.28.54\n0e13f889c97eeceb8e0db0805111248d\n76.139.144.27\nvpn-fortigate-patch.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-92",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 11,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-93",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2026-33021",
+    "value": 9.4,
+    "source": "SAP Security Notes",
+    "authorityClass": "cna",
+    "assessedAt": "2026-07-30T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-30T05:00:00Z"
+ },
+ {
+  "ref": "CPX-TIC-VA-2026-117",
+  "type": "VA",
+  "version": 1,
+  "title": "ESXi unauthenticated RCE chain, no public exploit",
+  "tlp": "GREEN",
+  "status": "in-review",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR15"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "ESXi unauthenticated RCE chain, no public exploit. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-94",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-95",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-96",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-97",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 9,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-98",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "vpn-fortigate-patch.com\nportal-update.ae-gov-services.com\nupdate.wp2shell-cdn.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-99",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 3,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-100",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2026-33307",
+    "value": 9.3,
+    "source": "Broadcom",
+    "authorityClass": "vendor",
+    "assessedAt": "2026-07-31T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2026-07-31T05:00:00Z"
+ },
+ {
+  "ref": "CPX-TIC-IA-2025-201",
+  "type": "IA",
+  "version": 1,
+  "title": "Initial analysis: GCC bank credential phishing wave",
+  "tlp": "AMBER",
+  "status": "superseded",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR9"
+  ],
+  "clientIds": [
+   "CLT-003"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Initial analysis: GCC bank credential phishing wave. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-101",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-102",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 9,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-103",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-104",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "b8e649c5b6aaaddbd053a8a7ed3dbb89\nb403cda2f8bc49940c500ac5eb3884c1\n98.201.250.149",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-105",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-30T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "supersededBy": "CPX-TIC-IA-2025-233",
+  "createdAt": "2025-06-28T05:00:00Z",
+  "publishedAt": "2025-06-30T09:00:00Z",
+  "approvedAt": "2025-06-30T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2025-233",
+  "type": "IA",
+  "version": 2,
+  "title": "GCC bank credential phishing wave, revised attribution",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR9"
+  ],
+  "clientIds": [
+   "CLT-003"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "GCC bank credential phishing wave, revised attribution. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-106",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-20T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-107",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-20T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-108",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-20T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-109",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-20T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "checkout-meridian.support\nupdate.wp2shell-cdn.com\ncdn.invoice-relay.net\n66.116.38.243\ne033c63d6f053d35e495bbae04343005\n160.93.167.2\nportal-update.ae-gov-services.com\n178.185.73.38\n163a40e219607cef5b2c12f2685651c6\nd0299e3a6dc158a9979f9d8e3d3488a3",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-110",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 10,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-20T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "supersedes": "CPX-TIC-IA-2025-201",
+  "createdAt": "2025-07-18T05:00:00Z",
+  "publishedAt": "2025-07-20T09:00:00Z",
+  "approvedAt": "2025-07-20T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2025-187",
+  "type": "IA",
+  "version": 1,
+  "title": "Seasonal scam campaigns around UAE public holidays",
+  "tlp": "GREEN",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR10"
+  ],
+  "clientIds": [],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Seasonal scam campaigns around UAE public holidays. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-111",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-10T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-112",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-10T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-113",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-10T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-114",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-10T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "d49350f317cca3d7e1f7b4d337b759f9\n114.53.153.50\n178.74.194.86\n169.97.178.153\ncdn.invoice-relay.net\nassets.dhafra-tracking.com\n6c274fb87df47c28b93b8db5f61adc48",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-115",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2025-06-10T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2025-06-08T05:00:00Z",
+  "publishedAt": "2025-06-10T09:00:00Z",
+  "approvedAt": "2025-06-10T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2025-259",
+  "type": "IA",
+  "version": 1,
+  "title": "Botnet resurgence across Gulf hosting providers",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR7"
+  ],
+  "clientIds": [
+   "CLT-014"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Botnet resurgence across Gulf hosting providers. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-116",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-18T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-117",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-18T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-118",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-18T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-119",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-18T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "b77413cb0a98f9cf254c1e652434300b\nf76ae1833a4103a79df585dd979838ad\n110.67.216.195\nportal-update.ae-gov-services.com\nmail.gulfcap-secure.com\ndocs-share.gulfcap-verify.net\n155.176.45.117\n53.184.128.150\n135.144.76.7\ncdn.invoice-relay.net",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-120",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 10,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-18T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2025-08-17T05:00:00Z",
+  "publishedAt": "2025-08-18T09:00:00Z",
+  "approvedAt": "2025-08-18T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2025-278",
+  "type": "IA",
+  "version": 1,
+  "title": "Deep web chatter on regional aviation targets",
+  "tlp": "GREEN",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR20"
+  ],
+  "clientIds": [
+   "CLT-041"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Deep web chatter on regional aviation targets. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-121",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-09-08T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-122",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2025-09-08T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-123",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2025-09-08T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-124",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2025-09-08T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "portal-update.ae-gov-services.com\ndocs-share.gulfcap-verify.net\n193.166.248.24\n160.38.69.35\n210f99c779dc82ec68d89dd4099d026e\n10b247ac2e4d84c64e23ad6b3937f84d\nmail.gulfcap-secure.com\n182.99.232.64\n111.200.4.64\n9b2588f89b52b27290bc0828dee31eb2\nvpn-fortigate-patch.com\ncheckout-meridian.support",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-125",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 12,
+      "urlSafe": false,
+      "snapshotAt": "2025-09-08T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2025-09-06T05:00:00Z",
+  "publishedAt": "2025-09-08T09:00:00Z",
+  "approvedAt": "2025-09-08T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2025-141",
+  "type": "VA",
+  "version": 1,
+  "title": "Citrix session hijack flaw under active exploitation",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR13"
+  ],
+  "clientIds": [
+   "CLT-003"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Citrix session hijack flaw under active exploitation. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-126",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-127",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-128",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-129",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-130",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "assets.dhafra-tracking.com\n165.206.117.9\nupdate.wp2shell-cdn.com\n4d066762a30732f7b613dc397696e199\n0af8e4ecce0f5aba6e1e69d0726cf5d8\n7f8847cca23cd667cf4bcd49eea79e54",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-131",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-132",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2025-07-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2025-25931",
+    "value": 9.4,
+    "source": "Citrix",
+    "authorityClass": "vendor",
+    "assessedAt": "2025-07-08T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2025-07-08T05:00:00Z",
+  "publishedAt": "2025-07-09T09:00:00Z",
+  "approvedAt": "2025-07-09T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2025-166",
+  "type": "VA",
+  "version": 1,
+  "title": "Ivanti EPMM chained zero-days",
+  "tlp": "RED",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR16"
+  ],
+  "clientIds": [
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Ivanti EPMM chained zero-days. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-133",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-134",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-135",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-136",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-137",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "vpn-fortigate-patch.com\n92cef3cfdb4967bd99634676fcdd66a2\nb3cbabbc816dc8eecca79e2b43348f20\n108.25.145.69\n88.158.173.169\nportal-update.ae-gov-services.com\n59.63.243.58\n8c6d9930cf82a669fa0e77fffb299b87\n73.198.214.160\nb658b2ac581df62a3db9ebcc8d20ad13\n450f8d77c630bdeb18fe2b807bd51e67\nce8b264b0816ccf2fc9ea3a0596af046",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-138",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 12,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-139",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-09T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2025-27812",
+    "value": 9.8,
+    "source": "Ivanti",
+    "authorityClass": "cna",
+    "assessedAt": "2025-08-07T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2025-08-07T05:00:00Z",
+  "publishedAt": "2025-08-09T09:00:00Z",
+  "approvedAt": "2025-08-09T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2025-190",
+  "type": "VA",
+  "version": 1,
+  "title": "Oracle FLEXCUBE July critical patch analysis",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR13"
+  ],
+  "clientIds": [
+   "CLT-003"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Oracle FLEXCUBE July critical patch analysis. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-140",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-29T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-141",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 9,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-29T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-142",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-29T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-143",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 2,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-29T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-144",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-29T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "3c6e196f3df6dea252fedcf9770e2c69\n83.205.89.216\n78.117.167.3\na6613fc09f3217f578663c973c87959f\n659f00b0e12099933b353aeccf36f83a\n88.32.14.212\nassets.dhafra-tracking.com\n133.113.213.22",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-145",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-29T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-146",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2025-08-29T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2025-28455",
+    "value": 8.1,
+    "source": "Oracle",
+    "authorityClass": "vendor",
+    "assessedAt": "2025-08-27T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2025-08-27T05:00:00Z",
+  "publishedAt": "2025-08-29T09:00:00Z",
+  "approvedAt": "2025-08-29T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2025-301",
+  "type": "IA",
+  "version": 1,
+  "title": "Retrospective: a year of ransomware listings in the Gulf",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR22"
+  ],
+  "clientIds": [],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Retrospective: a year of ransomware listings in the Gulf. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-147",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2025-10-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-148",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2025-10-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-149",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2025-10-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-150",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2025-10-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "docs-share.gulfcap-verify.net\nb692ae9a64e72ec37b868688845917c3\n53.25.48.128\nvpn-fortigate-patch.com\n131.171.25.10",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-151",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2025-10-01T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0003",
+    "techniqueId": "T1505.003",
+    "techniqueName": "Web Shell",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0005",
+    "techniqueId": "T1562.001",
+    "techniqueName": "Disable or Modify Tools",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0008",
+    "techniqueId": "T1021.001",
+    "techniqueName": "Remote Desktop Protocol",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2025-09-26T05:00:00Z",
+  "publishedAt": "2025-10-01T09:00:00Z",
+  "approvedAt": "2025-10-01T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2024-098",
+  "type": "IA",
+  "version": 1,
+  "title": "Exchange mass exploitation, regional exposure review",
+  "tlp": "GREEN",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR13"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Exchange mass exploitation, regional exposure review. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-152",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-07-05T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-153",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2024-07-05T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-154",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-07-05T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-155",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2024-07-05T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "docs-share.gulfcap-verify.net\nupdate.wp2shell-cdn.com\n125.41.67.175\n46.149.72.23\n48.195.112.156\nassets.dhafra-tracking.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-156",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2024-07-05T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2024-07-03T05:00:00Z",
+  "publishedAt": "2024-07-05T09:00:00Z",
+  "approvedAt": "2024-07-05T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2024-145",
+  "type": "IA",
+  "version": 1,
+  "title": "Regional DDoS-for-hire ecosystem assessment",
+  "tlp": "RED",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR2"
+  ],
+  "clientIds": [],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Regional DDoS-for-hire ecosystem assessment. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-157",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-09-04T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-158",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2024-09-04T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-159",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2024-09-04T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-160",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-09-04T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "56291c49f27f36ca8427e18e325044df\ndocs-share.gulfcap-verify.net\n181.155.184.105\n137.78.35.208\n77.212.244.142\n120.218.152.54\n50.215.49.247\n78.166.119.193\n67bba83e3c928ad40e52275052214420\nvpn-fortigate-patch.com\n95.72.101.105\ncdn.invoice-relay.net\nef1f6318ef8c74da8c35e29c32c82d4c",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-161",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 13,
+      "urlSafe": false,
+      "snapshotAt": "2024-09-04T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2024-09-01T05:00:00Z",
+  "publishedAt": "2024-09-04T09:00:00Z",
+  "approvedAt": "2024-09-04T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-IA-2024-203",
+  "type": "IA",
+  "version": 1,
+  "title": "Supply chain compromise of a regional software vendor",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR8"
+  ],
+  "clientIds": [
+   "CLT-014"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "Supply chain compromise of a regional software vendor. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-162",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-10-23T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-tic-analysis",
+    "heading": "TIC Analysis",
+    "body": "TIC Analysis for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-163",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 9,
+      "urlSafe": false,
+      "snapshotAt": "2024-10-23T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-campaign-overview",
+    "heading": "Campaign Overview",
+    "body": "Campaign Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-164",
+      "ref": 3,
+      "label": "Held corpus",
+      "recordCount": 7,
+      "urlSafe": false,
+      "snapshotAt": "2024-10-23T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-attack-chain-overview",
+    "heading": "Attack Chain Overview",
+    "body": "Attack Chain Overview for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-165",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2024-10-23T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "checkout-meridian.support\n176.15.15.127\nportal-update.ae-gov-services.com\n139.75.88.154\nb3d20734780f8ca2b56af499a93f09d1\n88.199.79.97\nupdate.wp2shell-cdn.com\n156.21.42.133\n429ebd5b97cb8234ad4f3bff2e2f8b4f\n4ca450cc7268836c4bfadc6cca8593f9\n290531dbc2c095272cc1f1e49f9daa23\n0f2741a724a8bb087f4cb9f801ac9a98\n166.113.157.203",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-166",
+      "ref": 6,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 13,
+      "urlSafe": false,
+      "snapshotAt": "2024-10-23T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-recommendations",
+    "heading": "Recommendations",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0002",
+    "techniqueId": "T1059",
+    "techniqueName": "Command and Scripting Interpreter",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0003",
+    "techniqueId": "T1505.003",
+    "techniqueName": "Web Shell",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2024-10-21T05:00:00Z",
+  "publishedAt": "2024-10-23T09:00:00Z",
+  "approvedAt": "2024-10-23T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2024-077",
+  "type": "VA",
+  "version": 1,
+  "title": "MOVEit transfer exploitation retrospective",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR14"
+  ],
+  "clientIds": [
+   "CLT-014"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "MOVEit transfer exploitation retrospective. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-167",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-06-15T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-168",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2024-06-15T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-169",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2024-06-15T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-170",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2024-06-15T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-171",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2024-06-15T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "assets.dhafra-tracking.com\nmail.gulfcap-secure.com\n110.85.64.148",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-172",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-06-15T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-173",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 8,
+      "urlSafe": false,
+      "snapshotAt": "2024-06-15T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2024-21899",
+    "value": 9.8,
+    "source": "Progress",
+    "authorityClass": "vendor",
+    "assessedAt": "2024-06-13T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2024-06-13T05:00:00Z",
+  "publishedAt": "2024-06-15T09:00:00Z",
+  "approvedAt": "2024-06-15T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-TIC-VA-2024-112",
+  "type": "VA",
+  "version": 1,
+  "title": "FortiOS pre-auth RCE, regional exposure high",
+  "tlp": "AMBER",
+  "status": "published",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR13"
+  ],
+  "clientIds": [
+   "CLT-003",
+   "CLT-027"
+  ],
+  "sections": [
+   {
+    "id": "sec-executive-summary",
+    "heading": "Executive Summary",
+    "body": "FortiOS pre-auth RCE, regional exposure high. This advisory summarises the activity, the affected technology, and the actions CPX recommends.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-174",
+      "ref": 1,
+      "label": "CrowdStrike Falcon X, Reports",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-08-14T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-impact",
+    "heading": "Impact",
+    "body": "Impact for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-175",
+      "ref": 2,
+      "label": "Held corpus",
+      "recordCount": 4,
+      "urlSafe": false,
+      "snapshotAt": "2024-08-14T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-cvss-v-base-score",
+    "heading": "CVSS v3 Base Score",
+    "body": "Scores and their authorities are recorded in the score table.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-affected-products-and-versions",
+    "heading": "Affected Products and Versions",
+    "body": "Affected Products and Versions for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-176",
+      "ref": 4,
+      "label": "Held corpus",
+      "recordCount": 9,
+      "urlSafe": false,
+      "snapshotAt": "2024-08-14T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-existence-of-public-exploit",
+    "heading": "Existence of Public Exploit",
+    "body": "Existence of Public Exploit for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-177",
+      "ref": 5,
+      "label": "Held corpus",
+      "recordCount": 3,
+      "urlSafe": false,
+      "snapshotAt": "2024-08-14T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-exploit-status",
+    "heading": "Exploit Status",
+    "body": "Exploit Status for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-178",
+      "ref": 6,
+      "label": "Held corpus",
+      "recordCount": 1,
+      "urlSafe": false,
+      "snapshotAt": "2024-08-14T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-ttps-mapping",
+    "heading": "TTPs Mapping",
+    "body": "Techniques observed in this activity are mapped in the table below.",
+    "generated": true,
+    "derivedFrom": "validator",
+    "citations": []
+   },
+   {
+    "id": "sec-indicators",
+    "heading": "Indicators",
+    "body": "8f62847af9fce016ffac10b9bab42dfe\n83.74.180.77\nacc58f85989830792e3e41865fb20bae\n137.145.157.23\n59.212.80.208\nmail.gulfcap-secure.com",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-179",
+      "ref": 8,
+      "label": "Held corpus, indicator extraction",
+      "recordCount": 6,
+      "urlSafe": false,
+      "snapshotAt": "2024-08-14T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-detection-and-hunting",
+    "heading": "Detection and Hunting",
+    "body": "Detection and Hunting for this advisory, drawn from held reporting and the triggering findings.",
+    "generated": true,
+    "citations": [
+     {
+      "id": "cit-180",
+      "ref": 9,
+      "label": "Held corpus",
+      "recordCount": 5,
+      "urlSafe": false,
+      "snapshotAt": "2024-08-14T09:00:00Z"
+     }
+    ]
+   },
+   {
+    "id": "sec-mitigation-and-recommendation",
+    "heading": "Mitigation and Recommendation",
+    "body": "Apply the vendor fix, hunt for the listed indicators, and review perimeter exposure for the affected products.",
+    "generated": true,
+    "derivedFrom": "template",
+    "citations": []
+   }
+  ],
+  "techniques": [
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1190",
+    "techniqueName": "Exploit Public-Facing Application",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   },
+   {
+    "tacticId": "TA0001",
+    "techniqueId": "T1566",
+    "techniqueName": "Phishing",
+    "resolved": true,
+    "observedActivity": "Observed in the reported activity window"
+   }
+  ],
+  "cvss": [
+   {
+    "cveId": "CVE-2024-23110",
+    "value": 9.6,
+    "source": "Fortinet PSIRT",
+    "authorityClass": "cna",
+    "assessedAt": "2024-08-12T07:00:00Z"
+   }
+  ],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "createdAt": "2024-08-12T05:00:00Z",
+  "publishedAt": "2024-08-14T09:00:00Z",
+  "approvedAt": "2024-08-14T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ },
+ {
+  "ref": "CPX-RFI-2026-014",
+  "type": "RFI",
+  "version": 1,
+  "title": "Exposure to the wp2shell campaign across the estate",
+  "tlp": "AMBER",
+  "status": "draft",
+  "owner": "Rajesh Menon",
+  "pirRefs": [
+   "PIR13"
+  ],
+  "clientIds": [
+   "CLT-027"
+  ],
+  "sections": [],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "rfi": {
+   "requester": "SOC Shift Lead",
+   "question": "Does the wp2shell campaign expose Meridian Energy Group, and what should the SOC hunt for?",
+   "clientId": "CLT-027",
+   "dueAt": "2026-08-03T12:00:00Z",
+   "steps": [
+    {
+     "label": "Scope the question against held reporting",
+     "done": true,
+     "investigationId": "inv-wp2shell"
+    },
+    {
+     "label": "Confirm affected technology with the client profile",
+     "done": true
+    },
+    {
+     "label": "Draft the intelligence advisory",
+     "done": false
+    }
+   ]
+  },
+  "createdAt": "2026-08-01T05:00:00Z"
+ },
+ {
+  "ref": "CPX-RFI-2026-011",
+  "type": "RFI",
+  "version": 1,
+  "title": "Actor background for board risk briefing",
+  "tlp": "RED",
+  "status": "published",
+  "owner": "Praveen Kumar",
+  "pirRefs": [
+   "PIR1"
+  ],
+  "clientIds": [
+   "CLT-003"
+  ],
+  "sections": [],
+  "techniques": [],
+  "cvss": [],
+  "checks": [
+   {
+    "id": "chk-links",
+    "label": "All links resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-mitre",
+    "label": "MITRE techniques resolve",
+    "passed": true,
+    "blocking": true
+   },
+   {
+    "id": "chk-citations",
+    "label": "Every generated section cites or declares derivation",
+    "passed": true,
+    "blocking": true
+   }
+  ],
+  "sendBacks": [],
+  "rfi": {
+   "requester": "Gulf Capital Bank CISO office",
+   "question": "Which actors have targeted Gulf banking in the last six months and with what tradecraft?",
+   "clientId": "CLT-003",
+   "dueAt": "2026-07-22T12:00:00Z",
+   "steps": [
+    {
+     "label": "Scope the question against held reporting",
+     "done": true
+    },
+    {
+     "label": "Compile actor profiles",
+     "done": true
+    },
+    {
+     "label": "Deliver as intelligence advisory CPX-TIC-IA-2026-336",
+     "done": true
+    }
+   ]
+  },
+  "createdAt": "2026-07-15T05:00:00Z",
+  "publishedAt": "2026-07-21T09:00:00Z",
+  "approvedAt": "2026-07-21T08:30:00Z",
+  "approvedBy": "Sara Haddad"
+ }
+]

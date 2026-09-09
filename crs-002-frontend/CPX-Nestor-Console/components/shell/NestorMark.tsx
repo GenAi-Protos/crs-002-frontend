@@ -1,0 +1,28 @@
+// The Cairn, reverse variant, inlined from brand/mark/mark-reverse.svg.
+// Never redrawn, never CSS-inverted.
+
+export function NestorMarkReverse({ size = 24 }: { size?: number }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      role="img"
+      aria-label="Nestor"
+    >
+      <path
+        d="M7.5 9.2 12 4.7l4.5 4.5"
+        fill="none"
+        stroke="#4CEE76"
+        strokeWidth="3"
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
+      />
+      <path
+        fill="#FFFFFF"
+        d="M7 11.6h10v2.2h-10zM4.5 15.6h7v2.2h-7zM12.5 15.6h7v2.2h-7zM2 19.6h6v2.2h-6zM9 19.6h6v2.2h-6zM16 19.6h6v2.2h-6z"
+      />
+    </svg>
+  );
+}

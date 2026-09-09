@@ -1,0 +1,32 @@
+[
+  {
+    "id": "req-001",
+    "url": "https://blog.eclecticiq.com/rss.xml",
+    "reason": "Actor reporting with consistent GCC coverage",
+    "pirRef": "PIR1",
+    "requestedBy": "Rajesh Menon",
+    "requestedAt": "2026-08-01T10:00:00Z",
+    "status": "auto-approved",
+    "note": "Feed detected. Live within the poll cycle."
+  },
+  {
+    "id": "req-002",
+    "url": "https://darkforums-index.example.onion/board/leaks",
+    "reason": "Leak board referenced in two recent credential listings",
+    "pirRef": "PIR20",
+    "requestedBy": "Praveen Kumar",
+    "requestedAt": "2026-07-31T08:00:00Z",
+    "status": "queued",
+    "note": "No feed pattern. Needs a collector decision."
+  },
+  {
+    "id": "req-003",
+    "url": "https://api.darktracer.live/v1/export.json",
+    "reason": "Ransomware victim tracker with GCC tagging",
+    "pirRef": "PIR22",
+    "requestedBy": "Rajesh Menon",
+    "requestedAt": "2026-07-29T09:00:00Z",
+    "status": "blocked-network",
+    "note": "Blocked by the approved URL-category list. Routed to CPX network approval."
+  }
+]

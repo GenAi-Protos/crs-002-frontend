@@ -1,0 +1,137 @@
+[
+  {
+    "hitId": "hit-001",
+    "clientId": "CLT-027",
+    "score": 0.92,
+    "reasons": [
+      {
+        "dimension": "product",
+        "matched": "WordPress",
+        "text": "Runs WordPress across its public web estate"
+      },
+      {
+        "dimension": "sector",
+        "matched": "Energy",
+        "text": "Campaign has already hit two regional energy operators"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-001",
+    "clientId": "CLT-014",
+    "score": 0.78,
+    "reasons": [
+      {
+        "dimension": "product",
+        "matched": "WordPress",
+        "text": "WordPress listed in the technology profile"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-002",
+    "clientId": "CLT-014",
+    "score": 0.87,
+    "reasons": [
+      {
+        "dimension": "sector",
+        "matched": "Transport",
+        "text": "Targets logistics software used in the sector"
+      },
+      {
+        "dimension": "region",
+        "matched": "UAE",
+        "text": "Campaign staging observed on regional infrastructure"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-003",
+    "clientId": "CLT-027",
+    "score": 0.81,
+    "reasons": [
+      {
+        "dimension": "sector",
+        "matched": "Energy",
+        "text": "Victim is an industrial group in the same sector"
+      },
+      {
+        "dimension": "region",
+        "matched": "UAE",
+        "text": "Listing names a GCC-headquartered group"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-004",
+    "clientId": "CLT-003",
+    "score": 0.85,
+    "reasons": [
+      {
+        "dimension": "product",
+        "matched": "Microsoft Exchange",
+        "text": "Exchange in the technology profile, patch is out-of-band"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-004",
+    "clientId": "CLT-027",
+    "score": 0.83,
+    "reasons": [
+      {
+        "dimension": "product",
+        "matched": "Microsoft Exchange",
+        "text": "Exchange in the technology profile, patch is out-of-band"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-006",
+    "clientId": "CLT-003",
+    "score": 0.74,
+    "reasons": [
+      {
+        "dimension": "sector",
+        "matched": "Banking",
+        "text": "Credential set is advertised as regional bank accounts"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-008",
+    "clientId": "CLT-027",
+    "score": 0.88,
+    "reasons": [
+      {
+        "dimension": "product",
+        "matched": "Palo Alto PAN-OS",
+        "text": "PAN-OS at the perimeter, exploit is now public"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-011",
+    "clientId": "CLT-003",
+    "score": 0.9,
+    "reasons": [
+      {
+        "dimension": "product",
+        "matched": "Fortinet FortiOS 7.4",
+        "text": "FortiOS SSL-VPN exposed and version in the affected range"
+      }
+    ]
+  },
+  {
+    "hitId": "hit-011",
+    "clientId": "CLT-027",
+    "score": 0.86,
+    "reasons": [
+      {
+        "dimension": "product",
+        "matched": "Fortinet FortiOS 7.4",
+        "text": "FortiOS in the technology profile"
+      }
+    ]
+  }
+]

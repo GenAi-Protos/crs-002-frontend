@@ -1,0 +1,132 @@
+[
+  {
+    "id": "con-crowdstrike",
+    "name": "CrowdStrike Falcon X",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-anomali",
+    "name": "Anomali ThreatStream",
+    "captureMode": "live-only",
+    "connected": false,
+    "verified": false,
+    "ourProposal": false,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-gti",
+    "name": "Google Threat Intelligence",
+    "captureMode": "hold-plus-revalidate",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-sekoia",
+    "name": "Sekoia",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-virustotal",
+    "name": "VirusTotal",
+    "captureMode": "live-only",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-shodan",
+    "name": "Shodan",
+    "captureMode": "live-only",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-nvd",
+    "name": "NVD",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": true,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-kev",
+    "name": "CISA KEV",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": true,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-epss",
+    "name": "EPSS",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": true,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-mitre",
+    "name": "MITRE ATT&CK",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": true,
+    "noRouteYet": false,
+    "residency": "egress"
+  },
+  {
+    "id": "con-soc",
+    "name": "CPX SOC Feeds",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": true,
+    "residency": "in-region"
+  },
+  {
+    "id": "con-ctem",
+    "name": "CPX CTEM",
+    "captureMode": "hold-body",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": true,
+    "residency": "in-region"
+  },
+  {
+    "id": "con-spidersilk",
+    "name": "spiderSilk",
+    "captureMode": "live-only",
+    "connected": false,
+    "verified": true,
+    "ourProposal": false,
+    "noRouteYet": true,
+    "residency": "in-region"
+  }
+]

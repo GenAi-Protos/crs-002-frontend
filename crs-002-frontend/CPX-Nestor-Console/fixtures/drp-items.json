@@ -1,0 +1,47 @@
+[
+  {
+    "id": "drp-001",
+    "clientId": "CLT-027",
+    "kind": "impersonating-domain",
+    "subject": "meridian-energy-support.com",
+    "firstSeen": "2026-07-30T07:00:00Z",
+    "severity": "High",
+    "status": "triaged"
+  },
+  {
+    "id": "drp-002",
+    "clientId": "CLT-027",
+    "kind": "leaked-credential",
+    "subject": "3 corporate accounts in an infostealer log, discovery DRP-2214, hash 9f2c44a1",
+    "firstSeen": "2026-08-01T05:00:00Z",
+    "severity": "Critical",
+    "status": "new"
+  },
+  {
+    "id": "drp-003",
+    "clientId": "CLT-003",
+    "kind": "phishing-campaign",
+    "subject": "SMS campaign imitating card services",
+    "firstSeen": "2026-07-31T09:00:00Z",
+    "severity": "High",
+    "status": "triaged"
+  },
+  {
+    "id": "drp-004",
+    "clientId": "CLT-003",
+    "kind": "leaked-credential",
+    "subject": "1 employee account in a combolist, discovery DRP-2199, hash c41ab220",
+    "firstSeen": "2026-07-27T11:00:00Z",
+    "severity": "Medium",
+    "status": "closed"
+  },
+  {
+    "id": "drp-005",
+    "clientId": "CLT-014",
+    "kind": "brand-abuse",
+    "subject": "Counterfeit mobile app on a third-party store",
+    "firstSeen": "2026-07-29T13:00:00Z",
+    "severity": "Medium",
+    "status": "new"
+  }
+]
