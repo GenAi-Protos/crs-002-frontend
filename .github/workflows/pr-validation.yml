@@ -26,7 +26,7 @@ jobs:
       # NOTE(cpx): GitHub Advanced Security Secret Scanning + Push Protection (AGT-CICD §7) are
       # enabled at repo/org settings by CPX; this Gitleaks job is the CI-level complement.
       - name: Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
   sast-codeql:
     runs-on: [self-hosted, ci]
     steps:
