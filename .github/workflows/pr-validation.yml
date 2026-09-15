@@ -9,7 +9,7 @@ jobs:
   metadata:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Validate metadata.yaml present and complete
         run: |
           test -f metadata.yaml || { echo "metadata.yaml missing"; exit 1; }
@@ -21,7 +21,7 @@ jobs:
   secret-scan:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
       # NOTE(cpx): GitHub Advanced Security Secret Scanning + Push Protection (AGT-CICD §7) are
       # enabled at repo/org settings by CPX; this Gitleaks job is the CI-level complement.
@@ -30,14 +30,14 @@ jobs:
   sast-codeql:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: github/codeql-action/init@v3
         with: { languages: javascript-typescript }
       - uses: github/codeql-action/analyze@v3
   sca:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/dependency-review-action@v4
         if: github.event_name == 'pull_request'
         with: { fail-on-severity: high }
@@ -49,7 +49,7 @@ jobs:
   iac-scan:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # AGT-CICD §7 IaC scan. Trivy is already installed on the self-hosted runner — call the
       # runner's binary directly. Do NOT pin a trivy-action version (that caused repeated
       # "trivy version not found" failures on this runner).
@@ -58,7 +58,7 @@ jobs:
   image-scan:
     runs-on: [self-hosted, ci]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Build the image and scan it at PR time (no push). --ignore-unfixed skips base-image OS
       # CVEs with no available fix; anything fixable still blocks. See Dockerfile.web hardening.
       - name: Build image for scan
