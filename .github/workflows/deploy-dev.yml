@@ -28,7 +28,7 @@ jobs:
       id-token: write          # job-scoped per AGT-CICD §8.4
     steps:
       - name: Azure login (OIDC — pipeline SP)
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}          # TODO(cpx)
           tenant-id: ${{ vars.AZURE_TENANT_ID }}            # TODO(cpx)
