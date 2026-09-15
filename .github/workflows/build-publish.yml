@@ -62,5 +62,5 @@ jobs:
         run: docker inspect --format='{{index .RepoDigests 0}}' "${{ steps.img.outputs.ref }}" > image-digest.txt
       # Pinned to @v3 — @v4 errors on this GitHub Enterprise Server + self-hosted runner setup
       # (the v4 artifact backend is not available on GHES here). Do not bump to v4.
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with: { name: release-evidence, path: "image-digest.txt" }
