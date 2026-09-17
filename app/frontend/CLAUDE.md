@@ -115,6 +115,8 @@ Everyone lands on `/`. The Dashboard resolves its content from the role.
 - Text sizes from the eight-step scale only; buttons via `Button` or `buttonClass`; overlays via `Dialog` or `Drawer`
 - Colours from the `cpx-*` tokens and scales only: no `black/N` greys, no hex in a component
 - While a fetch is in flight `SkeletonRows` holds the geometry; when it fell back to fixtures `OfflineNote` is visible
+- Motion only through the tokens and utilities in `app/globals.css` (`reveal`, `ease-out-quart`, the chart draw-ins); nothing pulses or loops, and reduced motion is honoured (docs/03 §6)
+- Nothing on the screen assumes it owns the browser viewport: `<main>` is the only scroll region (docs/01, Shell)
 
 ---
 

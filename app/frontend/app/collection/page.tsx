@@ -7,10 +7,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
-import { REQUESTS, SOURCES, WATCHES } from "@/lib/fixtures";
+import { REQUESTS, WATCHES } from "@/lib/fixtures";
+import { SOURCES } from "@/lib/fixtures-sources";
 import { getConnectors, getHealth, getRequests, getSources, getWatches, isUnreachable } from "@/lib/api";
 import type { Connector, KeywordWatch, Source, SourceRequest } from "@/lib/types";
-import { PageHeader, Tabs, OfflineNote } from "@/components/ui";
+import { PageHeader, Tabs, OfflineNote, tabPanelProps } from "@/components/ui";
 import { ConnectorsTab } from "@/components/collection/ConnectorsTab";
 import { SourcesTab } from "@/components/collection/SourcesTab";
 import { WatchesTab } from "@/components/collection/WatchesTab";
@@ -37,16 +38,23 @@ function CollectionInner() {
   const [schedulerOn, setSchedulerOn] = useState(false);
   const [offline, setOffline] = useState(false);
   useEffect(() => {
+    // Five reads in flight at once; `live` drops any that land after a role
+    // switch, so a stale payload never overwrites the new role's rows.
+    let live = true;
     getSources(user.id)
       .then((rows) => {
+        if (!live) return;
         setSources(rows);
         setOffline(false);
       })
-      .catch((e) => setOffline(isUnreachable(e)));
-    getRequests(user.id).then(setRequests).catch((e) => setOffline(isUnreachable(e)));
-    getWatches(user.id).then(setWatches).catch((e) => setOffline(isUnreachable(e)));
-    getConnectors(user.id).then(setConnectors).catch((e) => setOffline(isUnreachable(e)));
-    getHealth().then((h) => setSchedulerOn(h.scheduler)).catch(() => setSchedulerOn(false));
+      .catch((e) => live && setOffline(isUnreachable(e)));
+    getRequests(user.id).then((r) => live && setRequests(r)).catch((e) => live && setOffline(isUnreachable(e)));
+    getWatches(user.id).then((w) => live && setWatches(w)).catch((e) => live && setOffline(isUnreachable(e)));
+    getConnectors(user.id).then((c) => live && setConnectors(c)).catch((e) => live && setOffline(isUnreachable(e)));
+    getHealth().then((h) => live && setSchedulerOn(h.scheduler)).catch(() => live && setSchedulerOn(false));
+    return () => {
+      live = false;
+    };
   }, [user.id]);
 
   if (!canSee(user.role, "collection")) {
@@ -61,7 +69,7 @@ function CollectionInner() {
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] px-8 py-6">
+    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
       <PageHeader title="Collection" meta={offline ? <OfflineNote /> : undefined} />
       <Tabs<TabKey>
         tabs={[
@@ -72,18 +80,22 @@ function CollectionInner() {
         ]}
         value={tab}
         onChange={setTab}
+        id="collection"
+        label="Collection"
       />
-      {tab === "connectors" && <ConnectorsTab initialRows={connectors} />}
-      {tab === "sources" && (
-        <SourcesTab
-          initialRows={sources}
-          schedulerOn={schedulerOn}
-          connectors={connectors}
-          onRequestSource={() => setTab("requests")}
-        />
-      )}
-      {tab === "watches" && <WatchesTab initialRows={watches} />}
-      {tab === "requests" && <RequestsTab initialRows={requests} requestedBy={user.name} />}
+      <div {...tabPanelProps("collection", tab)}>
+        {tab === "connectors" && <ConnectorsTab initialRows={connectors} />}
+        {tab === "sources" && (
+          <SourcesTab
+            initialRows={sources}
+            schedulerOn={schedulerOn}
+            connectors={connectors}
+            onRequestSource={() => setTab("requests")}
+          />
+        )}
+        {tab === "watches" && <WatchesTab initialRows={watches} />}
+        {tab === "requests" && <RequestsTab initialRows={requests} requestedBy={user.name} />}
+      </div>
     </div>
   );
 }

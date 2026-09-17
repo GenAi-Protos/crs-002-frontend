@@ -193,3 +193,6 @@ export function blankFromTemplate(
     createdAt,
   };
 }
+
+/** What the custom-template upload accepts. Read by lib/template-import.ts. */
+export const ACCEPTED = ".docx,.md,.markdown,.json";

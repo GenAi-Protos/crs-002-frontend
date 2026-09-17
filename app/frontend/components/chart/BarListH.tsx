@@ -23,7 +23,7 @@ export function BarListH({
           </span>
           <span className="relative h-3.5 flex-1 bg-cpx-grey-50" title={`${i.label}: ${i.value}`}>
             <span
-              className="absolute inset-y-0 left-0"
+              className="bar-grow absolute inset-y-0 left-0"
               style={{ width: `${(i.value / max) * 100}%`, background: i.color ?? color }}
             />
           </span>

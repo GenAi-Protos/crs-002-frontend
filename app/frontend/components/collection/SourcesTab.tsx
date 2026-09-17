@@ -5,7 +5,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { SOURCES } from "@/lib/fixtures";
+import { SOURCES } from "@/lib/fixtures-sources";
 import { patchSource } from "@/lib/api";
 import { SourcesDashboard, type CategoryFilter } from "./SourcesDashboard";
 import { CategoryDays, NeedsAttention } from "./CollectionHealth";
@@ -26,6 +26,9 @@ const STATE_META: Record<Source["state"], { tone: StatusTone; label: string }> =
   "blocked-needs-credential": { tone: "warn", label: "Blocked, needs credential" },
   "not-collected": { tone: "idle", label: "Not collected" },
 };
+
+// The state filter options, once: the same list on every render.
+const STATE_OPTIONS = ["All", ...Object.keys(STATE_META)];
 
 const RHYTHMS: Rhythm[] = ["continuous", "hourly", "daily", "weekly"];
 
@@ -75,8 +78,10 @@ export function SourcesTab({
     [q, sheet, state, inCategory],
   );
 
-  const sheets = ["All", ...new Set(initialRows.map((s) => s.sheet))];
-  const states = ["All", ...Object.keys(STATE_META)];
+  const sheets = useMemo(
+    () => ["All", ...new Set(initialRows.map((s) => s.sheet))],
+    [initialRows],
+  );
   const visible = rows.slice(0, shown);
 
   return (
@@ -124,7 +129,7 @@ export function SourcesTab({
           aria-label="State"
           className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
         >
-          {states.map((s) => (
+          {STATE_OPTIONS.map((s) => (
             <option key={s} value={s}>
               {s === "All" ? "All" : STATE_META[s as Source["state"]].label}
             </option>
@@ -180,7 +185,7 @@ export function SourcesTab({
               <th
                 key={h}
                 scope="col"
-                className={`${T_TH} xl:sticky xl:top-[60px] xl:z-10`}
+                className={`${T_TH} xl:sticky xl:top-0 xl:z-10`}
               >
                 {h}
               </th>

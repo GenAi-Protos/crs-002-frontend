@@ -53,7 +53,7 @@ export default function InvestigationPage({
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-[880px] px-6 py-8">
+      <div className="mx-auto w-full max-w-[880px] px-6 py-8">
         <PageHeader title="Intelligence" />
         <SkeletonRows rows={5} />
       </div>
@@ -75,7 +75,7 @@ export default function InvestigationPage({
   }
 
   return (
-    <div className="mx-auto max-w-[880px] px-6 py-8">
+    <div className="mx-auto w-full max-w-[880px] px-6 py-8">
       <PageHeader title="Intelligence" meta={offline ? <OfflineNote /> : undefined} />
       <div className="space-y-8">
       {turns.map((t) => (

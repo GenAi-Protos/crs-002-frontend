@@ -11,14 +11,15 @@
 // group reaches here the search layer has already removed what the role may not
 // receive and counted it.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import {
   clearRecent,
-  countsFor,
+  countsOf,
   loadCorpus,
+  narrow,
   pushRecent,
   readRecent,
   runSearch,
@@ -41,11 +42,20 @@ const FILTER_LABEL: Record<SearchFilter, string> = {
   pirs: "PIRs",
 };
 
+// The option ids the combobox points its active descendant at.
+const optionId = (index: number) => `global-search-option-${index}`;
+
 export function GlobalSearch() {
   const { user } = useConsoleUser();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
+  // The hint shows the modifier this machine actually uses. Rendered as Ctrl
+  // on the server and corrected after mount, so the markup never mismatches.
+  const [shortcut, setShortcut] = useState("Ctrl K");
+  useEffect(() => {
+    if (/Mac|iPhone|iPad/.test(navigator.platform)) setShortcut("⌘K");
+  }, []);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<SearchFilter>("all");
   const [corpus, setCorpus] = useState<SearchCorpus | null>(null);
@@ -97,14 +107,18 @@ export function GlobalSearch() {
     };
   }, []);
 
-  const result = useMemo(
-    () => (corpus ? runSearch(corpus, user.role, q, filter) : null),
-    [corpus, user.role, q, filter],
+  // The input stays responsive and the matcher runs on the settled value: a
+  // deferred value lets React paint the keystroke before it recomputes. One
+  // run per query; the chip counts and the filtered view both read from it.
+  const deferredQ = useDeferredValue(q);
+  const all = useMemo(
+    () => (corpus ? runSearch(corpus, user.role, deferredQ, "all") : null),
+    [corpus, user.role, deferredQ],
   );
-
+  const result = useMemo(() => (all ? narrow(all, filter) : null), [all, filter]);
   const counts = useMemo(
-    () => (corpus && q.trim().length >= 2 ? countsFor(corpus, user.role, q) : null),
-    [corpus, user.role, q],
+    () => (all && deferredQ.trim().length >= 2 ? countsOf(all) : null),
+    [all, deferredQ],
   );
 
   // One flat list behind the groups, so the arrow keys move through what is
@@ -163,13 +177,24 @@ export function GlobalSearch() {
         role="combobox"
         aria-expanded={open}
         aria-controls="global-search-results"
-        className="h-8 w-64 rounded-sm border border-cpx-grey-100 bg-white pl-8 pr-3 text-sm text-cpx-black placeholder:text-cpx-grey-500 focus:border-cpx-green focus:outline-none xl:w-80"
+        aria-autocomplete="list"
+        aria-activedescendant={open && flat.length > 0 ? optionId(cursor) : undefined}
+        className="h-8 w-64 rounded-sm border border-cpx-grey-100 bg-white pl-8 pr-14 text-sm text-cpx-black placeholder:text-cpx-grey-500 focus:border-cpx-green focus:outline-none xl:w-80"
       />
+      {/* The shortcut, where the eye lands when it looks for the box. */}
+      <kbd
+        aria-hidden
+        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 px-1 font-sans text-2xs text-cpx-grey-500"
+      >
+        {shortcut}
+      </kbd>
 
       {open && (
         <div
           id="global-search-results"
-          className="absolute right-0 top-10 z-50 max-h-[70vh] w-[38rem] overflow-y-auto border border-cpx-grey-100 bg-white text-cpx-black shadow-pop"
+          role="listbox"
+          aria-label="Search results"
+          className="reveal absolute right-0 top-10 z-50 max-h-[70vh] w-[38rem] overflow-y-auto border border-cpx-grey-100 bg-white text-cpx-black shadow-pop"
         >
           {/* Filters stay visible while typing: the counts are the fastest way
               to see where a match actually lives. */}
@@ -211,19 +236,23 @@ export function GlobalSearch() {
           ) : result && result.total > 0 ? (
             <>
               {result.groups.map((group) => (
-                <section key={group.category}>
+                <section key={group.category} role="group" aria-label={group.label}>
                   <h3 className="border-b border-cpx-grey-100 bg-band px-3 py-1.5 text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
                     {group.label}
                   </h3>
-                  <ul>
+                  <ul role="presentation">
                     {group.hits.map((hit) => {
                       const index = flat.indexOf(hit);
                       return (
-                        <li key={hit.id}>
+                        <li key={hit.id} role="presentation">
                           <button
+                            id={optionId(index)}
+                            role="option"
+                            aria-selected={index === cursor}
+                            tabIndex={-1}
                             onMouseEnter={() => setCursor(index)}
                             onClick={() => go(hit.href, q)}
-                            className={`flex w-full items-start gap-2 border-b border-cpx-grey-100 px-3 py-2 text-left ${
+                            className={`flex w-full items-start gap-2 border-b border-cpx-grey-100 px-3 py-2 text-left transition-colors duration-150 ${
                               index === cursor ? "bg-cpx-grey-50" : "hover:bg-cpx-grey-50"
                             }`}
                           >
@@ -271,7 +300,7 @@ export function GlobalSearch() {
               />
             </>
           ) : (
-            <div className="px-3 py-5">
+            <div className="px-3 py-5" role="status">
               <p className="text-sm">
                 <span className="font-medium">0 results</span> for {q.trim()}
               </p>
@@ -361,7 +390,7 @@ function Footer({
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-2xs text-cpx-grey-500">
-      <span>
+      <span role="status">
         {result.total} {result.total === 1 ? "record" : "records"} held
         {result.withheld > 0 && (
           <> · {result.withheld} withheld at this access level</>

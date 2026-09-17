@@ -101,9 +101,11 @@ export function LineChart({
   const labelEvery = Math.max(1, Math.ceil(labels.length / 6));
 
   // The crosshair finds the x position: the reader aims at a date, never at a
-  // 2px line.
+  // 2px line. The wrapper's rectangle is measured once as the pointer enters,
+  // not on every move: getBoundingClientRect forces a layout each time.
+  const rectRef = useRef<DOMRect | null>(null);
   const track = (clientX: number) => {
-    const rect = wrapRef.current?.getBoundingClientRect();
+    const rect = (rectRef.current ??= wrapRef.current?.getBoundingClientRect() ?? null);
     if (!rect || labels.length === 0) return;
     const units = ((clientX - rect.left) / rect.width) * VIEW_W;
     const frac = (units - PAD_L) / plotW;
@@ -129,8 +131,14 @@ export function LineChart({
           aria-label={`${yLabel ?? "Trend"}: ${series
             .map((s) => `${s.label}, ${s.values.at(-1)} at ${labels.at(-1)}`)
             .join("; ")}`}
+          onMouseEnter={() => {
+            rectRef.current = wrapRef.current?.getBoundingClientRect() ?? null;
+          }}
           onMouseMove={(e) => track(e.clientX)}
-          onMouseLeave={() => setHover(null)}
+          onMouseLeave={() => {
+            rectRef.current = null;
+            setHover(null);
+          }}
           onFocus={() => setHover((h) => h ?? labels.length - 1)}
           onBlur={() => setHover(null)}
           onKeyDown={(e) => {
@@ -219,6 +227,8 @@ export function LineChart({
                   strokeWidth={2}
                   strokeLinejoin="round"
                   strokeLinecap="round"
+                  pathLength={1}
+                  className="line-draw"
                   points={s.values
                     .map((v, i) => `${x(i)},${yIn(r, v, ceiling)}`)
                     .join(" ")}

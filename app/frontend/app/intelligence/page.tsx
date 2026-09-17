@@ -13,10 +13,12 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
-import { makeTurn, STARTER_PROMPTS } from "@/lib/ask";
+// lib/turn, not lib/ask: the resolver there imports the fixture set, and this
+// page only needs to open a turn.
+import { makeTurn, STARTER_PROMPTS } from "@/lib/turn";
 import type { Advisory, Client, Investigation, PirHit, Turn, Workflow } from "@/lib/types";
 import { askIntelligence, getDashboardData, getInvestigations, getReports, isUnreachable } from "@/lib/api";
-import { TurnView } from "@/components/intelligence/AnswerCard";
+import { TurnView, type TurnRequest } from "@/components/intelligence/AnswerCard";
 import { EntityDrawer } from "@/components/intelligence/EntityDrawer";
 import { INVESTIGATIONS as FALLBACK_INVESTIGATIONS, WORKFLOWS } from "@/lib/fixtures";
 import { DEFAULT_ASK_OPTIONS, optionsAreDefault, type AskOptions } from "@/lib/ask-options";
@@ -67,6 +69,12 @@ function IntelligenceInner() {
   const [workflows] = useState<Workflow[]>(WORKFLOWS);
   const endRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef<string | null>(null);
+  // What each turn asked for, keyed by turn id (the local id and, once the
+  // backend has answered, its id too). Only a turn asked in this session has
+  // an entry, so a stored conversation never claims a workflow it cannot know.
+  const [requests, setRequests] = useState<Record<string, TurnRequest>>({});
+  // One controller per in-flight ask, so Stop ends exactly that request.
+  const controllers = useRef(new Map<string, AbortController>());
   // The history popover is non-modal: the page stays live behind it. Escape or a
   // click outside the header row closes it.
   const [offline, setOffline] = useState(false);
@@ -103,7 +111,9 @@ function IntelligenceInner() {
   }, [params, hits]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    // No behaviour option: the scroll region carries scroll-smooth in CSS, so
+    // prefers-reduced-motion can turn it off (a JS "smooth" cannot be).
+    endRef.current?.scrollIntoView();
   }, [turns]);
 
   // Every completed exchange lands in the session store, so History is
@@ -143,23 +153,52 @@ function IntelligenceInner() {
       investigations.find((i) => i.id === id)?.title ??
       question.replace(/[?.]+$/, "").slice(0, 64);
     if (!sessionId) setSessionId(id);
+    const request: TurnRequest = {
+      workflow: options.workflow
+        ? (workflows.find((w) => w.ref === options.workflow)?.name ?? options.workflow)
+        : null,
+    };
+    setRequests((r) => ({ ...r, [turn.id]: request }));
+    const controller = new AbortController();
+    controllers.current.set(turn.id, controller);
     setTurns((t) => [...t, turn]);
     setDraft("");
-    askIntelligence(user.id, question, sessionId ?? undefined, options).then(({ investigationId, turn: backendTurn }) => {
-      setTurns((t) => {
-        // The user may have switched sessions while the answer was pending;
-        // only complete and persist if this turn is still on screen.
-        if (!t.some((x) => x.id === turn.id)) return t;
-        const next = t.map((x) =>
-          x.id === turn.id ? backendTurn : x,
-        );
-        // Never persist an incomplete turn: an unmounted timeout would leave
-        // an eternal skeleton in the stored session.
-        setSessionId(investigationId);
-        persist(investigationId, title, next.filter((x) => x.status === "complete"));
-        return next;
-      });
-    }).catch(() => setTurns((t) => t.map((x) => x.id === turn.id ? { ...x, status: "failed" } : x)));
+    askIntelligence(user.id, question, sessionId ?? undefined, options, controller.signal)
+      .then(({ investigationId, turn: backendTurn }) => {
+        setRequests((r) => ({ ...r, [backendTurn.id]: request }));
+        setTurns((t) => {
+          // The user may have switched sessions while the answer was pending;
+          // only complete and persist if this turn is still on screen.
+          if (!t.some((x) => x.id === turn.id)) return t;
+          const next = t.map((x) =>
+            x.id === turn.id ? backendTurn : x,
+          );
+          // Never persist an incomplete turn: an unmounted timeout would leave
+          // an eternal skeleton in the stored session.
+          setSessionId(investigationId);
+          persist(investigationId, title, next.filter((x) => x.status === "complete"));
+          return next;
+        });
+      })
+      .catch(() =>
+        setTurns((t) =>
+          t.map((x) =>
+            x.id === turn.id
+              ? { ...x, status: controller.signal.aborted ? "stopped" : "failed" }
+              : x,
+          ),
+        ),
+      )
+      .finally(() => controllers.current.delete(turn.id));
+  };
+
+  const stop = (turnId: string) => controllers.current.get(turnId)?.abort();
+
+  // A failed or stopped turn is asked again in its place: the record of the
+  // failure is replaced by the new attempt, not stacked under it.
+  const retry = (t: Turn) => {
+    setTurns((ts) => ts.filter((x) => x.id !== t.id));
+    ask(t.question);
   };
 
   const newSession = () => {
@@ -191,7 +230,7 @@ function IntelligenceInner() {
   const forked = new Set(sessions.map((s) => s.id));
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-60px)] max-w-[880px] flex-col px-6">
+    <div className="mx-auto flex w-full max-w-[880px] flex-1 flex-col px-6">
       <PageHeader
         className="pt-4"
         title="Intelligence"
@@ -235,7 +274,7 @@ function IntelligenceInner() {
         </button>
         {historyOpen && (
           <>
-            <div className="absolute right-0 top-9 z-40 w-96 max-w-full border border-cpx-grey-100 bg-white shadow-pop">
+            <div className="reveal absolute right-0 top-9 z-40 w-96 max-w-full border border-cpx-grey-100 bg-white shadow-pop">
               <ul className="max-h-80 overflow-y-auto">
                 {localOnly.map((s) => (
                   <li key={s.id}>
@@ -298,7 +337,7 @@ function IntelligenceInner() {
               <button
                 key={p}
                 onClick={() => ask(p)}
-                className="border border-cpx-grey-100 bg-white px-4 py-2.5 text-left text-sm hover:border-cpx-green"
+                className="border border-cpx-grey-100 bg-white px-4 py-2.5 text-left text-sm transition-colors duration-150 hover:border-cpx-green"
               >
                 {p}
               </button>
@@ -309,6 +348,11 @@ function IntelligenceInner() {
           <TurnView
             key={t.id}
             turn={t}
+            request={requests[t.id]}
+            onStop={t.status === "streaming" ? () => stop(t.id) : undefined}
+            onRetry={
+              t.status === "failed" || t.status === "stopped" ? () => retry(t) : undefined
+            }
             onEntity={(id, entities) =>
               setEntity(entities.find((e) => e.id === id) ?? null)
             }

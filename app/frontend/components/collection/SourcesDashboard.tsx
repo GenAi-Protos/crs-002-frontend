@@ -105,7 +105,7 @@ function Summary({ rows, sources }: { rows: Row[]; sources: Source[] }) {
   // "With issues" counts units, not categories: an analyst chasing a problem
   // wants the number of things to fix. It counts exactly what the Needs
   // attention list above holds, so the two cannot disagree on one screen.
-  const issues = needsAttention(sources).length;
+  const issues = useMemo(() => needsAttention(sources).length, [sources]);
   const latest = rows
     .map((r) => r.status.lastCollection)
     .filter((d): d is string => Boolean(d))

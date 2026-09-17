@@ -159,7 +159,30 @@ On the white top bar. The CPX wordmark reads as the parent, the mark as the tool
 
 ---
 
-## 6 · The name
+## 6 · Motion
+
+Motion is CSS only, from the tokens in `app/globals.css`. No animation library, no pulse, no loop: hard rule 4 bans a pulsing skeleton and anything that narrates work the system has not reported.
+
+| Token | Value | Use |
+|---|---|---|
+| `ease-out-quart` | `cubic-bezier(0.25, 1, 0.5, 1)` | Anything arriving or changing state |
+| `ease-in-out-quart` | `cubic-bezier(0.76, 0, 0.24, 1)` | The rare thing that moves while visible |
+
+| Where | Motion |
+|---|---|
+| Route change (`app/template.tsx`) | 120ms crossfade, no movement |
+| Buttons, chips, tabs, rail items | `transition-colors duration-150`; buttons press to 98% |
+| `IconChevronDown` | eased in the icon, once, for every disclosure |
+| Disclosures, menus, popovers, notices | `reveal`: opacity and a 4px rise over 160ms via `@starting-style` |
+| An answer landing | `reveal-up`: 200ms, 6px |
+| Dialog, drawer, preview (`dialog[open]`) | entry only, 180 to 220ms; closing stays instant |
+| Charts | draw once on arrival: slices fade, bars grow, lines trace. Never on hover or update |
+
+Animate `opacity`, `translate`, `scale` and `stroke-dashoffset` only, never a layout property. Loading stays still: `SkeletonRows` and `AnswerSkeleton` hold the final geometry. Nothing animates on a keystroke or a filter. `prefers-reduced-motion: reduce` collapses every transition and animation to its final state, and programmatic scrolling snaps.
+
+---
+
+## 7 · The name
 
 ```
 NESTOR · CPX Threat Intelligence

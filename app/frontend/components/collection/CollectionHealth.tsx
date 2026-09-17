@@ -10,7 +10,7 @@
 // for the six ramp steps. Here the key renders from the same map as the cells,
 // so they cannot drift.
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   attentionReason,
@@ -65,7 +65,7 @@ const STATE_META: Record<Source["state"], { tone: StatusTone; label: string }> =
  * arrives for, and filtering it could hide half of it.
  */
 export function NeedsAttention({ sources }: { sources: Source[] }) {
-  const list = needsAttention(sources);
+  const list = useMemo(() => needsAttention(sources), [sources]);
   return (
     <section className="border border-cpx-grey-100 bg-white">
       <div className="flex items-center gap-2 border-b border-cpx-grey-100 px-4 py-2.5">
@@ -110,12 +110,14 @@ export function NeedsAttention({ sources }: { sources: Source[] }) {
  */
 export function CategoryDays({ sources }: { sources: Source[] }) {
   const [open, setOpen] = useState<string | null>(null);
-  const strips = categoryStrips(sources);
+  // Six categories by thirty days over every source: computed when the
+  // sources change, not on every expand and collapse.
+  const strips = useMemo(() => categoryStrips(sources), [sources]);
   const withRecord = strips.filter((s) => s.units > 0);
   const dates = withRecord[0]?.days ?? [];
 
   return (
-    <div className="mt-2 overflow-x-auto border border-cpx-grey-100 bg-white p-4">
+    <div className="reveal mt-2 overflow-x-auto border border-cpx-grey-100 bg-white p-4">
       <div className="min-w-[52rem]">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-2xs text-cpx-grey-500">
           <span>Share of a category&apos;s sources returning items, by day</span>
@@ -204,9 +206,11 @@ function CategoryRow({
       </div>
 
       {open && !empty && (
-        <SourceDayGrid
-          sources={sources.filter((s) => s.category === strip.sourceCategory)}
-        />
+        <div className="reveal">
+          <SourceDayGrid
+            sources={sources.filter((s) => s.category === strip.sourceCategory)}
+          />
+        </div>
       )}
     </div>
   );
@@ -215,8 +219,12 @@ function CategoryRow({
 /** One category's sources, quietest first, so pagination cannot hide a problem. */
 function SourceDayGrid({ sources }: { sources: Source[] }) {
   const [shown, setShown] = useState(50);
-  const list = [...sources].sort(
-    (a, b) => +new Date(a.lastNewItemAt) - +new Date(b.lastNewItemAt),
+  const list = useMemo(
+    () =>
+      [...sources].sort(
+        (a, b) => +new Date(a.lastNewItemAt) - +new Date(b.lastNewItemAt),
+      ),
+    [sources],
   );
 
   return (

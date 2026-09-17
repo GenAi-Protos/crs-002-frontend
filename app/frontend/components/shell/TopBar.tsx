@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { ROLE_LABELS, useConsoleUser } from "@/lib/role-context";
 import type { RoleKey } from "@/lib/types";
 import { GlobalSearch } from "./GlobalSearch";
 import { publicEnv } from "@/lib/runtime-env";
+import { getHealth } from "@/lib/api";
 
 const ROLES: RoleKey[] = [
   "analyst",
@@ -15,11 +17,45 @@ const ROLES: RoleKey[] = [
   "sales",
 ];
 
+type Backend = "checking" | "live" | "unreachable";
+
+// The chip says what the backend is doing, not what we hope it is doing: it
+// used to read "Live" as decoration, on the same screen as the demonstration
+// data notice. One check on mount and one each time the tab comes back into
+// view, which is when a long-lived Teams tab is most likely to be stale.
+function useBackend(): Backend {
+  const [backend, setBackend] = useState<Backend>("checking");
+  useEffect(() => {
+    let live = true;
+    const check = () =>
+      getHealth()
+        .then((h) => live && setBackend(h.status === "ok" ? "live" : "unreachable"))
+        .catch(() => live && setBackend("unreachable"));
+    check();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") check();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      live = false;
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, []);
+  return backend;
+}
+
+const BACKEND_LABEL: Record<Backend, string> = {
+  checking: "Checking",
+  live: "Live",
+  unreachable: "Unreachable",
+};
+
 // Light chrome, the same 60px white header as the other CPX consoles. The CPX
 // wordmark reads as the parent, the Nestor mark (on its Dark Purple tile, because
 // the green chevron is 1.5:1 on white) as the tool.
 export function TopBar() {
   const { user, setRole } = useConsoleUser();
+  const backend = useBackend();
   const switcherOn = publicEnv().ROLE_SWITCHER === "true";
   const initials = user.name
     .split(" ")
@@ -28,7 +64,7 @@ export function TopBar() {
     .join("");
 
   return (
-    <header className="fixed inset-x-0 top-0 z-40 flex h-[60px] items-center gap-3 border-b border-cpx-grey-100 bg-white px-6 text-cpx-black">
+    <header className="z-40 flex h-[60px] shrink-0 items-center gap-3 border-b border-cpx-grey-100 bg-white px-6 text-cpx-black">
       <Image
         src="/cpx-logo-primary.svg"
         alt="CPX"
@@ -44,9 +80,19 @@ export function TopBar() {
           Nestor
         </span>
       </span>
-      <span className="ml-1 inline-flex h-8 items-center gap-2 rounded-sm border border-cpx-grey-100 bg-white px-2.5 text-xs font-medium text-cpx-grey-500">
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-cpx-green" aria-hidden />
-        Live
+      {/* Colour and word together: green only ever appears beside a label. */}
+      <span
+        role="status"
+        title={backend === "live" ? "Backend reachable" : "Backend not reachable"}
+        className="ml-1 inline-flex h-8 items-center gap-2 rounded-sm border border-cpx-grey-100 bg-white px-2.5 text-xs font-medium text-cpx-grey-500"
+      >
+        <span
+          className={`inline-block h-1.5 w-1.5 rounded-full transition-colors duration-200 ${
+            backend === "live" ? "bg-cpx-green" : "bg-cpx-grey-400"
+          }`}
+          aria-hidden
+        />
+        {BACKEND_LABEL[backend]}
       </span>
 
       <div className="flex-1" />

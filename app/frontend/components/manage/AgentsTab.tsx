@@ -14,7 +14,7 @@ import { useMemo, useState } from "react";
 import { useConsoleUser } from "@/lib/role-context";
 import { canAdminister } from "@/lib/access";
 import type { Agent, Workflow } from "@/lib/types";
-import { gstDateTime } from "@/lib/format";
+import { agoFromNow, gstDateTime } from "@/lib/format";
 import { DetailRow, ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
 import { IconEgress } from "@/components/icons";
 import { CATEGORY_DEFINITIONS } from "@/lib/collection-workflows";
@@ -112,7 +112,7 @@ export function AgentsTab({
             <li key={a.id}>
               <button
                 onClick={() => onSelect(a.id)}
-                className={`block w-full border-l-2 px-3 py-2.5 text-left ${
+                className={`block w-full border-l-2 px-3 py-2.5 text-left transition-colors duration-150 ${
                   a.id === agent.id
                     ? "border-cpx-green bg-cpx-green-50/40"
                     : "border-transparent hover:bg-cpx-grey-50"
@@ -171,13 +171,23 @@ function AgentDetail({
           <h2 className="text-lg font-semibold tracking-tightish">{agent.name}</h2>
           <p className="mt-1 text-sm leading-relaxed">{agent.purpose}</p>
         </div>
-        <span className="flex shrink-0 items-center gap-2">
-          <StatusPill {...STATUS[agent.status]} />
-          {admin && (
-            <button className={buttonClass()}>
-              Edit
-            </button>
-          )}
+        <span className="flex shrink-0 flex-col items-end gap-1.5">
+          <span className="flex items-center gap-2">
+            <StatusPill {...STATUS[agent.status]} />
+            {admin && (
+              <button className={buttonClass()}>
+                Edit
+              </button>
+            )}
+          </span>
+          {/* A held field, read the same way the workflow library reads it:
+              "Never run" is the honest reading, not an absent line. */}
+          <span
+            className="text-2xs text-cpx-grey-500"
+            title={agent.lastRunAt ? gstDateTime(agent.lastRunAt) : undefined}
+          >
+            {agent.lastRunAt ? `Last run ${agoFromNow(agent.lastRunAt)}` : "Never run"}
+          </span>
         </span>
       </div>
 

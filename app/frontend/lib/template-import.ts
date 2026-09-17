@@ -23,7 +23,9 @@ export interface ImportedTemplate {
   warnings: string[];
 }
 
-export const ACCEPTED = ".docx,.md,.markdown,.json";
+// Declared beside the templates so the upload control can state what it
+// accepts without loading this parser and the ZIP reader behind it.
+export { ACCEPTED } from "./report-templates";
 
 // --- markdown ----------------------------------------------------------------
 

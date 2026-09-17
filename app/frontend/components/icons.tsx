@@ -103,9 +103,11 @@ export function IconDash({ className = "" }: P) {
   );
 }
 
+// Every disclosure in the console flips this chevron with `rotate-180`, so the
+// turn is eased here, once, rather than at each of the call sites.
 export function IconChevronDown({ className = "" }: P) {
   return (
-    <svg viewBox="0 0 16 16" width="14" height="14" className={`${base} ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+    <svg viewBox="0 0 16 16" width="14" height="14" className={`${base} transition-transform duration-200 ease-out-quart ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
       <path d="M4 6l4 4 4-4" strokeLinejoin="miter" />
     </svg>
   );

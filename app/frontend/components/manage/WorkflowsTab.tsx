@@ -32,6 +32,7 @@ import {
   ListMeta,
   SearchBox,
   StatusPill,
+  StepRail,
   type StatusTone,
   buttonClass,
 } from "@/components/ui";
@@ -174,7 +175,7 @@ export function WorkflowsTab({
                 <li key={w.ref}>
                   <button
                     onClick={() => setSelectedRef(w.ref)}
-                    className={`block w-full border-l-2 px-3 py-2.5 text-left ${
+                    className={`block w-full border-l-2 px-3 py-2.5 text-left transition-colors duration-150 ${
                       w.ref === workflow.ref
                         ? "border-cpx-green bg-cpx-green-50/40"
                         : "border-transparent hover:bg-cpx-grey-50"
@@ -256,8 +257,10 @@ function WorkflowDetail({
             style={{ width: `${total === 0 ? 0 : (built / total) * 100}%` }}
           />
         </span>
+        {/* The run count is a held field and it is zero: said, not hidden. */}
         <span className="mt-2 block text-2xs text-cpx-grey-500">
-          {w.steps.length} steps · {w.updateCount}{" "}
+          {w.steps.length} steps · {w.runsLast30d}{" "}
+          {w.runsLast30d === 1 ? "run" : "runs"} in 30 days · {w.updateCount}{" "}
           {w.updateCount === 1 ? "change" : "changes"} · updated{" "}
           {gstDateTime(w.updatedAt)}
         </span>
@@ -320,37 +323,25 @@ function WorkflowDetail({
       </DetailRow>
 
       <DetailRow label="The run" count={w.steps.length}>
-        <ol className="space-y-0">
-          {w.steps.map((s, i) => (
-            <li key={s.label} className="flex gap-3">
-              {/* A rail, so the steps read as a sequence rather than a list. */}
-              <span className="flex flex-col items-center">
-                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-white ring-1 ring-cpx-grey-200" />
-                {i < w.steps.length - 1 && (
-                  <span className="w-px flex-1 bg-cpx-grey-100" />
-                )}
-              </span>
-              <span
-                className={`min-w-0 flex-1 ${i === w.steps.length - 1 ? "" : "pb-4"}`}
+        {/* The shared rail, every marker pending: this is the definition, and
+            nothing has run. The same drawing carries state on the Collection
+            cards and under an answer. */}
+        <StepRail
+          steps={w.steps.map((s) => ({
+            key: s.label,
+            title: s.label,
+            detail: s.detail,
+            state: "pending",
+            aside: (
+              <button
+                onClick={() => onOpenAgent(s.agentRef)}
+                className="bg-cpx-grey-50 px-1 text-2xs transition-colors duration-150 hover:bg-cpx-grey-100"
               >
-                <span className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-sm font-medium">
-                    {i + 1}. {s.label}
-                  </span>
-                  <button
-                    onClick={() => onOpenAgent(s.agentRef)}
-                    className="bg-cpx-grey-50 px-1 text-2xs hover:bg-cpx-grey-100"
-                  >
-                    {nameOf(s.agentRef)}
-                  </button>
-                </span>
-                <span className="mt-0.5 block text-xs text-cpx-grey-500">
-                  {s.detail}
-                </span>
-              </span>
-            </li>
-          ))}
-        </ol>
+                {nameOf(s.agentRef)}
+              </button>
+            ),
+          }))}
+        />
       </DetailRow>
 
       <DetailRow label="Outputs" count={w.outputs.length}>

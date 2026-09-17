@@ -2,13 +2,11 @@
 // lookup and keyword search is the system's decision and is never named in UI.
 
 import { INVESTIGATIONS } from "./fixtures";
-import type { Answer, Turn } from "./types";
+import type { Answer } from "./types";
 
-let seq = 0;
-export function nextTurnId(): string {
-  seq += 1;
-  return `local-${seq}`;
-}
+// The fixture-free half lives in lib/turn.ts; re-exported so nothing that
+// imported them from here has to move.
+export { makeTurn, nextTurnId, STARTER_PROMPTS } from "./turn";
 
 const CANNED: { match: RegExp; investigationId: string; turnIndex: number }[] = [
   { match: /secur32/i, investigationId: "inv-wp2shell", turnIndex: 1 },
@@ -98,13 +96,3 @@ export function resolveQuestion(question: string): Answer {
   }
   return fallbackAnswer(question);
 }
-
-export function makeTurn(question: string): Turn {
-  return { id: nextTurnId(), question, status: "streaming" };
-}
-
-export const STARTER_PROMPTS = [
-  "What do we know about the wp2shell campaign and which clients are exposed?",
-  "Trace the DPRK fleet software supply chain campaign and its reach into GCC logistics operators.",
-  "Create an intelligence advisory for the DPRK fleet software supply chain campaign.",
-];

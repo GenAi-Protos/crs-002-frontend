@@ -19,9 +19,6 @@
 
 import { assembleAdvisories } from "../access";
 import { getInvestigations, getPirs, getReports } from "../api";
-import { ADVISORIES, INVESTIGATIONS, PIRS } from "../fixtures";
-import { LOOKUPS } from "../lookup";
-import { MOCK_DATASET } from "../dashboard/service";
 import type { ConsoleUser } from "../types";
 import type { SearchCorpus } from "./types";
 
@@ -31,6 +28,23 @@ export interface CorpusResult {
   live: boolean;
 }
 
+// The fallback records load on demand. This module sits in the shell (the
+// search box is in the top bar), so a static import here would put every
+// fixture and the dashboard projector into the chunk of every route. The
+// corpus is only built once, on the first open, and only then does this run.
+const fallback = () =>
+  Promise.all([
+    import("../fixtures"),
+    import("../lookup"),
+    import("../dashboard/service"),
+  ]).then(([fixtures, lookup, dashboard]) => ({
+    advisories: fixtures.ADVISORIES,
+    investigations: fixtures.INVESTIGATIONS,
+    pirs: fixtures.PIRS,
+    lookups: lookup.LOOKUPS,
+    dataset: dashboard.MOCK_DATASET,
+  }));
+
 /**
  * Load everything searchable for one user.
  *
@@ -39,10 +53,11 @@ export interface CorpusResult {
  * returns fewer records is worse than one that returns what it could reach.
  */
 export async function loadCorpus(user: ConsoleUser): Promise<CorpusResult> {
+  const held = await fallback();
   const [advisories, investigations, pirs] = await Promise.all([
-    getReports(user.id).catch(() => ADVISORIES),
-    getInvestigations(user.id).catch(() => INVESTIGATIONS),
-    getPirs(user.id).catch(() => PIRS),
+    getReports(user.id).catch(() => held.advisories),
+    getInvestigations(user.id).catch(() => held.investigations),
+    getPirs(user.id).catch(() => held.pirs),
   ]);
 
   return {
@@ -54,14 +69,14 @@ export async function loadCorpus(user: ConsoleUser): Promise<CorpusResult> {
       pirs,
       // Held IOC records and the shared intelligence dataset have no endpoint
       // yet. They are the same fixtures the Lookup and the dashboards read.
-      lookups: LOOKUPS,
-      dataset: MOCK_DATASET,
+      lookups: held.lookups,
+      dataset: held.dataset,
     },
-    live: advisories !== ADVISORIES,
+    live: advisories !== held.advisories,
   };
 }
 
-export { runSearch, countsFor, searchAccessFor, refang } from "./index";
+export { runSearch, countsFor, countsOf, narrow, searchAccessFor, refang } from "./index";
 
 // --- recent searches ---------------------------------------------------------
 //

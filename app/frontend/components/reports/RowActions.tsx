@@ -11,15 +11,18 @@
 // hidden. An analyst who cannot archive a published advisory should learn why
 // once rather than wonder where the control went.
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Advisory } from "@/lib/types";
+// lib/report-formats, not lib/report-export: this renders in every row of the
+// list, and the export module carries the DOCX and ZIP writers with it.
 import {
   FORMAT_LABEL,
   formatsFor,
   type ReportFormat,
   type TemplateFormat,
-} from "@/lib/report-export";
+} from "@/lib/report-formats";
 import { templateFor } from "@/lib/report-templates";
+import { useMenu } from "@/components/ui";
 
 const TEMPLATE_FORMATS: TemplateFormat[] = ["docx", "pdf", "md", "json"];
 
@@ -48,27 +51,13 @@ export function RowActions({
 }) {
   const [open, setOpen] = useState(false);
   const [level, setLevel] = useState<Level>("root");
-  const box = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: MouseEvent) => {
-      if (!box.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("mousedown", away);
-    document.addEventListener("keydown", esc);
-    return () => {
-      document.removeEventListener("mousedown", away);
-      document.removeEventListener("keydown", esc);
-    };
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
+  // Dismissal, arrow keys and focus return, from the one menu model in ui.tsx.
+  const box = useMenu(open, close);
 
   useEffect(() => {
     if (!open) setLevel("root");
   }, [open]);
-
-  const close = () => setOpen(false);
   const editable = writable && (a.status === "draft" || a.status === "in-review");
   const template = templateFor(a.type);
   // /reports/draft creates IA, VA and DG. An RFI is a work order and is filed,
@@ -98,7 +87,7 @@ export function RowActions({
         <div
           role="menu"
           onClick={(e) => e.stopPropagation()}
-          className="absolute right-0 top-8 z-50 min-w-[14rem] border border-cpx-grey-100 bg-white py-1 text-left shadow-pop"
+          className="reveal absolute right-0 top-8 z-50 min-w-[14rem] border border-cpx-grey-100 bg-white py-1 text-left shadow-pop"
         >
           {level === "root" && (
             <>
@@ -228,6 +217,7 @@ function Item({
 function Back({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button
+      role="menuitem"
       onClick={onClick}
       className="mb-1 flex w-full items-center gap-2 border-b border-cpx-grey-100 px-3 pb-1.5 text-left text-2xs text-cpx-grey-500 hover:text-cpx-black"
     >

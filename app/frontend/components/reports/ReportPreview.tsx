@@ -13,7 +13,7 @@
 import type { Advisory } from "@/lib/types";
 import { templateFor } from "@/lib/report-templates";
 import { isPlaceholder } from "@/lib/report-templates";
-import { structuredTables } from "@/lib/report-export";
+import { structuredTables } from "@/lib/report-formats";
 import { resolveTechnique, TACTICS } from "@/lib/mitre";
 import { gstDateTime, recordCount } from "@/lib/format";
 import { defang } from "@/lib/defang";

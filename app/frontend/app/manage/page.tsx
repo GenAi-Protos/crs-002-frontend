@@ -15,7 +15,7 @@ import { canSee } from "@/lib/access";
 import { AGENTS, PIRS, WORKFLOWS } from "@/lib/fixtures";
 import { getPirs, isUnreachable } from "@/lib/api";
 import type { Agent, Pir, Workflow } from "@/lib/types";
-import { PageHeader, Tabs, OfflineNote } from "@/components/ui";
+import { PageHeader, Tabs, OfflineNote, tabPanelProps } from "@/components/ui";
 import { AgentsTab } from "@/components/manage/AgentsTab";
 import { PirsTab } from "@/components/manage/PirsTab";
 import { WorkflowsTab } from "@/components/manage/WorkflowsTab";
@@ -31,8 +31,8 @@ function ManageInner() {
   const [tab, setTab] = useState<TabKey>(
     TAB_KEYS.includes(initial) ? initial : "agents",
   );
-  const [agents, setAgents] = useState<Agent[]>(AGENTS);
-  const [workflows, setWorkflows] = useState<Workflow[]>(WORKFLOWS);
+  const [agents] = useState<Agent[]>(AGENTS);
+  const [workflows] = useState<Workflow[]>(WORKFLOWS);
   const [pirs, setPirs] = useState<Pir[]>(PIRS);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [highlightWorkflow, setHighlightWorkflow] = useState<string | null>(null);
@@ -40,20 +40,24 @@ function ManageInner() {
 
   useEffect(() => {
     // Both rosters come from the backend once /agents and /workflows exist.
-    // Until then the fixture is the fallback, as it is on every other screen.
-    setAgents(AGENTS);
-    setWorkflows(WORKFLOWS);
-    // PIRs are live already. The fixture stands in only when the backend is
-    // down, the same fallback every other screen uses.
+    // Until then the fixture they were seeded with stands, as on every other
+    // screen. PIRs are live already: the fixture stands in only when the
+    // backend is down. `live` drops a response that lands after a role switch.
+    let live = true;
     getPirs(user.id)
       .then((rows) => {
+        if (!live) return;
         setPirs(rows.length > 0 ? rows : PIRS);
         setOffline(false);
       })
       .catch((e) => {
+        if (!live) return;
         setPirs(PIRS);
         setOffline(isUnreachable(e));
       });
+    return () => {
+      live = false;
+    };
   }, [user.id]);
 
   if (!canSee(user.role, "manage")) {
@@ -78,7 +82,7 @@ function ManageInner() {
   };
 
   return (
-    <div className="mx-auto max-w-[1400px] px-8 py-6">
+    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
       <PageHeader title="Manage" meta={offline ? <OfflineNote /> : undefined} />
       <Tabs<TabKey>
         tabs={[
@@ -89,33 +93,37 @@ function ManageInner() {
         ]}
         value={tab}
         onChange={setTab}
+        id="manage"
+        label="Manage"
       />
 
-      {tab === "agents" && (
-        <AgentsTab
-          agents={agents}
-          workflows={workflows}
-          selectedId={selectedAgentId}
-          onSelect={setSelectedAgentId}
-          onOpenWorkflow={openWorkflow}
-        />
-      )}
-      {tab === "workflows" && (
-        <WorkflowsTab
-          workflows={workflows}
-          agents={agents}
-          openRef={highlightWorkflow}
-          onOpenAgent={openAgent}
-        />
-      )}
-      {tab === "pirs" && (
-        <PirsTab
-          pirs={pirs}
-          onChange={setPirs}
-          initialQuery={params.get("q") ?? ""}
-        />
-      )}
-      {tab === "audit" && <NotBuiltYet tab="audit" />}
+      <div {...tabPanelProps("manage", tab)}>
+        {tab === "agents" && (
+          <AgentsTab
+            agents={agents}
+            workflows={workflows}
+            selectedId={selectedAgentId}
+            onSelect={setSelectedAgentId}
+            onOpenWorkflow={openWorkflow}
+          />
+        )}
+        {tab === "workflows" && (
+          <WorkflowsTab
+            workflows={workflows}
+            agents={agents}
+            openRef={highlightWorkflow}
+            onOpenAgent={openAgent}
+          />
+        )}
+        {tab === "pirs" && (
+          <PirsTab
+            pirs={pirs}
+            onChange={setPirs}
+            initialQuery={params.get("q") ?? ""}
+          />
+        )}
+        {tab === "audit" && <NotBuiltYet tab="audit" />}
+      </div>
     </div>
   );
 }

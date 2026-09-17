@@ -9,7 +9,7 @@ import { useConsoleUser } from "@/lib/role-context";
 import { assembleAdvisories, canSee, canWriteReports, publishedOnly } from "@/lib/access";
 import { ADVISORIES } from "@/lib/fixtures";
 import type { Advisory, Client } from "@/lib/types";
-import { downloadCsv, ListMeta, PageHeader, SearchBox, StatusPill, Tabs, type StatusTone, buttonClass, OfflineNote, SkeletonRows } from "@/components/ui";
+import { downloadCsv, ListMeta, PageHeader, SearchBox, StatusPill, Tabs, type StatusTone, buttonClass, OfflineNote, SkeletonRows, tabPanelProps } from "@/components/ui";
 import { IconChevronDown, IconPlus } from "@/components/icons";
 import {
   Clipped,
@@ -25,7 +25,6 @@ import { archiveReport, createReport, createRfi, getDashboardData, getReports, i
 import { NewReportDialog } from "@/components/reports/NewReportDialog";
 import { RowActions } from "@/components/reports/RowActions";
 import { ReportPreview } from "@/components/reports/ReportPreview";
-import { exportReport, exportTemplate } from "@/lib/report-export";
 import { sectionsFrom, type ReportType } from "@/lib/report-templates";
 
 type TabKey = "review" | "drafts" | "published" | "all";
@@ -51,6 +50,14 @@ const TYPE_TITLE: Record<string, string> = {
 };
 
 const yearOf = (a: Advisory) => new Date(a.createdAt).getUTCFullYear();
+
+const BY_TAB: Record<TabKey, (a: Advisory) => boolean> = {
+  review: (a) => a.status === "in-review",
+  drafts: (a) => a.status === "draft",
+  published: (a) =>
+    ["published", "superseded", "retracted", "did-not-run"].includes(a.status),
+  all: () => true,
+};
 
 export default function ReportsPage() {
   const { user } = useConsoleUser();
@@ -99,6 +106,25 @@ export default function ReportsPage() {
     return assembled.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
   }, [user, apiRows]);
 
+  // One pass over the rows per change of filter, not six per keystroke: the
+  // digest alone is a row a day, so the list is long by design.
+  const { filtered, tabCounts, years } = useMemo(() => {
+    const needle = q.toLowerCase();
+    const inScope = rows.filter((a) => String(yearOf(a)) === year && types.has(a.type));
+    const filtered = inScope.filter(
+      (a) =>
+        BY_TAB[effectiveTab](a) &&
+        (needle === "" ||
+          a.title.toLowerCase().includes(needle) ||
+          a.ref.toLowerCase().includes(needle)),
+    );
+    const tabCounts = Object.fromEntries(
+      (Object.keys(BY_TAB) as TabKey[]).map((k) => [k, inScope.filter(BY_TAB[k]).length]),
+    ) as Record<TabKey, number>;
+    const years = [...new Set(rows.map((a) => String(yearOf(a))))].sort().reverse();
+    return { filtered, tabCounts, years };
+  }, [rows, effectiveTab, year, types, q]);
+
   // Duplicate creates a fresh draft carrying the same structure and content.
   // The server issues the reference and resets the gate: a copy of a published
   // advisory is not itself published.
@@ -140,32 +166,11 @@ export default function ReportsPage() {
     );
   }
 
-  const byTab: Record<TabKey, (a: Advisory) => boolean> = {
-    review: (a) => a.status === "in-review",
-    drafts: (a) => a.status === "draft",
-    published: (a) =>
-      ["published", "superseded", "retracted", "did-not-run"].includes(a.status),
-    all: () => true,
-  };
-
-  const filtered = rows.filter(
-    (a) =>
-      byTab[effectiveTab](a) &&
-      String(yearOf(a)) === year &&
-      types.has(a.type) &&
-      (q === "" ||
-        a.title.toLowerCase().includes(q.toLowerCase()) ||
-        a.ref.toLowerCase().includes(q.toLowerCase())),
-  );
   const visible = filtered.slice(0, shown);
-
-  const tabCount = (k: TabKey) =>
-    rows.filter((a) => byTab[k](a) && String(yearOf(a)) === year && types.has(a.type)).length;
-
-  const years = [...new Set(rows.map((a) => String(yearOf(a))))].sort().reverse();
+  const tabCount = (k: TabKey) => tabCounts[k];
 
   return (
-    <div className="mx-auto max-w-[1400px] px-8 py-6">
+    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
       <PageHeader
         title="Reports"
         action={
@@ -195,8 +200,10 @@ export default function ReportsPage() {
         }
         value={effectiveTab}
         onChange={setTab}
+        id="reports"
       />
 
+      <div {...tabPanelProps("reports", effectiveTab)}>
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <SearchBox value={q} onChange={setQ} className="w-72" />
         <select
@@ -219,7 +226,8 @@ export default function ReportsPage() {
                 else next.add(t);
                 setTypes(next);
               }}
-              className={`h-8 px-2.5 text-xs ${
+              aria-pressed={types.has(t)}
+              className={`h-8 px-2.5 text-xs transition-colors duration-150 ${
                 types.has(t)
                   ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
                   : "border border-cpx-grey-100 text-cpx-grey-500"
@@ -355,10 +363,15 @@ export default function ReportsPage() {
                       onPreview={() => setPreview(a)}
                       onDuplicate={() => duplicate(a)}
                       onExportReport={(f) =>
-                        exportReport(a, f, () => setPreview(a))
+                        // The writers load on the click that needs them.
+                        import("@/lib/report-export").then((m) =>
+                          m.exportReport(a, f, () => setPreview(a)),
+                        )
                       }
                       onExportTemplate={(f) =>
-                        exportTemplate(a.type as ReportType, f, () => setPreview(a))
+                        import("@/lib/report-export").then((m) =>
+                          m.exportTemplate(a.type as ReportType, f, () => setPreview(a)),
+                        )
                       }
                       onArchive={() => archive(a)}
                     />
@@ -367,6 +380,7 @@ export default function ReportsPage() {
                 {a.type === "RFI" && rfiOpen && a.rfi && (
                   <tr className="border-b border-cpx-grey-100 bg-cpx-grey-50">
                     <td colSpan={6} className="px-6 py-3">
+                     <div className="reveal">
                       <p className="text-xs text-cpx-grey-500">
                         {a.rfi.requester} · due {gstDate(a.rfi.dueAt)} ·{" "}
                         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
@@ -392,6 +406,7 @@ export default function ReportsPage() {
                           </li>
                         ))}
                       </ul>
+                     </div>
                     </td>
                   </tr>
                 )}
@@ -410,6 +425,7 @@ export default function ReportsPage() {
           Show more
         </button>
       )}
+      </div>
 
       {showNew && (
         <NewReportDialog
@@ -446,7 +462,10 @@ export default function ReportsPage() {
       )}
 
       {notice && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-cpx-grey-100 bg-white px-4 py-2 text-xs shadow-pop">
+        <div
+          role="status"
+          className="reveal fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-cpx-grey-100 bg-white px-4 py-2 text-xs shadow-pop"
+        >
           {notice}
           <button
             onClick={() => setNotice(null)}

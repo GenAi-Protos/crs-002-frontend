@@ -1,15 +1,12 @@
-// Typed access to the fixture set. Derived fields are computed here, at load,
-// so no component ever derives or stores collector class, capture mode or residency.
+// Typed access to the fixture set (the source inventory is in lib/fixtures-sources.ts).
 
 import pirsJson from "@/fixtures/pirs.json";
-import usersJson from "@/fixtures/users.json";
 import clientsJson from "@/fixtures/clients.json";
 import hitsJson from "@/fixtures/pir-hits.json";
 import relevanceJson from "@/fixtures/relevance-matches.json";
 import advisoriesJson from "@/fixtures/advisories.json";
 import draftsJson from "@/fixtures/advisory-draft.json";
 import investigationsJson from "@/fixtures/investigations.json";
-import sourcesJson from "@/fixtures/sources.json";
 import connectorsJson from "@/fixtures/connectors.json";
 import watchesJson from "@/fixtures/keyword-watches.json";
 import requestsJson from "@/fixtures/source-requests.json";
@@ -23,7 +20,6 @@ import type {
   Agent,
   Client,
   Connector,
-  ConsoleUser,
   Delivery,
   DrpItem,
   Investigation,
@@ -31,14 +27,12 @@ import type {
   Pir,
   PirHit,
   RelevanceMatch,
-  Source,
   SourceRequest,
   Workflow,
 } from "./types";
-import { deriveCaptureMode, deriveCategory, deriveClass, deriveResidency } from "./derive";
 
 export const PIRS = pirsJson as Pir[];
-export const USERS = usersJson as ConsoleUser[];
+export { USERS } from "./users";
 export const CLIENTS = clientsJson as Client[];
 export const HITS = hitsJson as PirHit[];
 export const ADVISORIES = [...(advisoriesJson as unknown as Advisory[]), ...(draftsJson as unknown as Advisory[])];
@@ -53,18 +47,8 @@ export const AGENTS = agentsJson as Agent[];
 // The workflow library. Same rule: the backend wins once /workflows exists.
 export const WORKFLOWS = workflowsJson as Workflow[];
 
-type StoredSource = Omit<Source, "collectorClass" | "captureMode" | "residency" | "category">;
-
-export const SOURCES: Source[] = (sourcesJson as StoredSource[]).map((s) => {
-  const collectorClass = deriveClass(s.url);
-  return {
-    ...s,
-    collectorClass,
-    captureMode: deriveCaptureMode(collectorClass),
-    category: deriveCategory(s),
-    residency: deriveResidency(s.url),
-  };
-});
+// The source inventory lives in lib/fixtures-sources.ts: it is the one heavy
+// fixture and only the Collection screens need it.
 
 const RELEVANCE = relevanceJson as RelevanceMatch[];
 
@@ -107,8 +91,6 @@ export function drpForClient(clientId: string): DrpItem[] {
   );
 }
 
-export function userForRole(role: ConsoleUser["role"]): ConsoleUser {
-  const u = USERS.find((x) => x.role === role);
-  if (!u) throw new Error(`No fixture user for role ${role}`);
-  return u;
-}
+// Lives in lib/users.ts so the root layout can read six users without this
+// module; re-exported so existing imports keep working.
+export { userForRole } from "./users";

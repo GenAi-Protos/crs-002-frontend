@@ -38,25 +38,37 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
+    let live = true;
     getHealth()
       .then((health) => {
+        if (!live) return;
         setBackend(health.status === "ok" ? "connected" : "offline");
         setAdvisoryCount(health.counts.advisories);
       })
-      .catch(() => setBackend("offline"));
+      .catch(() => live && setBackend("offline"));
+    return () => {
+      live = false;
+    };
   }, [user.id]);
 
   useEffect(() => {
     // Neither service throws: each resolves to a state the dashboard can draw.
-    getAnalystDashboard(user.id).then(setAnalyst);
+    // `live` drops a projection that lands after the role has changed: the
+    // stored role is applied a tick after first render, and the first role's
+    // (empty) projection must not overwrite the second's.
+    let live = true;
+    getAnalystDashboard(user.id).then((r) => live && setAnalyst(r));
     setRoleView({ state: "loading", source: "mock", data: null });
-    getRoleDashboard(user.id, user.role).then(setRoleView);
+    getRoleDashboard(user.id, user.role).then((r) => live && setRoleView(r));
+    return () => {
+      live = false;
+    };
   }, [user.id, user.role]);
 
   const stamp = `as of ${gstTime(DEMO_NOW)}`;
 
   return (
-    <div className="mx-auto max-w-[1400px] px-8 py-6">
+    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
       <PageHeader
         title="Dashboard"
         action={

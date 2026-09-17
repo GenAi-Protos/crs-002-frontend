@@ -21,6 +21,7 @@ import {
   useLayoutEffect,
   useRef,
   type ButtonHTMLAttributes,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
   type ReactNode,
   type RefObject,
@@ -81,7 +82,9 @@ export function buttonClass(
   size: ButtonSize = "md",
   className = "",
 ) {
-  return `inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap disabled:cursor-not-allowed ${BUTTON_SIZE[size]} ${BUTTON_VARIANT[variant]} ${className}`;
+  // 150ms on colour, and a 2% press so a click reads as a click. The press
+  // needs :enabled, so a disabled button stays still.
+  return `inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap transition duration-150 ease-out-quart enabled:active:scale-[0.98] disabled:cursor-not-allowed ${BUTTON_SIZE[size]} ${BUTTON_VARIANT[variant]} ${className}`;
 }
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -202,7 +205,7 @@ export function Drawer({
       aria-labelledby={id}
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className={`fixed bottom-0 left-auto right-0 top-[60px] m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-xl ${className}`}
+      className={`drawer fixed bottom-0 left-auto right-0 top-[60px] m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-xl ${className}`}
     >
       <div className="flex items-center justify-between gap-4 border-b border-cpx-grey-100 px-5 py-3">
         <div id={id} className="min-w-0">
@@ -284,10 +287,15 @@ export function StatusPill({ tone, label }: { tone: StatusTone; label: string })
 }
 
 // Hard rule 1: demonstration data is never presented as live. One chip, one
-// wording, on every screen that fell back to fixtures.
+// wording, on every screen that fell back to fixtures. A status region, so a
+// screen reader hears the fallback happen rather than reading fixture rows as
+// live ones.
 export function OfflineNote() {
   return (
-    <span className="inline-flex h-5 items-center gap-1 rounded-sm border border-cpx-blue-100 bg-cpx-blue-50 px-1.5 text-2xs font-medium text-cpx-blue-700">
+    <span
+      role="status"
+      className="reveal inline-flex h-5 items-center gap-1 rounded-sm border border-cpx-blue-100 bg-cpx-blue-50 px-1.5 text-2xs font-medium text-cpx-blue-700"
+    >
       <IconWarn />
       Demonstration data. Backend unreachable.
     </span>
@@ -401,29 +409,71 @@ export function ListMeta({
   );
 }
 
+// Tab ids are derived from one base so a tab and its panel can name each
+// other from two different components: `<Tabs id="collection" …>` and
+// `<div {...tabPanelProps("collection", tab)}>`.
+export const tabId = (base: string, key: string) => `${base}-tab-${key}`;
+export function tabPanelProps(base: string, key: string) {
+  return {
+    role: "tabpanel" as const,
+    id: `${base}-panel-${key}`,
+    "aria-labelledby": tabId(base, key),
+  };
+}
+
 export function Tabs<T extends string>({
   tabs,
   value,
   onChange,
   label,
+  id,
 }: {
   tabs: { key: T; label: string; count?: number }[];
   value: T;
   onChange: (t: T) => void;
   label?: string;
+  /** Base for the tab and panel ids. Pass one when the panels use tabPanelProps. */
+  id?: string;
 }) {
+  const auto = useId();
+  const base = id ?? auto;
+
+  // Roving focus: one tab stop for the list, arrows move between tabs and
+  // select as they go, Home and End jump. Standard tablist keyboard model.
+  const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const keys = tabs.map((t) => t.key);
+    const i = keys.indexOf(value);
+    let next: number | null = null;
+    if (e.key === "ArrowRight") next = (i + 1) % keys.length;
+    else if (e.key === "ArrowLeft") next = (i - 1 + keys.length) % keys.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = keys.length - 1;
+    if (next === null) return;
+    e.preventDefault();
+    onChange(keys[next]);
+    document.getElementById(tabId(base, keys[next]))?.focus();
+  };
+
   return (
-    <div role="tablist" aria-label={label} className="flex items-end gap-1 border-b border-cpx-grey-100">
+    <div
+      role="tablist"
+      aria-label={label}
+      onKeyDown={onKeyDown}
+      className="flex items-end gap-1 border-b border-cpx-grey-100"
+    >
       {tabs.map((t) => {
         const selected = value === t.key;
         return (
           <button
             key={t.key}
+            id={tabId(base, t.key)}
             type="button"
             role="tab"
             aria-selected={selected}
+            aria-controls={`${base}-panel-${t.key}`}
+            tabIndex={selected ? 0 : -1}
             onClick={() => onChange(t.key)}
-            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-base ${
+            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-base transition-colors duration-150 ${
               selected
                 ? "border-cpx-green font-semibold text-cpx-purple"
                 : "border-transparent text-cpx-grey-500 hover:text-cpx-purple"
@@ -565,7 +615,7 @@ export function FilterChip({
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs ${
+      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs transition-colors duration-150 ${
         active
           ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
           : `border-cpx-grey-100 hover:bg-cpx-grey-50 ${count === 0 ? "text-cpx-grey-500" : ""}`
@@ -635,4 +685,133 @@ export function downloadCsv(filename: string, headers: string[], rows: string[][
   a.download = filename;
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+// ---------------------------------------------------------------------------
+// Menus. A popover with role="menu" promises the menu keyboard model, so this
+// is where that model lives: focus moves into the first item on open, the
+// arrows walk the items, Home and End jump, Escape or a click outside closes,
+// and focus returns to whatever opened it. `ref` goes on the box that holds
+// both the trigger and the popover, so a click on the trigger is "inside".
+
+export function useMenu(open: boolean, onClose: () => void) {
+  const ref = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
+  useDismiss(ref, onClose, open);
+  useEffect(() => {
+    if (!open) return;
+    opener.current = document.activeElement as HTMLElement | null;
+    const items = () =>
+      Array.from(
+        ref.current?.querySelectorAll<HTMLElement>('[role="menuitem"]:not(:disabled)') ?? [],
+      );
+    items()[0]?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      const list = items();
+      if (list.length === 0) return;
+      const i = list.indexOf(document.activeElement as HTMLElement);
+      let next: number | null = null;
+      if (e.key === "ArrowDown") next = (i + 1) % list.length;
+      else if (e.key === "ArrowUp") next = (i - 1 + list.length) % list.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = list.length - 1;
+      if (next === null) return;
+      e.preventDefault();
+      list[next].focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      opener.current?.focus();
+    };
+  }, [open, onClose]);
+  return ref;
+}
+
+// ---------------------------------------------------------------------------
+// The step rail: a marker per step joined by a line, so a sequence reads as a
+// sequence. One drawing for the collection pipeline, the workflow definition
+// and any run record, so an analyst learns the grammar once.
+//
+// Every state is a fact the data already carries. A definition that has not
+// run shows every marker pending; nothing here invents progress.
+
+export type StepState =
+  | "pending"
+  | "running"
+  | "completed"
+  | "partial"
+  | "failed"
+  | "awaiting-review";
+
+export interface Step {
+  key: string;
+  title: ReactNode;
+  /** Sits beside the title: an agent chip, a count. */
+  aside?: ReactNode;
+  /** The state, in words. Colour never carries it alone. */
+  stateLabel?: string;
+  detail?: ReactNode;
+  state: StepState;
+}
+
+const MARKER: Record<StepState, string> = {
+  pending: "bg-white ring-cpx-grey-200",
+  // In progress is Bright Purple, the CPX "waiting" colour, and it is still,
+  // not pulsing (hard rule 4).
+  running: "bg-cpx-bright-100 ring-cpx-bright",
+  completed: "bg-cpx-green ring-cpx-purple",
+  partial: "bg-status-warn-fill ring-status-warn-ink",
+  failed: "bg-cpx-red ring-cpx-red",
+  "awaiting-review": "bg-status-warn-fill ring-status-warn-ink",
+};
+
+const STATE_INK: Record<StepState, string> = {
+  pending: "text-cpx-grey-500",
+  running: "text-status-warn-ink",
+  completed: "text-green-contrast",
+  partial: "text-status-warn-ink",
+  failed: "text-status-warn-ink",
+  "awaiting-review": "text-status-warn-ink",
+};
+
+export function StepMarker({ state }: { state: StepState }) {
+  return (
+    <span
+      aria-hidden
+      className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ring-1 transition-colors duration-200 ${MARKER[state]}`}
+    />
+  );
+}
+
+export function StepRail({ steps }: { steps: Step[] }) {
+  return (
+    <ol className="space-y-0">
+      {steps.map((s, i) => {
+        const last = i === steps.length - 1;
+        return (
+          <li key={s.key} className="flex gap-3">
+            <span className="flex flex-col items-center">
+              <StepMarker state={s.state} />
+              {!last && <span className="w-px flex-1 bg-cpx-grey-100" />}
+            </span>
+            <span className={`min-w-0 flex-1 ${last ? "" : "pb-4"}`}>
+              <span className="flex flex-wrap items-baseline gap-2">
+                <span className="text-sm font-medium">
+                  {i + 1}. {s.title}
+                </span>
+                {s.aside}
+                {s.stateLabel && (
+                  <span className={`text-2xs ${STATE_INK[s.state]}`}>{s.stateLabel}</span>
+                )}
+              </span>
+              {s.detail && (
+                <span className="mt-0.5 block text-xs text-cpx-grey-500">{s.detail}</span>
+              )}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
 }

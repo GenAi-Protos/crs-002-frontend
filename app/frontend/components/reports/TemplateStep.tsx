@@ -13,8 +13,10 @@
 // keystroke into something structural.
 
 import { useState } from "react";
-import { TEMPLATES, type ReportType, type TemplateSection } from "@/lib/report-templates";
-import { ACCEPTED, importTemplate, type ImportedTemplate } from "@/lib/template-import";
+import { ACCEPTED, TEMPLATES, type ReportType, type TemplateSection } from "@/lib/report-templates";
+// Type only: the parser (and the ZIP reader behind it) loads on the first
+// upload, inside `choose` below, not with the dialog.
+import type { ImportedTemplate } from "@/lib/template-import";
 import type { TemplateChoice } from "./NewReportDialog";
 import { buttonClass } from "@/components/ui";
 
@@ -54,6 +56,7 @@ export function TemplateStep({
     setReading(true);
     resetEdits();
     try {
+      const { importTemplate } = await import("@/lib/template-import");
       const result = await importTemplate(file);
       setImported(result);
       if (result.sections.length > 0) setShowPreview(true);

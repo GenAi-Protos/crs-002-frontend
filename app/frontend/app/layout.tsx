@@ -56,7 +56,14 @@ export default function RootLayout({
       lang="en"
       className={`${unbounded.variable} ${inter.variable} ${plexArabic.variable}`}
     >
-      <body className="font-sans antialiased">
+      {/* The Teams-tab shell, the same shape as the other CPX consoles: the body
+          is a fixed-height box that never scrolls, and <main> is the one scroll
+          region. Inside a Teams tab that means one scrollbar, sticky bars that
+          measure against the tab rather than the window, and a composer that
+          pins to the tab's own bottom edge. tabIndex=0 on main because a scroll
+          container is not focusable by default, and without focus PageDown and
+          End do nothing in a non-scrolling document. */}
+      <body className="flex h-dvh flex-col overflow-hidden font-sans antialiased">
         <script dangerouslySetInnerHTML={{ __html: envScript }} />
         <a
           href="#main"
@@ -66,14 +73,17 @@ export default function RootLayout({
         </a>
         <RoleProvider>
           <TopBar />
-          <NavRail />
-          <main
-            id="main"
-            tabIndex={-1}
-            className="ml-16 mt-[60px] min-h-[calc(100vh-60px)] focus:outline-none rail:ml-44"
-          >
-            {children}
-          </main>
+          <div className="flex min-h-0 flex-1">
+            <NavRail />
+            <main
+              id="main"
+              tabIndex={0}
+              aria-label="Page content"
+              className="cpx-scroll flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden scroll-smooth focus-visible:-outline-offset-2"
+            >
+              {children}
+            </main>
+          </div>
         </RoleProvider>
       </body>
     </html>

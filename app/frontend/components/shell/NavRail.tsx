@@ -40,7 +40,7 @@ export function NavRail() {
   return (
     <nav
       aria-label="Primary"
-      className="fixed bottom-0 left-0 top-[60px] z-30 w-16 border-r border-cpx-grey-100 bg-white rail:w-44"
+      className="w-16 shrink-0 overflow-y-auto border-r border-cpx-grey-100 bg-white rail:w-44"
     >
       <ul className="flex flex-col gap-1 p-2 rail:p-3">
         {items.map((n) => {
@@ -51,7 +51,7 @@ export function NavRail() {
               <Link
                 href={n.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex h-9 items-center justify-center gap-2.5 rounded-sm px-0 text-base rail:justify-start rail:px-3 ${
+                className={`relative flex h-9 items-center justify-center gap-2.5 rounded-sm px-0 text-base transition-colors duration-150 rail:justify-start rail:px-3 ${
                   active
                     ? "bg-cpx-green-50 font-semibold text-cpx-purple"
                     : "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple"

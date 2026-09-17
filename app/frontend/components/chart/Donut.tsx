@@ -68,6 +68,8 @@ export function Donut({
                   strokeWidth={thickness}
                   strokeDasharray={dash}
                   strokeDashoffset={-offset}
+                  className="chart-in"
+                  style={{ animationDelay: `${i * 60}ms` }}
                 >
                   <title>
                     {s.label}: {s.value} of {total} (

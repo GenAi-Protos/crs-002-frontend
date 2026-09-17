@@ -5,13 +5,17 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
 import type { ConsoleUser, RoleKey } from "./types";
-import { userForRole } from "./fixtures";
+// lib/users.ts, not lib/fixtures.ts: this provider wraps every route, and the
+// fixture module would drag the whole fixture set into the shared chunk.
+import { userForRole } from "./users";
 
 const ROLE_KEY = "nestor-role";
 
@@ -28,16 +32,16 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     if (stored) setRoleState(stored);
   }, []);
 
-  const setRole = (r: RoleKey) => {
+  const setRole = useCallback((r: RoleKey) => {
     sessionStorage.setItem(ROLE_KEY, r);
     setRoleState(r);
-  };
+  }, []);
 
-  return (
-    <RoleContext.Provider value={{ user: userForRole(role), setRole }}>
-      {children}
-    </RoleContext.Provider>
-  );
+  // A stable value, so consumers only re-render when the role actually changes
+  // and setRole is safe in a dependency list.
+  const value = useMemo(() => ({ user: userForRole(role), setRole }), [role, setRole]);
+
+  return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;
 }
 
 export function useConsoleUser() {

@@ -47,16 +47,25 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
 
   useEffect(() => {
     // Fixtures stand in when the backend is down, labelled as such (hard rule 1).
+    // `live` drops a response that lands after the role changed: the stored
+    // role applies a tick after first render, and the first role's refusal
+    // must not overwrite the rows the second role was allowed.
+    let live = true;
     getClients(user.id)
       .then((cs) => {
+        if (!live) return;
         setApiClients(cs);
         setOffline(false);
       })
       .catch((e) => {
+        if (!live) return;
         setApiClients(CLIENTS);
         setOffline(isUnreachable(e));
       });
-    getPirs(user.id).then(setPirs).catch(() => setPirs([]));
+    getPirs(user.id).then((p) => live && setPirs(p)).catch(() => live && setPirs([]));
+    return () => {
+      live = false;
+    };
   }, [user.id]);
 
   const allClients = apiClients;
@@ -170,7 +179,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-60px)]">
+    <div className="flex min-h-0 flex-1">
       <aside className="w-80 shrink-0 border-r border-cpx-grey-100 bg-white">
         <div className="flex items-center justify-between px-4 pb-2 pt-5">
           <h1 className="text-xl font-semibold tracking-tightish">Clients</h1>

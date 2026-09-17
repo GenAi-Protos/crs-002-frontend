@@ -71,7 +71,7 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
                   <IconChevronDown className={isOpen ? "rotate-180" : ""} />
                 </button>
                 {isOpen && (
-                  <div className="border-t border-cpx-grey-100 px-4 py-3">
+                  <div className="reveal border-t border-cpx-grey-100 px-4 py-3">
                     <div className="flex flex-wrap gap-1.5">
                       {w.terms.map((t) => (
                         <span

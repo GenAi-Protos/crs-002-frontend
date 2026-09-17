@@ -3,6 +3,8 @@
 Five destinations. Two detail routes. Read the layouts, not the prose.
 
 **Shell:** white 60px top bar and white 176px left rail, both with a hairline (64px icons below 1100px); the active destination sits on a green wash with a 3px green bar. The CSD-007 style guide is the visual reference.
+
+The console runs inside a Microsoft Teams tab, so the shell is the same fixed-height box the other CPX Teams tab uses (CSD-007 style guide §5): the body never scrolls, `<main>` is the one scroll region and is keyboard-scrollable (`tabIndex=0`), sticky bars and the composer measure against the tab rather than the window, and the scrollbar gutter is always reserved so a long table never looks like it ends. Nothing on a screen may assume it owns the browser viewport: no `fixed` chrome inside a page, no `100vh` page roots; a page that wants the full height takes `flex-1` of the template wrapper.
 Top bar: CPX primary logo · Nestor mark and wordmark · Live chip · search · role switcher (dev only) · user chip.
 
 **Every list:** search box · stated default sort · cursor pagination with an honest total (`Showing 50 of 431`) · CSV export.

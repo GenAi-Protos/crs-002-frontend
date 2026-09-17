@@ -5,9 +5,9 @@
 // report already carries the decisions that matter and export is not one of
 // them.
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { IconChevronDown } from "@/components/icons";
-import { buttonClass } from "@/components/ui";
+import { buttonClass, useMenu } from "@/components/ui";
 
 export interface MenuItem<T extends string> {
   key: T;
@@ -37,21 +37,9 @@ export function Menu<T extends string>({
   footer?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const box = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: MouseEvent) => {
-      if (!box.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("mousedown", away);
-    document.addEventListener("keydown", esc);
-    return () => {
-      document.removeEventListener("mousedown", away);
-      document.removeEventListener("keydown", esc);
-    };
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
+  // Dismissal, arrow keys and focus return, from the one menu model in ui.tsx.
+  const box = useMenu(open, close);
 
   return (
     <div ref={box} className="relative shrink-0">
@@ -86,7 +74,7 @@ export function Menu<T extends string>({
       {open && (
         <div
           role="menu"
-          className={`absolute z-50 mt-1 min-w-[13rem] border border-cpx-grey-100 bg-white py-1 shadow-pop ${
+          className={`reveal absolute z-50 mt-1 min-w-[13rem] border border-cpx-grey-100 bg-white py-1 shadow-pop ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >

@@ -10,11 +10,7 @@ import type { LookupRecord, ObservableKind } from "./types";
 
 export const LOOKUPS = lookupsJson as unknown as LookupRecord[];
 
-export const KIND_LABEL: Record<ObservableKind, string> = {
-  ip: "IP address",
-  domain: "Domain",
-  hash: "File hash",
-};
+export { KIND_LABEL } from "./observables";
 
 const IPV4 = /^\d{1,3}(\.\d{1,3}){3}$/;
 const HASH = /^[a-f0-9]{32}$|^[a-f0-9]{40}$|^[a-f0-9]{64}$/i;

@@ -22,12 +22,21 @@ export class BackendUnreachable extends Error {}
 
 export const isUnreachable = (e: unknown): boolean => e instanceof BackendUnreachable;
 
+// A read that never answers must end as "unreachable", with the fixture
+// fallback and the offline chip, not as a skeleton that stays up all day.
+// Writes and the ask keep their own timing: a draft being created or an
+// answer being composed is allowed to take longer than a list.
+const READ_TIMEOUT_MS = 15_000;
+
 async function request(input: string, init?: RequestInit): Promise<Response> {
+  const isRead = !init?.method || init.method === "GET";
+  const signal = init?.signal ?? (isRead ? AbortSignal.timeout(READ_TIMEOUT_MS) : undefined);
   try {
-    return await fetch(input, init);
+    return await fetch(input, { ...init, signal });
   } catch {
-    // Only a network-level failure lands here. An HTTP error is a response and
-    // each caller reads the backend's own reason from it.
+    // Only a network-level failure lands here (a refused connection, a timeout,
+    // a caller's abort). An HTTP error is a response and each caller reads the
+    // backend's own reason from it.
     throw new BackendUnreachable(unreachable());
   }
 }
@@ -184,11 +193,14 @@ export async function getSource(userId: string, id: string): Promise<Source> {
 export const getInvestigations = (userId: string) => listApi<Investigation>(userId, "/intelligence", "items");
 export const getPirs = (userId: string) => listApi<Pir>(userId, "/pirs", "items");
 
-export async function askIntelligence(userId: string, question: string, investigationId?: string, options?: AskOptions): Promise<{ investigationId: string; turn: Turn }> {
+// `signal` is the analyst's Stop: aborting it ends the request and the turn
+// records itself as stopped, which is a state the model already carries.
+export async function askIntelligence(userId: string, question: string, investigationId?: string, options?: AskOptions, signal?: AbortSignal): Promise<{ investigationId: string; turn: Turn }> {
   const response = await request(`${apiBase()}/intelligence/ask`, {
     method: "POST",
     headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
     body: JSON.stringify({ question, investigationId, options }),
+    signal,
   });
   if (!response.ok) throw new Error(`Backend returned ${response.status}`);
   return response.json() as Promise<{ investigationId: string; turn: Turn }>;

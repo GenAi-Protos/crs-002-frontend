@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { getPirs, getSource, patchSource, isUnreachable } from "@/lib/api";
-import { SOURCES } from "@/lib/fixtures";
+import { SOURCES } from "@/lib/fixtures-sources";
 import type { Pir, Rhythm, Source } from "@/lib/types";
 import { pollLog } from "@/lib/source-log";
 import { agoFromNow, gstDate, gstDateTime } from "@/lib/format";
@@ -120,7 +120,7 @@ export default function SourcePage({
   });
 
   return (
-    <div className="mx-auto max-w-[1400px] px-8 py-6">
+    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/collection?tab=sources"

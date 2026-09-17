@@ -12,16 +12,13 @@ import { changeReport, getDashboardData, getReport, sendBackReport, isUnreachabl
 import type { Advisory, Client, Delivery, SendBackReason } from "@/lib/types";
 import { resolveTechnique, TACTICS } from "@/lib/mitre";
 import { gstDate, gstDateTime, recordCount } from "@/lib/format";
-import { IndicatorChip, TlpBadge, Button, Dialog, buttonClass, OfflineNote, SkeletonRows } from "@/components/ui";
+import { IndicatorChip, TlpBadge, Button, Dialog, StatusPill, type StatusTone, buttonClass, OfflineNote, SkeletonRows } from "@/components/ui";
 import { Menu } from "@/components/reports/ExportMenu";
 import { ReportPreview } from "@/components/reports/ReportPreview";
 import { DiamondPanel } from "@/components/reports/DiamondPanel";
-import {
-  FORMAT_LABEL,
-  exportReport,
-  formatsFor,
-  type ReportFormat,
-} from "@/lib/report-export";
+// The format list is render-time metadata; the writers behind it (DOCX, XLSX,
+// ZIP) load on the click that needs them, see the Export menu below.
+import { FORMAT_LABEL, formatsFor, type ReportFormat } from "@/lib/report-formats";
 import { templateFor } from "@/lib/report-templates";
 import { IconCheck, IconWarn } from "@/components/icons";
 import {
@@ -34,17 +31,19 @@ import {
   T_TH,
 } from "@/components/table";
 
-// Same four words the list uses, so a state reads identically in both places.
-const STATE_LABEL: Record<Advisory["status"], string> = {
-  draft: "Draft",
-  "in-review": "In review",
-  published: "Published",
-  superseded: "Superseded",
-  withdrawn: "Withdrawn",
-  abandoned: "Abandoned",
-  retracted: "Retracted",
-  "did-not-run": "Did not run",
-  archived: "Archived",
+// Same four words the list uses, so a state reads identically in both places,
+// and the same pill: a state change on Approve or Send back is then both seen
+// and announced.
+const STATE: Record<Advisory["status"], { tone: StatusTone; label: string }> = {
+  draft: { tone: "idle", label: "Draft" },
+  "in-review": { tone: "warn", label: "In review" },
+  published: { tone: "good", label: "Published" },
+  superseded: { tone: "idle", label: "Superseded" },
+  withdrawn: { tone: "idle", label: "Withdrawn" },
+  abandoned: { tone: "idle", label: "Abandoned" },
+  retracted: { tone: "critical", label: "Retracted" },
+  "did-not-run": { tone: "critical", label: "Did not run" },
+  archived: { tone: "idle", label: "Archived" },
 };
 
 const SEND_BACK_REASONS: { key: SendBackReason; label: string }[] = [
@@ -162,13 +161,13 @@ export default function ReportPage({
   }
 
   return (
-    <div className="pb-24">
+    <div>
       {/* One row that never wraps. Identity on the left, actions pinned right,
           and the metadata between them drops out in order of how much it is
           needed as the window narrows. Every item is nowrap and shrink-0:
           without that a flex child compresses below its text and wraps inside
           itself, which is what turned this bar into six stacked fragments. */}
-      <div className="sticky top-[60px] z-20 flex h-14 items-center gap-2 border-b border-cpx-grey-100 bg-white px-6">
+      <div className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-cpx-grey-100 bg-white px-6">
         <span className="shrink-0 whitespace-nowrap font-mono text-sm font-medium">
           {a.ref}
         </span>
@@ -186,8 +185,8 @@ export default function ReportPage({
         <span className="shrink-0 whitespace-nowrap text-xs text-cpx-grey-500">
           v{a.version}
         </span>
-        <span className="shrink-0 whitespace-nowrap text-xs">
-          {STATE_LABEL[a.status]}
+        <span className="shrink-0" role="status">
+          <StatusPill {...STATE[a.status]} />
         </span>
         {offline && (
           <span className="shrink-0">
@@ -225,7 +224,11 @@ export default function ReportPage({
               label: FORMAT_LABEL[f],
               hint: f === "pdf" ? "Opens the print dialogue" : undefined,
             }))}
-            onSelect={(f) => exportReport(a, f, () => setPreview(true))}
+            onSelect={(f) =>
+              import("@/lib/report-export").then((m) =>
+                m.exportReport(a, f, () => setPreview(true)),
+              )
+            }
             footer="Indicators leave defanged. An unsafe citation URL never leaves."
           />
         </div>
@@ -262,8 +265,15 @@ export default function ReportPage({
 
       <ChecksLine advisory={a} />
 
+      {/* A report that came back carries why, on the report itself, until it
+          is published: the reason was recorded and never shown. One line, the
+          latest send-back. */}
+      {(a.status === "draft" || a.status === "in-review") && a.sendBacks.length > 0 && (
+        <SentBackLine sendBack={a.sendBacks[a.sendBacks.length - 1]} />
+      )}
+
       {publishedState && (
-        <div className="mx-auto mt-4 max-w-[720px] space-y-1 px-6">
+        <div className="reveal mx-auto mt-4 max-w-[720px] space-y-1 px-6">
           <div className="flex items-center gap-2 bg-cpx-purple px-3 py-2 text-xs text-white">
             <span className="font-medium">Version {a.version}</span>
             <span className="text-white/70">
@@ -383,7 +393,7 @@ export default function ReportPage({
       </article>
 
       {!isDigest && (lead || (publishedState && editable === false && canWriteReports(user.role))) && (
-        <footer className="fixed bottom-0 left-16 right-0 z-20 flex h-14 items-center gap-2 border-t border-cpx-grey-100 bg-white px-6 rail:left-44">
+        <footer className="sticky bottom-0 z-20 mt-6 flex h-14 items-center gap-2 border-t border-cpx-grey-100 bg-white px-6">
           {publishedState ? (
             <button
                 onClick={() =>
@@ -564,6 +574,20 @@ function Center({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
       {children}
+    </div>
+  );
+}
+
+function SentBackLine({ sendBack }: { sendBack: Advisory["sendBacks"][number] }) {
+  const reason =
+    SEND_BACK_REASONS.find((r) => r.key === sendBack.reason)?.label ?? sendBack.reason;
+  return (
+    <div className="reveal flex items-center gap-2 border-b border-cpx-grey-100 bg-white px-6 py-2 text-xs">
+      <IconWarn className="text-status-warn-ink" />
+      <span>
+        Sent back by {sendBack.by}, {gstDateTime(sendBack.at)}:{" "}
+        <span className="font-medium">{reason}</span>.
+      </span>
     </div>
   );
 }

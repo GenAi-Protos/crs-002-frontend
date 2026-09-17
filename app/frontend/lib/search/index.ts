@@ -19,7 +19,7 @@ import type {
   Pir,
   RoleKey,
 } from "../types";
-import { KIND_LABEL } from "../lookup";
+import { KIND_LABEL } from "../observables";
 import {
   CATEGORY_LABEL,
   type SearchCategory,
@@ -587,13 +587,8 @@ export function runSearch(
   return { query, groups, total, withheld };
 }
 
-/** Counts per filter chip, computed on the unfiltered result. */
-export function countsFor(
-  corpus: SearchCorpus,
-  role: RoleKey,
-  query: string,
-): Record<SearchFilter, number> {
-  const all = runSearch(corpus, role, query, "all");
+/** Counts per filter chip, read off an unfiltered result. */
+export function countsOf(all: SearchResult): Record<SearchFilter, number> {
   const counts = {
     all: all.total,
     intelligence: 0,
@@ -604,4 +599,27 @@ export function countsFor(
   } as Record<SearchFilter, number>;
   for (const g of all.groups) counts[g.category] = g.hits.length + g.more;
   return counts;
+}
+
+/**
+ * One filter's view of an unfiltered result. The matcher runs once per query
+ * and both the chip counts and the visible groups are read from that one run.
+ */
+export function narrow(all: SearchResult, filter: SearchFilter): SearchResult {
+  if (filter === "all") return all;
+  const groups = all.groups.filter((g) => g.category === filter);
+  return {
+    ...all,
+    groups,
+    total: groups.reduce((n, g) => n + g.hits.length + g.more, 0),
+  };
+}
+
+/** Counts per filter chip, computed on the unfiltered result. */
+export function countsFor(
+  corpus: SearchCorpus,
+  role: RoleKey,
+  query: string,
+): Record<SearchFilter, number> {
+  return countsOf(runSearch(corpus, role, query, "all"));
 }

@@ -3,6 +3,16 @@
 // One turn: the question row and the answer card beneath it.
 // Two text treatments carry all the semantics: blue underline is a navigable
 // entity, grey monospace chip is a defanged inert observable.
+//
+// Every state a turn can be in renders: streaming, complete, stopped, failed
+// and superseded. A turn that failed used to fall through to the loading
+// skeleton and stay there; it now says so in one sentence with the fix.
+//
+// The run behind an answer is openable from the one collapsed row under it
+// (CLAUDE.md hard rule 4, AC-13). Everything in that row is a field the answer
+// already carries: citations, the searches that returned nothing, the sources
+// that were unavailable, whether the query left the region, and the marking.
+// Nothing is inferred from timing and nothing is invented.
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
@@ -11,12 +21,13 @@ import { defang } from "@/lib/defang";
 import { recordCount } from "@/lib/format";
 import { NestorMarkReverse } from "@/components/shell/NestorMark";
 import {
+  IconCheck,
   IconChevronDown,
   IconCopy,
   IconEgress,
   IconExport,
 } from "@/components/icons";
-import { IndicatorChip, TlpBadge } from "@/components/ui";
+import { Button, IndicatorChip, TlpBadge } from "@/components/ui";
 import {
   T_FLUSH,
   T_HEAD,
@@ -25,6 +36,16 @@ import {
   T_TD,
   T_TH,
 } from "@/components/table";
+
+/**
+ * What the analyst asked for with the question. Absent when it is not known,
+ * which is every stored or fixture conversation, so the run block states a
+ * workflow only when the request is on record and never guesses one.
+ */
+export interface TurnRequest {
+  /** The workflow chosen by name, or null when the system selected it. */
+  workflow: string | null;
+}
 
 function linkEntities(
   text: string,
@@ -80,14 +101,16 @@ function answerExportJson(a: Answer): string {
   return JSON.stringify(safe, null, 2);
 }
 
+// Loading at final geometry and still: hard rule 4 bans the pulse, the same
+// as SkeletonRows in components/ui.tsx.
 export function AnswerSkeleton() {
   return (
-    <div className="border border-cpx-grey-100 bg-white p-5">
-      <div className="mb-3 h-4 w-2/3 animate-pulse bg-cpx-grey-100" />
-      <div className="mb-2 h-3 w-full animate-pulse bg-cpx-grey-50" />
-      <div className="mb-2 h-3 w-11/12 animate-pulse bg-cpx-grey-50" />
-      <div className="mb-2 h-3 w-4/5 animate-pulse bg-cpx-grey-50" />
-      <div className="mt-4 h-3 w-40 animate-pulse bg-cpx-grey-50" />
+    <div aria-hidden className="space-y-2">
+      <div className="h-4 w-2/3 bg-cpx-grey-100" />
+      <div className="h-3 w-full bg-cpx-grey-50" />
+      <div className="h-3 w-11/12 bg-cpx-grey-50" />
+      <div className="h-3 w-4/5 bg-cpx-grey-50" />
+      <div className="mt-4 h-3 w-40 bg-cpx-grey-50" />
     </div>
   );
 }
@@ -95,23 +118,85 @@ export function AnswerSkeleton() {
 export function TurnView({
   turn,
   onEntity,
+  request,
+  onStop,
+  onRetry,
 }: {
   turn: Turn;
   onEntity: (id: string, entities: Answer["entities"]) => void;
+  request?: TurnRequest;
+  /** Present while the answer is in flight. */
+  onStop?: () => void;
+  /** Present on a failed or stopped turn. */
+  onRetry?: () => void;
 }) {
   const a = turn.answer;
+  const superseded = turn.status === "superseded";
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 ${superseded ? "opacity-60" : ""}`}>
       <div className="flex items-start gap-2.5">
         <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-cpx-grey-100 text-2xs font-medium">
           Q
         </span>
         <p className="pt-0.5 text-base font-medium">{turn.question}</p>
       </div>
-      {turn.status === "streaming" || !a ? (
-        <AnswerSkeleton />
+      {turn.status === "streaming" ? (
+        <PendingCard onStop={onStop} />
+      ) : turn.status === "failed" ? (
+        <Outcome text="The backend did not answer. Ask again." onRetry={onRetry} />
+      ) : turn.status === "stopped" ? (
+        <Outcome text="Stopped before an answer arrived." onRetry={onRetry} />
+      ) : !a ? (
+        <Outcome text="No answer was recorded for this turn." onRetry={onRetry} />
       ) : (
-        <AnswerBody answer={a} onEntity={(id) => onEntity(id, a.entities)} />
+        <AnswerBody
+          answer={a}
+          status={turn.status}
+          request={request}
+          onEntity={(id) => onEntity(id, a.entities)}
+        />
+      )}
+    </div>
+  );
+}
+
+// The answer is being composed. The one live state is said in a word and a
+// still marker, and the analyst can stop it: `stopped` is a state the turn
+// already has. No step-by-step progress is drawn, because none is reported.
+function PendingCard({ onStop }: { onStop?: () => void }) {
+  return (
+    <div className="border border-cpx-grey-100 bg-white p-5" aria-busy="true">
+      <div className="flex items-center justify-between gap-3">
+        <span
+          role="status"
+          className="inline-flex h-5 items-center gap-1.5 rounded-sm border border-cpx-bright-200 bg-cpx-bright-50 px-1.5 text-2xs font-medium text-cpx-bright-700"
+        >
+          <span aria-hidden className="h-2 w-2 rounded-full bg-cpx-bright-100 ring-1 ring-cpx-bright" />
+          Running
+        </span>
+        {onStop && (
+          <Button size="sm" onClick={onStop}>
+            Stop
+          </Button>
+        )}
+      </div>
+      <div className="mt-4">
+        <AnswerSkeleton />
+      </div>
+    </div>
+  );
+}
+
+// One sentence naming the thing and the fix, in the answer's frame, so the
+// scrollback stays an honest record of what happened.
+function Outcome({ text, onRetry }: { text: string; onRetry?: () => void }) {
+  return (
+    <div role="status" className="reveal border border-cpx-grey-100 bg-white p-5">
+      <p className="text-sm">{text}</p>
+      {onRetry && (
+        <Button size="sm" className="mt-3" onClick={onRetry}>
+          Ask again
+        </Button>
       )}
     </div>
   );
@@ -119,16 +204,22 @@ export function TurnView({
 
 function AnswerBody({
   answer: a,
+  status,
+  request,
   onEntity,
 }: {
   answer: Answer;
+  status: Turn["status"];
+  request?: TurnRequest;
   onEntity: (id: string) => void;
 }) {
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const records = a.citations.reduce((n, c) => n + c.recordCount, 0);
+  const superseded = status === "superseded";
 
   return (
-    <div className="border border-cpx-grey-100 bg-white">
+    <div className="reveal-up border border-cpx-grey-100 bg-white">
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-2.5">
@@ -144,17 +235,19 @@ function AnswerBody({
           <div className="flex shrink-0 items-center gap-1">
             <button
               title="Copy"
+              aria-label="Copy answer"
               onClick={() => {
                 navigator.clipboard.writeText(answerPlainText(a));
                 setCopied(true);
                 setTimeout(() => setCopied(false), 1200);
               }}
-              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
+              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 transition-colors duration-150 hover:bg-cpx-grey-50 hover:text-cpx-black"
             >
               <IconCopy />
             </button>
             <button
               title="Export JSON"
+              aria-label="Export answer as JSON"
               onClick={() => {
                 const blob = new Blob([answerExportJson(a)], {
                   type: "application/json",
@@ -165,12 +258,14 @@ function AnswerBody({
                 el.click();
                 URL.revokeObjectURL(el.href);
               }}
-              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
+              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 transition-colors duration-150 hover:bg-cpx-grey-50 hover:text-cpx-black"
             >
               <IconExport />
             </button>
             {copied && (
-              <span className="text-2xs text-cpx-grey-500">Copied</span>
+              <span role="status" className="reveal text-2xs text-cpx-grey-500">
+                Copied
+              </span>
             )}
           </div>
         </div>
@@ -237,13 +332,16 @@ function AnswerBody({
             </p>
           ))}
 
+          {/* The denominator is stated only when the answer carries one. A
+              number the backend did not send is not a number (hard rule 8). */}
           {a.sourcesUnavailable.length > 0 && (
             <p className="text-sm">
               Produced with{" "}
               <span className="font-medium">
-                {a.sourcesUnavailable.length} of {a.sourcesTotal ?? 13}
+                {a.sourcesUnavailable.length}
+                {a.sourcesTotal ? ` of ${a.sourcesTotal}` : ""}
               </span>{" "}
-              sources unavailable.
+              {a.sourcesUnavailable.length === 1 && !a.sourcesTotal ? "source" : "sources"} unavailable.
             </p>
           )}
 
@@ -267,13 +365,24 @@ function AnswerBody({
         </div>
       </div>
 
+      {/* The one collapsed row: the sources, and the run that produced them. */}
       <button
         onClick={() => setSourcesOpen(!sourcesOpen)}
-        className="flex w-full items-center justify-between border-t border-cpx-grey-100 px-5 py-2 text-xs text-cpx-grey-500 hover:bg-cpx-grey-50"
+        aria-expanded={sourcesOpen}
+        className="flex w-full items-center justify-between border-t border-cpx-grey-100 px-5 py-2 text-xs text-cpx-grey-500 transition-colors duration-150 hover:bg-cpx-grey-50"
       >
-        <span className="flex items-center gap-2">
+        <span className="flex flex-wrap items-center gap-2">
           Sources
           <span className="bg-cpx-grey-50 px-1 text-2xs">{a.citations.length}</span>
+          <span className="text-cpx-grey-400">·</span>
+          {superseded ? (
+            <span>Superseded</span>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-green-contrast">
+              <IconCheck />
+              Run complete
+            </span>
+          )}
           {a.egress && (
             <span className="inline-flex items-center gap-1 text-status-warn-ink">
               <IconEgress />
@@ -284,8 +393,53 @@ function AnswerBody({
         <IconChevronDown className={sourcesOpen ? "rotate-180" : ""} />
       </button>
       {sourcesOpen && (
-        <div className="border-t border-cpx-grey-100 px-5 py-3">
-          <ul className="space-y-1.5">
+        <div className="reveal border-t border-cpx-grey-100 px-5 py-3">
+          <dl className="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-1 text-xs">
+            {request && (
+              <>
+                <dt className="text-cpx-grey-500">Workflow</dt>
+                <dd>{request.workflow ?? "Auto-selected"}</dd>
+              </>
+            )}
+            <dt className="text-cpx-grey-500">Evidence</dt>
+            <dd>
+              <span className="font-medium">{a.citations.length}</span>{" "}
+              {a.citations.length === 1 ? "citation" : "citations"} ·{" "}
+              <span className="font-medium">{recordCount(records)}</span>
+            </dd>
+            <dt className="text-cpx-grey-500">Empty searches</dt>
+            <dd>
+              <span className="font-medium">{a.negativeResults.length}</span> returned 0
+              records
+            </dd>
+            <dt className="text-cpx-grey-500">Coverage</dt>
+            <dd>
+              <span className="font-medium">
+                {a.sourcesUnavailable.length}
+                {a.sourcesTotal ? ` of ${a.sourcesTotal}` : ""}
+              </span>{" "}
+              {a.sourcesUnavailable.length === 1 && !a.sourcesTotal ? "source" : "sources"} unavailable
+              {a.sourcesUnavailable.length > 0 && <>: {a.sourcesUnavailable.join(", ")}</>}
+            </dd>
+            <dt className="text-cpx-grey-500">Region</dt>
+            <dd>{a.egress ? "Left region" : "In region"}</dd>
+            <dt className="text-cpx-grey-500">Classification</dt>
+            <dd>{a.classificationSettled ? `TLP:${a.tlp}` : "Pending"}</dd>
+            {a.producedArtefact && (
+              <>
+                <dt className="text-cpx-grey-500">Output</dt>
+                <dd>
+                  <Link
+                    href={`/reports/${encodeURIComponent(a.producedArtefact.ref)}`}
+                    className="text-link underline underline-offset-2"
+                  >
+                    {a.producedArtefact.ref}
+                  </Link>
+                </dd>
+              </>
+            )}
+          </dl>
+          <ul className="mt-3 space-y-1.5 border-t border-cpx-grey-100 pt-3">
             {a.citations.map((c) => (
               <li key={c.id} className="flex items-baseline gap-2 text-xs">
                 <span className="font-mono text-cpx-grey-400">[{c.ref}]</span>

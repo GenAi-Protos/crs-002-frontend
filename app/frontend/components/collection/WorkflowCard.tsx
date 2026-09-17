@@ -14,7 +14,7 @@
 import type { Connector, Source } from "@/lib/types";
 import { RUN_STATE_LABEL, nextCollectionLabel, stageStates, statusFor, unitsFor, type CategoryDefinition, type RunState } from "@/lib/collection-workflows";
 import { agoFromNow, gstDateTime } from "@/lib/format";
-import { StatusPill, type StatusTone, buttonClass } from "@/components/ui";
+import { StatusPill, StepRail, type StatusTone, buttonClass } from "@/components/ui";
 import { IconChevronDown } from "@/components/icons";
 
 const TONE: Record<RunState, StatusTone> = {
@@ -52,7 +52,7 @@ export function WorkflowCard({
       <button
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-cpx-grey-50"
+        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-cpx-grey-50"
       >
         <IconChevronDown className={`mt-1 shrink-0 ${open ? "rotate-180" : ""}`} />
         <span className="min-w-0 flex-1">
@@ -91,25 +91,24 @@ export function WorkflowCard({
       </button>
 
       {open && (
-        <div className="border-t border-cpx-grey-100 px-4 py-4">
+        <div className="reveal border-t border-cpx-grey-100 px-4 py-4">
           {definition.gap && (
             <p className="mb-4 border border-cpx-grey-100 bg-cpx-grey-50 px-3 py-2 text-xs">
               {definition.gap}
             </p>
           )}
 
-          <ol className="space-y-0">
-            {definition.stages.map((stage, i) => (
-              <Stage
-                key={stage.label}
-                index={i + 1}
-                label={stage.label}
-                detail={stage.detail}
-                state={stages[i]}
-                last={i === definition.stages.length - 1}
-              />
-            ))}
-          </ol>
+          {/* The shared rail (components/ui.tsx): the same drawing the workflow
+              library and the answer run use, with this category's own stages. */}
+          <StepRail
+            steps={definition.stages.map((stage, i) => ({
+              key: stage.label,
+              title: stage.label,
+              detail: stage.detail,
+              state: stages[i],
+              stateLabel: RUN_STATE_LABEL[stages[i]],
+            }))}
+          />
 
           <Actions
             status={status}
@@ -137,62 +136,6 @@ function Fact({
       <span className="font-medium">{value}</span>
     </span>
   );
-}
-
-function Stage({
-  index,
-  label,
-  detail,
-  state,
-  last,
-}: {
-  index: number;
-  label: string;
-  detail: string;
-  state: RunState;
-  last: boolean;
-}) {
-  return (
-    <li className="flex gap-3">
-      {/* The rail: a marker per stage, joined by a line so the order reads as
-          a sequence rather than a list of unrelated steps. */}
-      <span className="flex flex-col items-center">
-        <Marker state={state} />
-        {!last && <span className="w-px flex-1 bg-cpx-grey-100" />}
-      </span>
-      <span className={`min-w-0 flex-1 ${last ? "pb-0" : "pb-4"}`}>
-        <span className="flex flex-wrap items-baseline gap-2">
-          <span className="text-sm font-medium">
-            {index}. {label}
-          </span>
-          <span
-            className={`text-2xs ${
-              state === "failed"
-                ? "text-status-warn-ink"
-                : state === "pending"
-                  ? "text-cpx-grey-500"
-                  : "text-green-contrast"
-            }`}
-          >
-            {RUN_STATE_LABEL[state]}
-          </span>
-        </span>
-        <span className="mt-0.5 block text-xs text-cpx-grey-500">{detail}</span>
-      </span>
-    </li>
-  );
-}
-
-function Marker({ state }: { state: RunState }) {
-  const cls =
-    state === "completed"
-      ? "bg-cpx-green ring-cpx-purple"
-      : state === "failed"
-        ? "bg-cpx-red ring-cpx-red"
-        : state === "partial" || state === "awaiting-review"
-          ? "bg-status-warn-fill ring-status-warn-ink"
-          : "bg-white ring-cpx-grey-200";
-  return <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ring-1 ${cls}`} />;
 }
 
 // Actions are enabled only where something is genuinely wired. A control that
