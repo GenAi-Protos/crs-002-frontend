@@ -197,7 +197,9 @@ function IntelligenceInner() {
     setTurns((t) => [...t, turn]);
     setDraft("");
     setAttachments([]);
-    askIntelligence(user.id, question, sessionId ?? undefined, options, controller.signal, files.map((f) => f.id), allowPartial)
+    const onProgress = (label: string) =>
+      setTurns((t) => t.map((x) => (x.id === turn.id ? { ...x, progress: [...(x.progress ?? []), label] } : x)));
+    askIntelligence(user.id, question, sessionId ?? undefined, options, controller.signal, files.map((f) => f.id), allowPartial, onProgress)
       .then(({ investigationId, turn: backendTurn }) => {
         setTurnFiles((previous) => ({ ...previous, [backendTurn.id]: files }));
         setRequests((r) => ({ ...r, [backendTurn.id]: request }));

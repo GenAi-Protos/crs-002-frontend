@@ -246,6 +246,8 @@ export interface Turn {
   question: string;
   attachmentIds?: string[];
   status: "streaming" | "complete" | "stopped" | "failed" | "superseded";
+  /** Console-only: what the backend said it was doing while the turn streamed. */
+  progress?: string[];
   answer?: Answer;
   supersededBy?: string;
 }
