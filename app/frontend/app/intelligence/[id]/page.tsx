@@ -11,7 +11,7 @@ import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { TurnView } from "@/components/intelligence/AnswerCard";
 import { EntityDrawer } from "@/components/intelligence/EntityDrawer";
-import { PageHeader, OfflineNote, SkeletonRows } from "@/components/ui";
+import { CenterMessage, NotPermitted, OfflineNote, Page, PageHeader, SkeletonRows } from "@/components/ui";
 
 export default function InvestigationPage({
   params,
@@ -40,44 +40,39 @@ export default function InvestigationPage({
     return () => { active = false; };
   }, [user.id, id]);
 
-  if (!canSee(user.role, "intelligence")) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-base">Not permitted at this access level.</p>
-        <Link href="/" className="text-sm text-link underline underline-offset-2">
-          Dashboard
-        </Link>
-      </div>
-    );
-  }
+  if (!canSee(user.role, "intelligence")) return <NotPermitted />;
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-[880px] px-6 py-8">
+      <Page narrow>
         <PageHeader title="Intelligence" />
         <SkeletonRows rows={5} />
-      </div>
+      </Page>
     );
   }
 
+  // An outage is not an absence: a conversation the backend could not be
+  // asked about says so instead of claiming it does not exist.
   if (!found) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-base">No conversation with this reference.</p>
-        <Link
-          href="/intelligence"
-          className="text-sm text-link underline underline-offset-2"
-        >
-          Intelligence
-        </Link>
-      </div>
+      <CenterMessage
+        action={
+          <Link href="/intelligence" className="link-quiet text-sm">
+            Intelligence
+          </Link>
+        }
+      >
+        {offline
+          ? "Conversations could not be reached. Retry when the backend is available."
+          : "No conversation with this reference."}
+      </CenterMessage>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-[880px] px-6 py-8">
+    <Page narrow>
       <PageHeader title="Intelligence" meta={offline ? <OfflineNote /> : undefined} />
-      <div className="space-y-8">
+      <div className="space-y-6">
       {turns.map((t) => (
         <TurnView
           key={t.id}
@@ -89,6 +84,6 @@ export default function InvestigationPage({
       ))}
       </div>
       <EntityDrawer entity={entity} hits={hits} advisories={advisories} onClose={() => setEntity(null)} />
-    </div>
+    </Page>
   );
 }

@@ -33,8 +33,10 @@ export function gstDateTime(iso: string | Date): string {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${hh}:${mm} GST`;
 }
 
-export function agoFromNow(iso: string): string {
-  const ms = DEMO_NOW.getTime() - new Date(iso).getTime();
+// Fixture screens measure from the demo clock; live screens pass `new Date()`.
+export function agoFromNow(iso: string, now: Date = DEMO_NOW): string {
+  const ms = now.getTime() - new Date(iso).getTime();
+  if (Number.isNaN(ms)) return "-";
   const mins = Math.floor(ms / 60000);
   if (mins < 1) return "now";
   if (mins < 60) return `${mins}m ago`;
@@ -42,6 +44,13 @@ export function agoFromNow(iso: string): string {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
+}
+
+/** An hours figure in the unit a reader thinks in: 1,400.1 hours is 58 days. */
+export function hoursLabel(hours: number): string {
+  if (hours < 1) return `${Math.round(hours * 60)} min`;
+  if (hours < 48) return `${Math.round(hours)} h`;
+  return `${Math.round(hours / 24)} days`;
 }
 
 export function recordCount(n: number): string {

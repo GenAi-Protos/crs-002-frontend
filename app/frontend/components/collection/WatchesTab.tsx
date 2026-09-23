@@ -4,148 +4,144 @@
 // analyst judgement lives. Seeded from PIR17, PIR18, PIR19.
 
 import { useEffect, useState } from "react";
+import { TypeBadge } from "@/components/table";
 import { WATCHES } from "@/lib/fixtures";
 import { createWatch, deleteWatch, getPirs, patchWatch } from "@/lib/api";
 import { useConsoleUser } from "@/lib/role-context";
 import type { KeywordWatch, Pir, Rhythm } from "@/lib/types";
 import { gstDateTime } from "@/lib/format";
 import { IconChevronDown, IconPlus } from "@/components/icons";
-import { Dialog, buttonClass } from "@/components/ui";
+import { Banner, Button, Dialog, ListMeta, Panel, SearchBox, buttonClass } from "@/components/ui";
 
 const CADENCES: Rhythm[] = ["continuous", "hourly", "daily", "weekly"];
 
 export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWatch[] }) {
   const [watches, setWatches] = useState<KeywordWatch[]>(initialRows);
-  const [open, setOpen] = useState<string | null>(WATCHES[0]?.id ?? null);
+  const [open, setOpen] = useState<string | null>(null);
   const [editing, setEditing] = useState<KeywordWatch | null>(null);
   const [creating, setCreating] = useState(false);
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [q, setQ] = useState("");
   const { user } = useConsoleUser();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => setWatches(initialRows), [initialRows]);
 
-  return (
-    <div className="mt-4 max-w-3xl xl:max-w-none">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-cpx-grey-500">
-          <span className="font-medium text-cpx-black">{watches.length}</span> watches ·
-          Name A to Z
-        </span>
-        <button
-          onClick={() => setCreating(true)}
-          className={buttonClass("primary")}
-        >
-          <IconPlus />
-          New watch
-        </button>
-      </div>
+  const needle = q.toLowerCase();
+  const rows = [...watches]
+    .filter((w) => !needle || `${w.name} ${w.terms.join(" ")} ${w.pirRefs.join(" ")}`.toLowerCase().includes(needle))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
-      {/* One column: these cards expand in place, and in a two-column grid an
-          expanded card left a card-height hole beside its collapsed neighbour. */}
-      <div className="mt-3 flex max-w-[880px] flex-col gap-2">
-        {watches.length === 0 && (
-          <p className="text-sm">
-            <span className="font-medium">0 watches</span>
+  return (
+    <div className="space-y-3">
+      {error && <Banner tone="warn">Not deleted: {error}</Banner>}
+      <Panel
+        title="Keyword watches"
+        count={watches.length}
+        action={
+          <Button size="sm" variant="primary" onClick={() => setCreating(true)}>
+            <IconPlus />
+            New watch
+          </Button>
+        }
+        enter={0}
+        flush
+      >
+        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+          <SearchBox value={q} onChange={setQ} placeholder="Search watches" className="w-full max-w-72" />
+          <div className="flex-1" />
+          <ListMeta shown={rows.length} total={watches.length} sort="Name A to Z" />
+        </div>
+        {rows.length === 0 && (
+          <p className="px-3 py-6 text-center text-sm text-cpx-grey-500">
+            <span className="font-medium text-cpx-black">0 watches</span>
+            {q ? " match." : "."}
           </p>
         )}
-        {[...watches]
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((w) => {
+        <ul>
+          {rows.map((w) => {
             const isOpen = open === w.id;
             return (
-              <div key={w.id} className="border border-cpx-grey-100 bg-white">
+              <li key={w.id} className="border-b border-cpx-grey-100 last:border-b-0">
                 <button
                   onClick={() => setOpen(isOpen ? null : w.id)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                  aria-expanded={isOpen}
+                  className={`row-link flex w-full items-center gap-3 px-3 py-2 text-left ${isOpen ? "bg-cpx-green-50/60" : ""}`}
                 >
-                  <span className="flex-1 text-base font-medium tracking-tightish">
-                    {w.name}
+                  <IconChevronDown className={`text-cpx-grey-400 ${isOpen ? "" : "-rotate-90"}`} />
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{w.name}</span>
+                  <span className="hidden flex-wrap gap-1 @xl/page:flex">
+                    {w.pirRefs.map((p) => (
+                      <TypeBadge key={p} label={p} />
+                    ))}
                   </span>
-                  {w.pirRefs.map((p) => (
-                    <span key={p} className="bg-cpx-grey-50 px-1.5 py-0.5 text-2xs">
-                      {p}
-                    </span>
-                  ))}
-                  <span className="text-xs text-cpx-grey-500">{w.cadence}</span>
-                  <IconChevronDown className={isOpen ? "rotate-180" : ""} />
+                  <span className="w-20 shrink-0 text-right text-xs capitalize text-cpx-grey-500">{w.cadence}</span>
+                  <span className="w-20 shrink-0 text-right text-xs tabular-nums text-cpx-grey-500">
+                    {w.terms.length} {w.terms.length === 1 ? "term" : "terms"}
+                  </span>
                 </button>
                 {isOpen && (
-                  <div className="reveal border-t border-cpx-grey-100 px-4 py-3">
-                    <div className="flex flex-wrap gap-1.5">
-                      {w.terms.map((t) => (
-                        <span
-                          key={t}
-                          className="bg-cpx-grey-50 px-2 py-0.5 font-mono text-xs"
+                  <div className="reveal grid gap-3 border-t border-cpx-grey-100 bg-cpx-grey-50/60 px-3 py-3 pl-9 @3xl/page:grid-cols-2">
+                    <div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {w.terms.map((t) => (
+                          <span key={t} className="rounded-sm border border-cpx-grey-100 bg-white px-1.5 py-0.5 font-mono text-xs">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="mt-2 text-xs text-cpx-grey-500">
+                        {w.language} · {w.region}
+                      </p>
+                      <div className="mt-3 flex gap-2">
+                        <Button size="sm" onClick={() => setEditing(w)}>
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          onClick={() => {
+                            if (confirming === w.id) {
+                              setConfirming(null);
+                              setError(null);
+                              deleteWatch(user.id, w.id)
+                                .then(() => setWatches((ws) => ws.filter((x) => x.id !== w.id)))
+                                .catch((e: Error) => setError(e.message));
+                            } else {
+                              setConfirming(w.id);
+                            }
+                          }}
+                          onBlur={() => setConfirming(null)}
+                          className={confirming === w.id ? "border-cpx-red-700 bg-cpx-red-50" : ""}
                         >
-                          {t}
-                        </span>
-                      ))}
+                          {confirming === w.id ? "Confirm delete" : "Delete"}
+                        </Button>
+                      </div>
                     </div>
-                    <p className="mt-2 text-xs text-cpx-grey-500">
-                      {w.language} · {w.region}
-                    </p>
                     {w.lastRun ? (
-                      <div className="mt-3">
-                        <p className="text-xs text-cpx-grey-500">
-                          Last run {gstDateTime(w.lastRun.at)}
-                        </p>
-                        <ul className="mt-1 space-y-0.5">
+                      <div>
+                        <p className="text-xs text-cpx-grey-500">Last run {gstDateTime(w.lastRun.at)}</p>
+                        <ul className="mt-1 divide-y divide-cpx-grey-100 rounded-sm border border-cpx-grey-100 bg-white">
                           {w.lastRun.results.map((r) => (
-                            <li
-                              key={r.sourceName}
-                              className="flex justify-between text-xs"
-                            >
-                              <span className="">{r.sourceName}</span>
-                              <span className="font-medium">{r.count}</span>
+                            <li key={r.sourceName} className="flex justify-between px-2 py-1 text-xs">
+                              <span>{r.sourceName}</span>
+                              <span className="font-medium tabular-nums">{r.count}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
                     ) : (
-                      <p className="mt-3 text-xs">
+                      <p className="text-xs">
                         <span className="font-medium">0 runs</span>
                       </p>
                     )}
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        onClick={() => setEditing(w)}
-                        className={buttonClass("secondary", "sm")}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirming === w.id) {
-                            setConfirming(null);
-                            setError(null);
-                            deleteWatch(user.id, w.id)
-                              .then(() => setWatches((ws) => ws.filter((x) => x.id !== w.id)))
-                              .catch((e: Error) => setError(e.message));
-                          } else {
-                            setConfirming(w.id);
-                          }
-                        }}
-                        onBlur={() => setConfirming(null)}
-                        className={
-                          confirming === w.id
-                            ? "inline-flex h-7 items-center bg-status-warn-ink px-2.5 text-xs font-medium text-white"
-                            : buttonClass("danger", "sm")
-                        }
-                      >
-                        {confirming === w.id ? "Confirm delete" : "Delete"}
-                      </button>
-                    </div>
                   </div>
                 )}
-              </div>
+              </li>
             );
           })}
-      </div>
-
-      {error && (
-        <p className="mt-3 text-xs text-status-warn-ink">Not deleted: {error}</p>
-      )}
+        </ul>
+      </Panel>
 
       {(creating || editing) && (
         <WatchDialog

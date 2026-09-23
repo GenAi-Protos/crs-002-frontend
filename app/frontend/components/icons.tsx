@@ -90,7 +90,7 @@ export function IconCritical({ className = "" }: P) {
   return (
     <svg viewBox="0 0 16 16" width="12" height="12" className={`${base} ${className}`} fill="currentColor" aria-hidden>
       <path d="M5 1.5h6L15 5.5v5L11 14.5H5L1 10.5v-5z" />
-      <path d="M5.5 8h5" stroke="white" strokeWidth="1.6" fill="none" />
+      <path d="M5.5 8h5" stroke="var(--color-canvas)" strokeWidth="1.6" fill="none" />
     </svg>
   );
 }
@@ -181,6 +181,74 @@ export function IconEgress({ className = "" }: P) {
       <circle cx="8" cy="8" r="5.5" />
       <path d="M8 2.5v11M2.5 8h11" />
       <path d="M4 4.5c2.4 1.6 5.6 1.6 8 0M4 11.5c2.4-1.6 5.6-1.6 8 0" />
+    </svg>
+  );
+}
+
+// A case file: a folder with a tab, for Investigations (shared cases).
+export function IconCase({ className = "" }: P) {
+  return (
+    <svg viewBox="0 0 20 20" width="18" height="18" className={`${base} ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+      <path d="M2.5 5.5V16h15V7.5H9.5L8 5.5z" strokeLinejoin="miter" />
+      <path d="M2.5 9.5h15" />
+    </svg>
+  );
+}
+
+// Three dots, for a row's overflow menu. Replaces the typed "⋮" glyph.
+export function IconMore({ className = "" }: P) {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" className={`${base} ${className}`} fill="currentColor" aria-hidden>
+      <rect x="7" y="2.5" width="2" height="2" />
+      <rect x="7" y="7" width="2" height="2" />
+      <rect x="7" y="11.5" width="2" height="2" />
+    </svg>
+  );
+}
+
+export function IconChevronRight({ className = "" }: P) {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" className={`${base} ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+      <path d="M6 4l4 4-4 4" strokeLinejoin="miter" />
+    </svg>
+  );
+}
+
+export function IconChevronLeft({ className = "" }: P) {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" className={`${base} ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+      <path d="M10 4 6 8l4 4" strokeLinejoin="miter" />
+    </svg>
+  );
+}
+
+// Turns half a revolution once per refresh (the caller drives `rotate`); it
+// never spins while waiting, because nothing in the console loops.
+export function IconRefresh({ className = "" }: P) {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" className={`${base} ${className}`} fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+      <path d="M13 8a5 5 0 1 1-1.5-3.55" strokeLinecap="square" />
+      <path d="M13 2.5v3h-3" strokeLinejoin="miter" />
+    </svg>
+  );
+}
+
+// The rail toggle: a panel with its side column.
+export function IconPanel({ className = "" }: P) {
+  return (
+    <svg viewBox="0 0 16 16" width="14" height="14" className={`${base} ${className}`} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <rect x="2" y="2.5" width="12" height="11" />
+      <path d="M6 2.5v11" />
+    </svg>
+  );
+}
+
+export function IconInfo({ className = "" }: P) {
+  return (
+    <svg viewBox="0 0 16 16" width="12" height="12" className={`${base} ${className}`} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <circle cx="8" cy="8" r="6" />
+      <path d="M8 7v4.5" />
+      <path d="M8 4.6v1.2" />
     </svg>
   );
 }

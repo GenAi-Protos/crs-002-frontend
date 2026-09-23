@@ -102,3 +102,21 @@ Genuinely open. **None of it is a CPX position. Do not assert any of it.**
 
 - **The PhishTank URL carries a 64-character API key in its path** and the workbook has reached at least six external recipients. Recommend rotation.
 - **CPX's own published advisories carry defects** we found while building the validators: an invented MITRE technique name, a technique with no ID, a tactic filed under the wrong heading, and two CVSS authorities ranking the same CVEs in opposite order with the prose silently following one of them. These go to Mohanasundaram directly, framed as findings from building against them. Never raised in the room.
+
+---
+
+## 5 · Backend follow-ups from the dashboard redesign (23 September 2026)
+
+Found while wiring `/dashboard/intelligence` into the Dashboard. The frontend works around each one; none is fixed in the frontend, because rule 5 says the payload, not the DOM, decides what a role receives.
+
+| # | Follow-up | Frontend today |
+|---|---|---|
+| 1 | `/dashboard/intelligence` gives the executive draft and in-review advisory titles: `assemble_advisories` applies the published-only filter to IR, leadership and sales, not the executive. | The feed is not fetched for leadership, executive or sales. |
+| 2 | The same feed gives sales PIR finding titles, which is analyst-level data. | As above. |
+| 3 | `emergingThreats` rows carry no `id`, so an emerging hit cannot link to a Draft. | Listed by title and age only. |
+| 4 | Campaign and advisory `severity` is mapped from TLP. Sending `tlp` itself would let the screen show what the field actually is. | Severity is not shown for campaigns or advisories. |
+| 5 | Leadership's source-gap count exists only inside the insight description. | That one description is shown as a line. |
+| 6 | The views payload has no withheld count, so a Sales dashboard cannot say "14 indicators, withheld at this access level" (hard rule 5). | Not shown for sales. |
+| 7 | The lead's `failed-runs` KPI links to `/manage`, which held the agent run history until Agents and Workflows left Manage. | The frontend sends `/manage` to `/investigations`, where a failed run is inspected on its case. |
+
+**To confirm with CPX.** At the user's request on 23 September 2026, Manage keeps only PIRs and Audit: the agent specification view and the workflow catalogue are gone. CPX asked for both on 2 September (Praveen Singh 13:45 and 29:21 to 31:45). The run inspector that AC-13 needs is unaffected, because it opens from the answer and the case. If CPX still expects the catalogue, it is a restore from git history, not a rebuild.

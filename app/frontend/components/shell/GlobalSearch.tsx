@@ -179,7 +179,7 @@ export function GlobalSearch() {
         aria-controls="global-search-results"
         aria-autocomplete="list"
         aria-activedescendant={open && flat.length > 0 ? optionId(cursor) : undefined}
-        className="h-8 w-64 rounded-sm border border-cpx-grey-100 bg-white pl-8 pr-14 text-sm text-cpx-black placeholder:text-cpx-grey-500 focus:border-cpx-green focus:outline-none xl:w-80"
+        className="h-7 w-52 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 pl-8 pr-14 text-sm text-cpx-black transition-colors duration-150 placeholder:text-cpx-grey-500 hover:border-cpx-grey-200 focus:border-cpx-green focus:bg-white focus:outline-none lg:w-64 xl:w-80"
       />
       {/* The shortcut, where the eye lands when it looks for the box. */}
       <kbd
@@ -194,7 +194,7 @@ export function GlobalSearch() {
           id="global-search-results"
           role="listbox"
           aria-label="Search results"
-          className="reveal absolute right-0 top-10 z-50 max-h-[70vh] w-[38rem] overflow-y-auto border border-cpx-grey-100 bg-white text-cpx-black shadow-pop"
+          className="pop absolute right-0 top-9 z-50 max-h-[70vh] w-[38rem] max-w-[calc(100vw-5rem)] origin-top-right overflow-y-auto border border-cpx-grey-100 bg-white text-cpx-black shadow-pop"
         >
           {/* Filters stay visible while typing: the counts are the fastest way
               to see where a match actually lives. */}

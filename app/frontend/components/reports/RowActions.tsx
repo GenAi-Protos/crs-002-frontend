@@ -13,6 +13,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Advisory } from "@/lib/types";
+import { IconMore } from "@/components/icons";
 // lib/report-formats, not lib/report-export: this renders in every row of the
 // list, and the export module carries the DOCX and ZIP writers with it.
 import {
@@ -76,18 +77,16 @@ export function RowActions({
           e.stopPropagation();
           setOpen(!open);
         }}
-        className="flex h-7 w-7 items-center justify-center text-cpx-grey-500 hover:bg-cpx-grey-50"
+        className="flex h-6 w-6 items-center justify-center rounded-sm text-cpx-grey-500 transition-colors duration-150 hover:bg-cpx-grey-100 hover:text-cpx-black aria-expanded:bg-cpx-grey-100 aria-expanded:text-cpx-black"
       >
-        <span aria-hidden className="text-md leading-none">
-          &#8942;
-        </span>
+        <IconMore />
       </button>
 
       {open && (
         <div
           role="menu"
           onClick={(e) => e.stopPropagation()}
-          className="reveal absolute right-0 top-8 z-50 min-w-[14rem] border border-cpx-grey-100 bg-white py-1 text-left shadow-pop"
+          className="pop absolute right-0 top-7 z-50 origin-top-right min-w-[14rem] border border-cpx-grey-100 bg-white py-1 text-left shadow-pop"
         >
           {level === "root" && (
             <>
@@ -203,7 +202,7 @@ function Item({
       role="menuitem"
       disabled={disabled}
       onClick={onClick}
-      className="block w-full px-3 py-1.5 text-left text-xs hover:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
+      className="block w-full px-3 py-1.5 text-left text-xs transition-colors duration-100 hover:bg-cpx-grey-50 focus-visible:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
     >
       <span className="flex items-center gap-2">
         {label}

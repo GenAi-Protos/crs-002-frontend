@@ -38,13 +38,22 @@ export const T_HEAD = "border-b border-cpx-grey-100 text-left";
  * stays opaque as rows scroll under it. CSD-007 head: grey-50 band, 12px
  * uppercase, semibold, secondary grey.
  */
-export const T_TH = `${PAD} bg-cpx-grey-50 py-2 text-xs font-semibold uppercase tracking-wide whitespace-nowrap text-cpx-grey-500`;
+export const T_TH = `${PAD} bg-cpx-grey-50 py-1.5 text-2xs font-semibold uppercase tracking-wide whitespace-nowrap text-cpx-grey-500`;
 
-/** Row hover is a 40% green-50 wash, the same as every other CPX console. */
-export const T_ROW =
-  "border-b border-cpx-grey-100 align-top transition-colors hover:bg-cpx-green-50/40";
+/** Opt-in: a header that stays put while the page scrolls under it. */
+export const T_STICKY = "sticky top-0 z-10";
 
-export const T_TD = `${PAD} py-2 align-top`;
+/**
+ * Row hover is the green-50 wash of every CPX console, plus a 2px green rule
+ * on the leading edge (`row-link`, an inset shadow: nothing reflows) and a
+ * `.lean` chevron that leans in, where the row navigates.
+ */
+export const T_ROW = "row-link border-b border-cpx-grey-100 align-middle last:border-b-0";
+
+/** A row that is the current selection or the open one. */
+export const T_ROW_SELECTED = "bg-cpx-green-50/60 shadow-[inset_2px_0_0_var(--color-cpx-green)]";
+
+export const T_TD = `${PAD} py-1.5 text-sm`;
 
 /**
  * Pulls the outer edges flush with the panel that contains it. Panel tables use
@@ -54,6 +63,17 @@ export const T_FLUSH = "first:pl-0 last:pr-0";
 
 /** Numeric columns. Applied to the heading and its cells together. */
 export const T_NUM = "text-right tabular-nums";
+
+/** The one empty row: centred, the count in bold, one line. */
+export function EmptyRow({ colSpan, children }: { colSpan: number; children: React.ReactNode }) {
+  return (
+    <tr>
+      <td colSpan={colSpan} className="px-3 py-6 text-center text-sm text-cpx-grey-500">
+        {children}
+      </td>
+    </tr>
+  );
+}
 
 // --- cell contents -----------------------------------------------------------
 

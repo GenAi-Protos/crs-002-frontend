@@ -14,19 +14,42 @@ import type { Pir, Rhythm, Source } from "@/lib/types";
 import { pollLog } from "@/lib/source-log";
 import { agoFromNow, gstDate, gstDateTime } from "@/lib/format";
 import { captureModeLabel } from "@/lib/derive";
-import { downloadCsv, InertUrl, ListMeta, SearchBox, StatusPill, type StatusTone, buttonClass, OfflineNote } from "@/components/ui";
+import {
+  Banner,
+  Button,
+  buttonClass,
+  CenterMessage,
+  downloadCsv,
+  InertUrl,
+  ListMeta,
+  NotPermitted,
+  OfflineNote,
+  Page,
+  PageHeader,
+  Panel,
+  SearchBox,
+  Select,
+  SkeletonPanel,
+  Stat,
+  StatStrip,
+  StatusPill,
+} from "@/components/ui";
 import { DailyBars } from "@/components/chart/DailyBars";
-import { IconEgress } from "@/components/icons";
-import { T_HEAD, T_NUM, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
+import { IconCheck, IconChevronLeft, IconEgress } from "@/components/icons";
+import { EmptyRow, T_HEAD, T_NUM, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
+import { SOURCE_STATE } from "@/lib/status";
 
-const STATE_META: Record<Source["state"], { tone: StatusTone; label: string }> = {
-  healthy: { tone: "good", label: "Healthy" },
-  "silent-expected": { tone: "idle", label: "Silent, expected" },
-  "silent-unexplained": { tone: "warn", label: "Silent, unexplained" },
-  failing: { tone: "critical", label: "Failing" },
-  "blocked-needs-credential": { tone: "warn", label: "Blocked, needs credential" },
-  "not-collected": { tone: "idle", label: "Not collected" },
-};
+function Back() {
+  return (
+    <Link
+      href="/collection?tab=sources"
+      className="group/b mb-2 inline-flex items-center gap-0.5 text-xs text-cpx-grey-500 transition-colors duration-150 hover:text-cpx-purple"
+    >
+      <IconChevronLeft className="transition-transform duration-150 group-hover/b:-translate-x-0.5" />
+      Sources
+    </Link>
+  );
+}
 
 const RHYTHMS: Rhythm[] = ["continuous", "hourly", "daily", "weekly"];
 
@@ -46,13 +69,17 @@ export default function SourcePage({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [offline, setOffline] = useState(false);
+  // "No source" waits for the backend's answer; ids outside the fixtures used
+  // to flash it while loading.
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     getSource(user.id, id)
       .then((s) => {
         setApiBase(s);
         setOffline(false);
       })
-      .catch((e) => setOffline(isUnreachable(e)));
+      .catch((e) => setOffline(isUnreachable(e)))
+      .finally(() => setLoaded(true));
     getPirs(user.id).then(setPirs).catch(() => setPirs([]));
   }, [user.id, id]);
 
@@ -82,33 +109,37 @@ export default function SourcePage({
       JSON.stringify([...s.pirRefs].sort()) !==
         JSON.stringify([...savedSnap.pirRefs].sort()));
 
-  if (!canSee(user.role, "collection")) {
+  if (!canSee(user.role, "collection")) return <NotPermitted />;
+
+  if (!s && !loaded) {
     return (
-      <Center>
-        <p className="text-base">Not permitted at this access level.</p>
-        <Link href="/" className="text-sm text-link underline underline-offset-2">
-          Dashboard
-        </Link>
-      </Center>
+      <Page band>
+        <Back />
+        <div className="mb-3 h-7 w-72 bg-cpx-grey-100" />
+        <div className="grid gap-3 @4xl/page:grid-cols-12">
+          <SkeletonPanel rows={6} className="@4xl/page:col-span-4" />
+          <SkeletonPanel rows={5} className="@4xl/page:col-span-8" />
+        </div>
+      </Page>
     );
   }
 
   if (!s) {
     return (
-      <Center>
-        <p className="text-base">No source with this reference.</p>
-        <Link
-          href="/collection?tab=sources"
-          className="text-sm text-link underline underline-offset-2"
-        >
-          Sources
-        </Link>
-      </Center>
+      <CenterMessage
+        action={
+          <Link href="/collection?tab=sources" className="link-quiet text-sm">
+            Sources
+          </Link>
+        }
+      >
+        {offline ? "Sources could not be reached. Retry when the backend is available." : "No source with this reference."}
+      </CenterMessage>
     );
   }
 
   const update = (fn: (x: Source) => Source) => setDraft(fn(s));
-  const st = STATE_META[s.state];
+  const st = SOURCE_STATE[s.state];
   const filteredLog = log.filter((r) => {
     if (logQuery === "") return true;
     const q = logQuery.toLowerCase();
@@ -119,81 +150,71 @@ export default function SourcePage({
     );
   });
 
+  const save = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      // Only these three are settings. Class, capture mode and residency are
+      // derived server-side and must not be sent.
+      const saved = await patchSource(user.id, s.id, {
+        enabled: s.enabled,
+        expectedRhythm: s.expectedRhythm,
+        pirRefs: s.pirRefs,
+      });
+      setDraft(saved);
+      setSavedSnap(saved);
+    } catch (e) {
+      setSaveError((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <Link
-          href="/collection?tab=sources"
-          className="text-xs text-cpx-grey-500 underline underline-offset-2"
-        >
-          Sources
-        </Link>
-        <span className="text-cpx-grey-400">/</span>
-        <h1 className="text-xl font-semibold tracking-tightish">{s.name}</h1>
-        <StatusPill {...st} />
-        {offline && <OfflineNote />}
-        <div className="flex-1" />
-        {saveError && (
-          <span className="text-xs text-status-warn-ink">Not saved: {saveError}</span>
-        )}
-        {dirty && (
+    <Page band>
+      <Back />
+      <PageHeader
+        title={s.name}
+        meta={
+          <span className="flex shrink-0 items-center gap-1.5">
+            <StatusPill {...st} />
+            {!s.enabled && <StatusPill tone="idle" label="Disabled" />}
+            {offline && <OfflineNote />}
+          </span>
+        }
+        action={
           <>
-            <button
-              disabled={saving}
-              onClick={async () => {
-                setSaving(true);
-                setSaveError(null);
-                try {
-                  // Only these three are settings. Class, capture mode and
-                  // residency are derived server-side and must not be sent.
-                  const saved = await patchSource(user.id, s.id, {
-                    enabled: s.enabled,
-                    expectedRhythm: s.expectedRhythm,
-                    pirRefs: s.pirRefs,
-                  });
-                  setDraft(saved);
-                  setSavedSnap(saved);
-                } catch (e) {
-                  setSaveError((e as Error).message);
-                } finally {
-                  setSaving(false);
-                }
-              }}
-              className={buttonClass("primary")}
-            >
-              {saving ? "Saving" : "Save"}
-            </button>
-            <button
-              onClick={() => setDraft(savedSnap)}
-              className={buttonClass()}
-            >
-              Discard
-            </button>
+            {dirty && (
+              <>
+                <Button variant="primary" disabled={saving} onClick={() => void save()}>
+                  {saving ? "Saving" : "Save"}
+                </Button>
+                <Button onClick={() => setDraft(savedSnap)}>Discard</Button>
+              </>
+            )}
+            <Button onClick={() => update((x) => ({ ...x, enabled: !x.enabled }))}>
+              {s.enabled ? "Disable" : "Enable"}
+            </Button>
+            {(s.state === "blocked-needs-credential" || s.state === "failing") && (
+              <Link href="/collection?tab=requests" className={buttonClass()}>
+                Request queue
+              </Link>
+            )}
           </>
-        )}
-        <button
-          onClick={() => update((x) => ({ ...x, enabled: !x.enabled }))}
-          className={buttonClass(s.enabled ? "secondary" : "primary")}
-        >
-          {s.enabled ? "Disable" : "Enable"}
-        </button>
-        {(s.state === "blocked-needs-credential" || s.state === "failing") && (
-          <Link
-            href="/collection?tab=requests"
-            className={buttonClass()}
-          >
-            Request queue
-          </Link>
-        )}
-      </div>
-      <p className="mt-1">
+        }
+      />
+      <p className="-mt-2 mb-3">
         <InertUrl url={s.url} />
       </p>
+      {saveError && (
+        <Banner tone="warn" className="mb-3">
+          Not saved: {saveError}
+        </Banner>
+      )}
 
-      <div className="mt-5 grid grid-cols-1 items-start gap-4 xl:grid-cols-12">
-        <div className="border border-cpx-grey-100 bg-white p-4 xl:col-span-4">
-          <span className="text-xs text-cpx-grey-500">Facts</span>
-          <dl className="mt-3 space-y-2.5 text-sm">
+      <div className="grid items-start gap-3 @4xl/page:grid-cols-12">
+        <Panel title="Facts" enter={0} className="@4xl/page:col-span-4">
+          <dl className="space-y-2 text-sm">
             <FactRow label="Sheet">{s.sheet}</FactRow>
             <FactRow label="Class">{s.collectorClass}</FactRow>
             <FactRow label="Capture">{captureModeLabel[s.captureMode]}</FactRow>
@@ -210,18 +231,17 @@ export default function SourcePage({
               </span>
             </FactRow>
             <FactRow label="Rhythm">
-              <select
+              <Select
+                fieldSize="sm"
                 value={s.expectedRhythm}
-                onChange={(e) =>
-                  update((x) => ({ ...x, expectedRhythm: e.target.value as Rhythm }))
-                }
+                onChange={(e) => update((x) => ({ ...x, expectedRhythm: e.target.value as Rhythm }))}
                 aria-label="Expected rhythm"
-                className="h-7 border border-cpx-grey-100 bg-white px-1 text-xs focus:outline-none"
+                className="capitalize"
               >
                 {RHYTHMS.map((r) => (
                   <option key={r}>{r}</option>
                 ))}
-              </select>
+              </Select>
             </FactRow>
             <FactRow label="PIRs served">
               <span className="flex flex-wrap gap-1">
@@ -231,20 +251,20 @@ export default function SourcePage({
                     <button
                       key={p.ref}
                       title={p.question}
+                      aria-pressed={on}
                       onClick={() =>
                         update((x) => ({
                           ...x,
-                          pirRefs: on
-                            ? x.pirRefs.filter((r) => r !== p.ref)
-                            : [...x.pirRefs, p.ref],
+                          pirRefs: on ? x.pirRefs.filter((r) => r !== p.ref) : [...x.pirRefs, p.ref],
                         }))
                       }
-                      className={`px-1.5 py-0.5 text-2xs ${
+                      className={`inline-flex h-6 min-w-8 items-center justify-center gap-0.5 rounded-sm border px-1.5 text-2xs tabular-nums transition-colors duration-150 ${
                         on
-                          ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-                          : "border border-cpx-grey-100 text-cpx-grey-500"
+                          ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+                          : "border-cpx-grey-100 text-cpx-grey-500 hover:border-cpx-grey-200 hover:text-cpx-black"
                       }`}
                     >
+                      {on && <IconCheck className="text-green-contrast" />}
                       {p.ref.replace("PIR", "")}
                     </button>
                   );
@@ -252,39 +272,42 @@ export default function SourcePage({
               </span>
             </FactRow>
           </dl>
-        </div>
+        </Panel>
 
-        <div className="border border-cpx-grey-100 bg-white p-4 xl:col-span-8">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Stamp label="Last attempt" value={agoFromNow(s.lastAttempt)} sub={gstDateTime(s.lastAttempt)} />
-            <Stamp label="Last success" value={agoFromNow(s.lastSuccess)} sub={gstDateTime(s.lastSuccess)} />
-            <Stamp
+        <Panel title="Collection" aside="30 days" enter={1} flush className="@4xl/page:col-span-8">
+          <StatStrip className="grid-cols-1 border-0 border-b @xl/page:grid-cols-3">
+            <Stat label="Last attempt" value={agoFromNow(s.lastAttempt)} caption={gstDateTime(s.lastAttempt)} />
+            <Stat label="Last success" value={agoFromNow(s.lastSuccess)} caption={gstDateTime(s.lastSuccess)} />
+            <Stat
               label="Last new item"
               value={agoFromNow(s.lastNewItemAt)}
-              sub={gstDateTime(s.lastNewItemAt)}
-              accent={s.state === "silent-unexplained"}
+              caption={gstDateTime(s.lastNewItemAt)}
+              tone={s.state === "silent-unexplained" ? "warn" : "neutral"}
             />
+          </StatStrip>
+          <div className="p-3">
+            <div className="flex items-baseline gap-5 text-sm">
+              <span>
+                <span className="font-medium tabular-nums">{s.itemsLast30d}</span>{" "}
+                <span className="text-cpx-grey-500">items, 30 days</span>
+              </span>
+              <span>
+                <span className={`font-medium tabular-nums ${s.consecutiveFailures > 0 ? "text-cpx-red-700" : ""}`}>
+                  {s.consecutiveFailures}
+                </span>{" "}
+                <span className="text-cpx-grey-500">consecutive failures</span>
+              </span>
+            </div>
+            <div className="mt-3">
+              <DailyBars days={s.dailyItems} />
+            </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-5 text-sm">
-            <span>
-              <span className="font-medium">{s.itemsLast30d}</span>{" "}
-              <span className="text-cpx-grey-500">items, 30 days</span>
-            </span>
-            <span>
-              <span className="font-medium">{s.consecutiveFailures}</span>{" "}
-              <span className="text-cpx-grey-500">consecutive failures</span>
-            </span>
-          </div>
-          <div className="mt-3">
-            <DailyBars days={s.dailyItems} />
-          </div>
-        </div>
+        </Panel>
       </div>
 
-      <div className="mt-4 border border-cpx-grey-100 bg-white p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs text-cpx-grey-500">Poll log</span>
-          <SearchBox value={logQuery} onChange={setLogQuery} className="w-64" />
+      <Panel title="Poll log" count={log.length} enter={2} flush className="mt-3">
+        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+          <SearchBox value={logQuery} onChange={setLogQuery} className="w-full max-w-64" />
           <div className="flex-1" />
           <ListMeta
             shown={filteredLog.length}
@@ -294,105 +317,56 @@ export default function SourcePage({
               downloadCsv(
                 `${s.id}-log.csv`,
                 ["Date", "Attempts", "Items", "Outcome"],
-                filteredLog.map((r) => [
-                  r.date,
-                  String(r.attempts),
-                  String(r.items),
-                  r.outcome,
-                ]),
+                filteredLog.map((r) => [r.date, String(r.attempts), String(r.items), r.outcome]),
               )
             }
           />
         </div>
-        <div className="mt-3 overflow-x-auto">
-          <table className={`${T_TABLE} min-w-[34rem] text-sm`}>
-            <colgroup>
-              <col className="w-36" />
-              <col className="w-24" />
-              <col className="w-28" />
-              <col />
-            </colgroup>
-            <thead>
-              <tr className={T_HEAD}>
-                <th scope="col" className={T_TH}>Date</th>
-                <th scope="col" className={`${T_TH} ${T_NUM}`}>Attempts</th>
-                <th scope="col" className={`${T_TH} ${T_NUM}`}>New items</th>
-                <th scope="col" className={T_TH}>Outcome</th>
+        <table className={`${T_TABLE} table-fixed text-sm`}>
+          <colgroup>
+            <col className="w-36" />
+            <col className="w-24" />
+            <col className="w-28" />
+            <col />
+          </colgroup>
+          <thead>
+            <tr className={T_HEAD}>
+              <th scope="col" className={T_TH}>Date</th>
+              <th scope="col" className={`${T_TH} ${T_NUM}`}>Attempts</th>
+              <th scope="col" className={`${T_TH} ${T_NUM}`}>New items</th>
+              <th scope="col" className={T_TH}>Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredLog.length === 0 && (
+              <EmptyRow colSpan={4}>
+                <span className="font-medium text-cpx-black">0 entries</span> matched
+              </EmptyRow>
+            )}
+            {filteredLog.map((r) => (
+              <tr key={r.date} className={T_ROW}>
+                <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>{gstDate(`${r.date}T12:00:00Z`)}</td>
+                <td className={`${T_TD} ${T_NUM}`}>{r.attempts}</td>
+                <td className={`${T_TD} ${T_NUM} font-medium`}>{r.items}</td>
+                <td className={`${T_TD} truncate ${r.failed ? "font-medium text-status-warn-ink" : ""}`} title={r.outcome}>
+                  {r.outcome}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredLog.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-3 py-6 text-center">
-                    <span className="font-medium">0 entries</span> matched
-                  </td>
-                </tr>
-              )}
-              {filteredLog.map((r) => (
-                <tr key={r.date} className={T_ROW}>
-                  <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
-                    {gstDate(`${r.date}T12:00:00Z`)}
-                  </td>
-                  <td className={`${T_TD} ${T_NUM}`}>{r.attempts}</td>
-                  <td className={`${T_TD} ${T_NUM} font-medium`}>{r.items}</td>
-                  <td
-                    className={`${T_TD} ${
-                      r.failed ? "font-medium text-status-warn-ink" : ""
-                    }`}
-                  >
-                    {r.outcome}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Center({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-      {children}
-    </div>
+            ))}
+          </tbody>
+        </table>
+      </Panel>
+    </Page>
   );
 }
 
 function FactRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3">
-      <dt className="w-24 shrink-0 pt-0.5 text-xs text-cpx-grey-500">
+    <div className="flex items-start gap-3 border-b border-cpx-grey-100 pb-2 last:border-b-0 last:pb-0">
+      <dt className="w-24 shrink-0 pt-0.5 text-xs font-medium text-cpx-grey-600">
         {label}
       </dt>
       <dd className="min-w-0 flex-1">{children}</dd>
-    </div>
-  );
-}
-
-function Stamp({
-  label,
-  value,
-  sub,
-  accent = false,
-}: {
-  label: string;
-  value: string;
-  sub: string;
-  accent?: boolean;
-}) {
-  return (
-    <div className={`border p-3 ${accent ? "border-status-warn-ink/30 bg-status-warn-fill" : "border-cpx-grey-100"}`}>
-      <span className={`text-2xs ${accent ? "text-status-warn-ink" : "text-cpx-grey-500"}`}>
-        {label}
-      </span>
-      <span className={`mt-1 block text-lg font-display font-medium leading-none tracking-tightish ${accent ? "text-status-warn-ink" : ""}`}>
-        {value}
-      </span>
-      <span className={`mt-1 block text-2xs ${accent ? "text-status-warn-ink/80" : "text-cpx-grey-500"}`}>
-        {sub}
-      </span>
     </div>
   );
 }

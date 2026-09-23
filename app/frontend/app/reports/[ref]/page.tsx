@@ -14,7 +14,22 @@ import { saveReport, workspaceWrite } from "@/lib/workspace-api";
 import type { Advisory, Client, Delivery, SendBackReason } from "@/lib/types";
 import { resolveTechnique, TACTICS } from "@/lib/mitre";
 import { gstDate, gstDateTime, recordCount } from "@/lib/format";
-import { IndicatorChip, TlpBadge, Button, Dialog, StatusPill, type StatusTone, buttonClass, OfflineNote, SkeletonRows } from "@/components/ui";
+import {
+  Banner,
+  Button,
+  buttonClass,
+  CenterMessage,
+  Dialog,
+  fieldClass,
+  IndicatorChip,
+  inputClass,
+  NotPermitted,
+  OfflineNote,
+  SkeletonRows,
+  StatusPill,
+  type StatusTone,
+  TlpBadge,
+} from "@/components/ui";
 import { Menu } from "@/components/reports/ExportMenu";
 import { ReportPreview } from "@/components/reports/ReportPreview";
 import { DiamondPanel } from "@/components/reports/DiamondPanel";
@@ -31,6 +46,7 @@ import {
   T_TABLE,
   T_TD,
   T_TH,
+  TypeBadge,
 } from "@/components/table";
 
 // Same four words the list uses, so a state reads identically in both places,
@@ -118,33 +134,31 @@ export default function ReportPage({
     return assembleAdvisory(src, user);
   }, [base, local, user]);
 
-  if (!canSee(user.role, "reports")) {
-    return (
-      <Center>
-        <p className="text-base">Not permitted at this access level.</p>
-        <Link href="/" className="text-sm text-link underline underline-offset-2">
-          Dashboard
-        </Link>
-      </Center>
-    );
-  }
+  if (!canSee(user.role, "reports")) return <NotPermitted />;
 
   if (loading && !base) {
     return (
-      <div className="mx-auto max-w-[720px] px-6 py-8">
-        <SkeletonRows rows={8} />
+      <div className="flex flex-1 flex-col bg-band">
+        <div className="h-12 border-b border-cpx-grey-100 bg-white" />
+        <div className="mx-auto my-4 w-full max-w-[760px] rounded-sm border border-cpx-grey-100 bg-white px-8 py-6">
+          <div className="mb-5 h-6 w-2/3 bg-cpx-grey-100" />
+          <SkeletonRows rows={8} height="h-5" />
+        </div>
       </div>
     );
   }
 
   if (!base || !assembled) {
     return (
-      <Center>
-        <p className="text-base">No report with this reference.</p>
-        <Link href="/reports" className="text-sm text-link underline underline-offset-2">
-          Reports
-        </Link>
-      </Center>
+      <CenterMessage
+        action={
+          <Link href="/reports" className="link-quiet text-sm">
+            Reports
+          </Link>
+        }
+      >
+        No report with this reference.
+      </CenterMessage>
     );
   }
 
@@ -217,13 +231,13 @@ export default function ReportPage({
   }
 
   return (
-    <div>
-      {/* One row that never wraps. Identity on the left, actions pinned right,
-          and the metadata between them drops out in order of how much it is
-          needed as the window narrows. Every item is nowrap and shrink-0:
-          without that a flex child compresses below its text and wraps inside
-          itself, which is what turned this bar into six stacked fragments. */}
-      <div className="sticky top-0 z-20 flex h-14 items-center gap-2 border-b border-cpx-grey-100 bg-white px-6">
+    <div className="@container/page flex flex-1 flex-col bg-band">
+      {/* Identity on the left, actions pinned right. Every item is nowrap and
+          shrink-0 (a flex child compressed below its text wraps inside
+          itself); the context between them drops out by the width the page
+          actually has, and a Teams tab narrower than the row wraps the actions
+          onto a second line rather than clipping them. */}
+      <div className="sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-cpx-grey-100 bg-white px-4 py-2">
         <span className="shrink-0 whitespace-nowrap font-mono text-sm font-medium">
           {a.ref}
         </span>
@@ -232,12 +246,7 @@ export default function ReportPage({
         </span>
         {/* Report type, stated. Which format a document follows is the first
             thing a reviewer needs and it was only implicit in the reference. */}
-        <span
-          className="shrink-0 bg-cpx-grey-50 px-1.5 py-0.5 text-2xs"
-          title={template?.name}
-        >
-          {a.type}
-        </span>
+        <TypeBadge label={a.type} title={template?.name} />
         <span className="shrink-0 whitespace-nowrap text-xs text-cpx-grey-500">
           v{a.version}
         </span>
@@ -252,28 +261,26 @@ export default function ReportPage({
 
         {/* Everything from here is context rather than identity, so it gives way
             first. The full value stays on the title attribute. */}
-        <span className="hidden min-w-0 items-center gap-2 xl:flex">
+        <span className="hidden min-w-0 items-center gap-1 @4xl/page:flex">
           {a.pirRefs.map((p) => (
-            <span key={p} className="shrink-0 bg-cpx-grey-50 px-1.5 py-0.5 text-2xs">
-              {p}
-            </span>
+            <TypeBadge key={p} label={p} />
           ))}
         </span>
         <span
-          className="hidden shrink-0 truncate whitespace-nowrap text-xs text-cpx-grey-500 lg:inline"
+          className="hidden shrink-0 truncate whitespace-nowrap text-xs text-cpx-grey-500 @2xl/page:inline"
           title={`Owner: ${a.owner ?? "unassigned"}`}
         >
           {a.owner ?? "-"}
         </span>
         <span
-          className="hidden shrink-0 whitespace-nowrap text-xs text-cpx-grey-500 2xl:inline"
+          className="hidden shrink-0 whitespace-nowrap text-xs text-cpx-grey-500 @3xl/page:inline"
           title={`Last updated ${gstDateTime(lastUpdated)}`}
         >
           {gstDate(lastUpdated)}
         </span>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          {editable && <><span className="hidden text-2xs text-cpx-grey-500 sm:inline" role="status">{local ? "Unsaved changes" : `Saved · revision ${a.revision ?? 0}`}</span><Button disabled={!local || saving || offline} onClick={save}>{saving ? "Saving…" : "Save"}</Button></>}
+          {editable && <><span className={`hidden text-2xs @2xl/page:inline ${local ? "font-medium text-status-warn-ink" : "text-cpx-grey-500"}`} role="status">{local ? "Unsaved changes" : `Saved · revision ${a.revision ?? 0}`}</span><Button variant={local ? "primary" : "secondary"} disabled={!local || saving || offline} onClick={save}>{saving ? "Saving" : "Save"}</Button></>}
           <Menu<ReportFormat>
             label="Export report"
             items={formatsFor(a).map((f) => ({
@@ -291,7 +298,7 @@ export default function ReportPage({
         </div>
       </div>
 
-      {reportError && <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-cpx-grey-100 bg-status-warn-fill px-6 py-3 text-sm text-status-warn-ink"><span>{reportError}{local ? " Your unsaved changes remain in this page." : ""}</span><Button size="sm" disabled={saving} onClick={async () => { setSaving(true); try { const result = await getReport(user.id, a.ref); setBase(result.advisory); setLocal(null); setSent(result.deliveries); setReportError(null); } catch (cause) { setReportError((cause as Error).message); } finally { setSaving(false); } }}>{local ? "Discard edits and reload" : "Reload report"}</Button></div>}
+      {reportError && <Banner tone="warn" className="rounded-none border-x-0 border-t-0 px-4" action={<Button size="sm" disabled={saving} onClick={async () => { setSaving(true); try { const result = await getReport(user.id, a.ref); setBase(result.advisory); setLocal(null); setSent(result.deliveries); setReportError(null); } catch (cause) { setReportError((cause as Error).message); } finally { setSaving(false); } }}>{local ? "Discard edits and reload" : "Reload report"}</Button>}>{reportError}{local ? " Your unsaved changes remain in this page." : ""}</Banner>}
 
       {preview && (
         <ReportPreview
@@ -301,7 +308,7 @@ export default function ReportPage({
         />
       )}
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-cpx-grey-100 bg-white px-6 py-1.5 text-2xs text-cpx-grey-500">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-cpx-grey-100 bg-white px-4 py-1.5 text-2xs text-cpx-grey-500">
         <span>
           Report type <span className="text-cpx-black">{a.type}</span>
           {template && <> · {template.name}</>}
@@ -332,16 +339,16 @@ export default function ReportPage({
       )}
 
       {publishedState && (
-        <div className="reveal mx-auto mt-4 max-w-[720px] space-y-1 px-6">
-          <div className="flex items-center gap-2 bg-cpx-purple px-3 py-2 text-xs text-white">
+        <div className="reveal mx-auto mt-4 w-full max-w-[760px] space-y-1">
+          <div className="flex items-center gap-2 rounded-sm bg-cpx-purple px-3 py-2 text-xs text-white">
             <span className="font-medium">Version {a.version}</span>
-            <span className="text-white/70">
+            <span className="text-cpx-bright-100">
               Published {a.publishedAt ? gstDateTime(a.publishedAt) : ""}
             </span>
-            {a.status === "retracted" && <span className="bg-cpx-red px-1.5">Retracted</span>}
+            {a.status === "retracted" && <span className="rounded-sm bg-cpx-red px-1.5">Retracted</span>}
           </div>
           {a.supersededBy && (
-            <p className="bg-status-warn-fill px-3 py-1.5 text-xs text-status-warn-ink">
+            <p className="rounded-sm bg-status-warn-fill px-3 py-1.5 text-xs text-status-warn-ink">
               Superseded by{" "}
               <Link
                 href={`/reports/${encodeURIComponent(a.supersededBy)}`}
@@ -356,13 +363,14 @@ export default function ReportPage({
       )}
 
       {a.status === "did-not-run" && (
-        <div className="mx-auto mt-4 max-w-[720px] px-6">
-          <p className="bg-cpx-red px-3 py-2 text-xs text-white">Did not run.</p>
+        <div className="mx-auto mt-4 w-full max-w-[760px]">
+          <p className="rounded-sm bg-cpx-red-700 px-3 py-2 text-xs text-white">Did not run.</p>
         </div>
       )}
 
-      <article className="mx-auto max-w-[720px] px-6 py-8">
-        {editable ? <input aria-label="Report title" value={a.title} onChange={(event) => update((draft) => ({ ...draft, title: event.target.value }))} className="w-full border border-transparent bg-transparent text-xl font-semibold leading-snug tracking-tightish focus:border-cpx-grey-100 focus:outline-none" /> : <h1 className="text-xl font-semibold leading-snug tracking-tightish">{a.title}</h1>}
+      {/* The document is the page: white paper on the grey canvas. */}
+      <article className="enter mx-auto my-4 w-full max-w-[760px] rounded-sm border border-cpx-grey-100 bg-white px-8 py-6">
+        {editable ? <input aria-label="Report title" value={a.title} onChange={(event) => update((draft) => ({ ...draft, title: event.target.value }))} className="-mx-1 w-full rounded-sm border border-transparent bg-transparent px-1 text-xl font-semibold leading-snug tracking-tightish transition-colors duration-150 hover:border-cpx-grey-100 focus:border-cpx-green focus:outline-none" /> : <h1 className="text-xl font-semibold leading-snug tracking-tightish">{a.title}</h1>}
 
         <div className="mt-6 space-y-7">
           {a.sections.map((s) => (
@@ -408,7 +416,7 @@ export default function ReportPage({
                     }))
                   }
                   rows={Math.max(2, Math.ceil(s.body.length / 90))}
-                  className="mt-2 w-full resize-y border border-transparent bg-transparent text-sm leading-relaxed hover:border-cpx-grey-100 focus:border-cpx-grey-100 focus:bg-white focus:outline-none"
+                  className="-mx-1 mt-2 w-full resize-y rounded-sm border border-transparent bg-transparent px-1 text-sm leading-relaxed transition-colors duration-150 hover:border-cpx-grey-100 focus:border-cpx-green focus:bg-white focus:outline-none"
                 />
               ) : (
                 <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">
@@ -450,34 +458,26 @@ export default function ReportPage({
       </article>
 
       {!isDigest && canWriteReports(user.role) && (
-        <footer className="sticky bottom-0 z-20 mt-6 flex h-14 items-center gap-2 border-t border-cpx-grey-100 bg-white px-6">
+        <footer className="sticky bottom-0 z-20 mt-auto flex h-12 items-center gap-2 border-t border-cpx-grey-100 bg-white px-4">
           {publishedState ? (
-            <button
-              onClick={() => setShowUpdate(true)}
-              disabled={saving || offline}
-              className={buttonClass()}
-            >
+            <Button onClick={() => setShowUpdate(true)} disabled={saving || offline}>
               Issue an update
-            </button>
+            </Button>
           ) : a.status === "draft" ? (
             <Button variant="primary" disabled={saving || offline} onClick={() => transition("submit")}>Submit for review</Button>
           ) : lead && a.status === "in-review" ? (
             <>
-              <button
+              <Button
+                variant="primary"
                 disabled={saving || offline || (blockingFailed.length > 0 && !local)}
                 onClick={() => transition("approve")}
                 title={blockingFailed.map((c) => c.label).join("; ")}
-                className={buttonClass("primary")}
               >
                 Approve & publish
-              </button>
-              <button
-                disabled={saving || offline}
-                onClick={() => setShowSendBack(true)}
-                className={buttonClass()}
-              >
+              </Button>
+              <Button disabled={saving || offline} onClick={() => setShowSendBack(true)}>
                 Send back
-              </button>
+              </Button>
             </>
           ) : null}
         </footer>
@@ -491,7 +491,7 @@ export default function ReportPage({
                   <button
                     disabled={saving}
                     onClick={() => transition("send-back", r.key)}
-                    className="w-full border border-cpx-grey-100 px-3 py-2 text-left text-sm hover:border-cpx-green"
+                    className="w-full rounded-sm border border-cpx-grey-100 px-3 py-2 text-left text-sm transition-colors duration-150 hover:border-cpx-green hover:bg-cpx-green-50/60 disabled:opacity-50"
                   >
                     {r.label}
                   </button>
@@ -503,7 +503,7 @@ export default function ReportPage({
             </Button>
         </Dialog>
       )}
-      {showUpdate && <Dialog title="Issue an update" onClose={() => setShowUpdate(false)} className="max-w-lg"><p className="text-sm text-cpx-grey-500">Create a new draft while keeping the published version available.</p><label className="mt-4 block text-sm">Change note<textarea value={changeNote} onChange={(event) => setChangeNote(event.target.value)} required rows={3} className="mt-1 w-full border border-cpx-grey-100 p-2" /></label><div className="mt-4 flex justify-end gap-2"><Button disabled={saving} onClick={() => setShowUpdate(false)}>Cancel</Button><Button variant="primary" disabled={saving || !changeNote.trim()} onClick={issueUpdate}>{saving ? "Creating…" : "Create update draft"}</Button></div></Dialog>}
+      {showUpdate && <Dialog title="Issue an update" onClose={() => setShowUpdate(false)} className="max-w-lg"><p className="text-sm text-cpx-grey-500">A new draft; the published version stays available.</p><label className="mt-4 block text-xs font-medium text-cpx-grey-700">Change note<textarea value={changeNote} onChange={(event) => setChangeNote(event.target.value)} required rows={3} className={fieldClass} /></label><div className="mt-4 flex justify-end gap-2"><Button disabled={saving} onClick={() => setShowUpdate(false)}>Cancel</Button><Button variant="primary" disabled={saving || !changeNote.trim()} onClick={issueUpdate}>{saving ? "Creating…" : "Create update draft"}</Button></div></Dialog>}
     </div>
   );
 }
@@ -598,19 +598,11 @@ function SourcesSection({ a }: { a: Advisory }) {
   );
 }
 
-function Center({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-      {children}
-    </div>
-  );
-}
-
 function SentBackLine({ sendBack }: { sendBack: Advisory["sendBacks"][number] }) {
   const reason =
     SEND_BACK_REASONS.find((r) => r.key === sendBack.reason)?.label ?? sendBack.reason;
   return (
-    <div className="reveal flex items-center gap-2 border-b border-cpx-grey-100 bg-white px-6 py-2 text-xs">
+    <div className="reveal flex items-center gap-2 border-b border-cpx-grey-100 bg-cpx-bright-50 px-4 py-2 text-xs text-cpx-bright-700">
       <IconWarn className="text-status-warn-ink" />
       <span>
         Sent back by {sendBack.by}, {gstDateTime(sendBack.at)}:{" "}
@@ -626,7 +618,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
   if (a.checks.length === 0) return null;
   if (failed.length === 0) {
     return (
-      <div className="flex items-center gap-2 border-b border-cpx-grey-100 bg-white px-6 py-2 text-xs">
+      <div className="flex items-center gap-2 border-b border-cpx-grey-100 bg-white px-4 py-1.5 text-xs">
         <IconCheck className="text-green-contrast" />
         All checks passed.
       </div>
@@ -637,7 +629,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
     // One line, not one line per check. Every check is unpassed on a new draft,
     // and three stacked red rows read as a fault rather than as the ordinary
     // starting state of a document nobody has written yet.
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-cpx-grey-100 bg-white px-6 py-2 text-xs">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-cpx-grey-100 bg-white px-4 py-1.5 text-xs">
       <IconWarn className={blocking > 0 ? "text-cpx-red" : "text-status-warn-ink"} />
       <span className="whitespace-nowrap">
         <span className="font-medium">
@@ -652,7 +644,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
       {failed.map((c, i) => (
         <span key={c.id} className="text-cpx-grey-500">
           {c.anchorSectionId ? (
-            <a href={`#${c.anchorSectionId}`} className="underline underline-offset-2">
+            <a href={`#${c.anchorSectionId}`} className="link-quiet">
               {c.label}
             </a>
           ) : (
@@ -678,29 +670,29 @@ function TechniquesTable({
   const resolved = resolveTechnique(newId);
   return (
     <div className="mt-3">
-      <table className="w-full border-collapse text-xs">
+      <table className={`${T_TABLE} text-xs`}>
         <thead>
-          <tr className="border-b border-cpx-grey-100 text-left">
-            <th className="py-1.5 pr-3 font-medium">Tactic</th>
-            <th className="py-1.5 pr-3 font-medium">Technique</th>
-            <th className="py-1.5 pr-3 font-medium">Name</th>
-            <th className="py-1.5 font-medium">Observed activity</th>
+          <tr className={T_HEAD}>
+            <th className={`${T_TH} ${T_FLUSH}`}>Tactic</th>
+            <th className={`${T_TH} ${T_FLUSH}`}>Technique</th>
+            <th className={`${T_TH} ${T_FLUSH}`}>Name</th>
+            <th className={`${T_TH} ${T_FLUSH}`}>Observed activity</th>
           </tr>
         </thead>
         <tbody>
           {a.techniques.map((t) => (
-            <tr key={t.techniqueId} className="border-b border-cpx-grey-100">
-              <td className="py-1.5 pr-3">
+            <tr key={t.techniqueId} className={T_ROW}>
+              <td className={`${T_TD} ${T_FLUSH} text-xs`}>
                 {t.tacticId} {TACTICS[t.tacticId]}
               </td>
-              <td className="py-1.5 pr-3 font-mono text-xs">{t.techniqueId}</td>
-              <td className="py-1.5 pr-3">{t.techniqueName}</td>
-              <td className="py-1.5">{t.observedActivity}</td>
+              <td className={`${T_TD} ${T_FLUSH} font-mono text-xs`}>{t.techniqueId}</td>
+              <td className={`${T_TD} ${T_FLUSH} text-xs`}>{t.techniqueName}</td>
+              <td className={`${T_TD} ${T_FLUSH} text-xs`}>{t.observedActivity}</td>
             </tr>
           ))}
           {a.techniques.length === 0 && (
             <tr>
-              <td colSpan={4} className="py-2">
+              <td colSpan={4} className="py-2 text-xs">
                 <span className="font-medium">0 techniques</span>
               </td>
             </tr>
@@ -713,7 +705,8 @@ function TechniquesTable({
             value={newId}
             onChange={(e) => setNewId(e.target.value)}
             placeholder="Technique ID"
-            className="h-8 w-36 border border-cpx-grey-100 px-2 font-mono text-xs focus:border-cpx-green focus:outline-none"
+            aria-label="Technique ID"
+            className={`${inputClass} w-36 font-mono text-xs`}
           />
           <span className="text-xs text-cpx-grey-500">
             {newId.trim() === ""
@@ -776,27 +769,27 @@ function CvssTable({
     source.trim() !== "";
   return (
     <div className="mt-3">
-      <table className="w-full border-collapse text-xs">
+      <table className={`${T_TABLE} text-xs`}>
         <thead>
-          <tr className="border-b border-cpx-grey-100 text-left">
-            <th className="py-1.5 pr-3 font-medium">CVE</th>
-            <th className="py-1.5 pr-3 font-medium">Score</th>
-            <th className="py-1.5 pr-3 font-medium">Authority</th>
-            <th className="py-1.5 font-medium">Class</th>
+          <tr className={T_HEAD}>
+            <th className={`${T_TH} ${T_FLUSH}`}>CVE</th>
+            <th className={`${T_TH} ${T_FLUSH} ${T_NUM}`}>Score</th>
+            <th className={`${T_TH} ${T_FLUSH}`}>Authority</th>
+            <th className={`${T_TH} ${T_FLUSH}`}>Class</th>
           </tr>
         </thead>
         <tbody>
           {a.cvss.map((c, i) => (
-            <tr key={i} className="border-b border-cpx-grey-100">
-              <td className="py-1.5 pr-3 font-mono text-xs">{c.cveId}</td>
-              <td className="py-1.5 pr-3 font-medium">{c.value.toFixed(1)}</td>
-              <td className="py-1.5 pr-3">{c.source}</td>
-              <td className="py-1.5 uppercase">{c.authorityClass}</td>
+            <tr key={i} className={T_ROW}>
+              <td className={`${T_TD} ${T_FLUSH} font-mono text-xs`}>{c.cveId}</td>
+              <td className={`${T_TD} ${T_FLUSH} ${T_NUM} text-xs font-medium`}>{c.value.toFixed(1)}</td>
+              <td className={`${T_TD} ${T_FLUSH} text-xs`}>{c.source}</td>
+              <td className={`${T_TD} ${T_FLUSH} text-xs uppercase`}>{c.authorityClass}</td>
             </tr>
           ))}
           {a.cvss.length === 0 && (
             <tr>
-              <td colSpan={4} className="py-2">
+              <td colSpan={4} className="py-2 text-xs">
                 <span className="font-medium">0 scores</span>
               </td>
             </tr>
@@ -809,19 +802,22 @@ function CvssTable({
             value={cve}
             onChange={(e) => setCve(e.target.value)}
             placeholder="CVE ID"
-            className="h-8 w-40 border border-cpx-grey-100 px-2 font-mono text-xs focus:border-cpx-green focus:outline-none"
+            aria-label="CVE ID"
+            className={`${inputClass} w-40 font-mono text-xs`}
           />
           <input
             value={score}
             onChange={(e) => setScore(e.target.value)}
             placeholder="Score"
-            className="h-8 w-20 border border-cpx-grey-100 px-2 text-xs focus:border-cpx-green focus:outline-none"
+            aria-label="Score"
+            className={`${inputClass} w-20 text-xs`}
           />
           <input
             value={source}
             onChange={(e) => setSource(e.target.value)}
             placeholder="Authority"
-            className="h-8 w-36 border border-cpx-grey-100 px-2 text-xs focus:border-cpx-green focus:outline-none"
+            aria-label="Authority"
+            className={`${inputClass} w-36 text-xs`}
           />
           <button
             disabled={!valid}
@@ -856,10 +852,11 @@ function CvssTable({
 function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
   if (!a.rfi) return null;
   return (
-    <article className="mx-auto max-w-[720px] px-6 py-8">
+    <div className="flex flex-1 flex-col bg-band">
+    <article className="enter mx-auto my-4 w-full max-w-[760px] rounded-sm border border-cpx-grey-100 bg-white px-8 py-6">
       <div className="flex items-center gap-3">
         <span className="font-mono text-sm font-medium">{a.ref}</span>
-        <span className="bg-cpx-grey-50 px-1.5 py-0.5 text-2xs">RFI</span>
+        <TypeBadge label="RFI" />
       </div>
       <h1 className="mt-3 text-xl font-semibold leading-snug tracking-tightish">
         {a.rfi.question}
@@ -868,20 +865,20 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
         {a.rfi.requester} · due {gstDateTime(a.rfi.dueAt)} ·{" "}
         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
       </p>
-      {a.caseId && <Link href={`/investigations/${a.caseId}`} className="mt-4 inline-block text-sm text-link underline">Open investigation</Link>}
+      {a.caseId && <Link href={`/investigations/${a.caseId}`} className="link-quiet mt-4 inline-block text-sm">Open investigation</Link>}
       <ul className="mt-6 space-y-2">
         {a.rfi.steps.map((s) => (
           <li key={s.label} className="flex items-center gap-2.5 text-sm">
             <span
-              className={`flex h-5 w-5 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-100"}`}
+              className={`flex h-5 w-5 items-center justify-center ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-200"}`}
             >
-              {s.done ? "✓" : ""}
+              {s.done && <IconCheck />}
             </span>
             <span className="">{s.label}</span>
             {s.investigationId && (
               <Link
                 href={`/intelligence/${s.investigationId}`}
-                className="text-xs text-link underline underline-offset-2"
+                className="link-quiet text-xs"
               >
                 Conversation
               </Link>
@@ -890,5 +887,6 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
         ))}
       </ul>
     </article>
+    </div>
   );
 }

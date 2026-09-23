@@ -25,9 +25,9 @@ import { DEFAULT_ASK_OPTIONS, optionsAreDefault, type AskOptions } from "@/lib/a
 import { AskOptionsBar } from "@/components/intelligence/AskOptionsBar";
 import { LookupPanel } from "@/components/intelligence/LookupPanel";
 import { gstDate } from "@/lib/format";
-import { IconChevronDown, IconPlus, IconSend } from "@/components/icons";
+import { IconArrowRight, IconChevronDown, IconPlus, IconSend } from "@/components/icons";
 import Link from "next/link";
-import { PageHeader, buttonClass, useDismiss, OfflineNote } from "@/components/ui";
+import { Banner, CountBadge, OfflineNote, PageHeader, SegmentedControl, buttonClass, useDismiss } from "@/components/ui";
 import { EvidenceUploader, evidencePending } from "@/components/evidence/EvidenceUploader";
 import { AddToCase } from "@/components/investigations/AddToCase";
 import { getEvidence, workspaceRequest } from "@/lib/workspace-api";
@@ -270,7 +270,7 @@ function IntelligenceInner() {
   const forked = new Set(sessions.map((s) => s.id));
 
   return (
-    <div className="mx-auto flex w-full max-w-[880px] flex-1 flex-col px-6">
+    <div className="@container/page mx-auto flex w-full max-w-[960px] flex-1 flex-col px-4">
       <PageHeader
         className="pt-4"
         title="Intelligence"
@@ -278,30 +278,22 @@ function IntelligenceInner() {
         action={
           <div ref={headerRef} className="relative flex items-center gap-1">
         {/* Two jobs, two sections. Neither replaces the other. */}
-        <div className="flex border border-cpx-grey-100">
-          {(["ask", "lookup"] as const).map((k) => (
-            <button
-              key={k}
-              onClick={() => setSection(k)}
-              className={`h-7 px-3 text-xs ${
-                section === k
-                  ? "bg-cpx-purple font-medium text-white"
-                  : "text-cpx-grey-500 hover:bg-cpx-grey-50"
-              }`}
-            >
-              {k === "ask" ? "Ask" : "IOC Lookup"}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          label="Intelligence tool"
+          value={section}
+          onChange={setSection}
+          options={[
+            { key: "ask", label: "Ask" },
+            { key: "lookup", label: "IOC Lookup" },
+          ]}
+        />
         <button
           onClick={() => setHistoryOpen(!historyOpen)}
           disabled={section !== "ask"}
           className={buttonClass("ghost", "sm")}
         >
           History
-          <span className="bg-cpx-grey-50 px-1 text-2xs">
-            {localOnly.length + investigations.length}
-          </span>
+          <CountBadge n={localOnly.length + investigations.length} />
           <IconChevronDown className={historyOpen ? "rotate-180" : ""} />
         </button>
         <button
@@ -314,13 +306,13 @@ function IntelligenceInner() {
         </button>
         {historyOpen && (
           <>
-            <div className="reveal absolute right-0 top-9 z-40 w-96 max-w-full border border-cpx-grey-100 bg-white shadow-pop">
+            <div className="pop absolute right-0 top-9 z-40 w-96 max-w-[calc(100vw-2rem)] origin-top-right rounded-sm border border-cpx-grey-100 bg-white py-1 shadow-pop">
               <ul className="max-h-80 overflow-y-auto">
                 {localOnly.map((s) => (
                   <li key={s.id}>
                     <button
                       onClick={() => openStored(s)}
-                      className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-cpx-grey-50 ${s.id === sessionId ? "bg-cpx-grey-50" : ""}`}
+                      className={`flex w-full items-baseline gap-2 px-3 py-1.5 text-left transition-colors duration-100 hover:bg-cpx-grey-50 ${s.id === sessionId ? "bg-cpx-green-50/60" : ""}`}
                     >
                       <span
                         className="min-w-0 flex-1 truncate text-xs"
@@ -338,7 +330,7 @@ function IntelligenceInner() {
                   <li key={inv.id}>
                     <button
                       onClick={() => openInvestigation(inv.id)}
-                      className={`flex w-full items-baseline gap-2 px-3 py-2 text-left hover:bg-cpx-grey-50 ${sessionId === `fx-${inv.id}` ? "bg-cpx-grey-50" : ""}`}
+                      className={`flex w-full items-baseline gap-2 px-3 py-1.5 text-left transition-colors duration-100 hover:bg-cpx-grey-50 ${sessionId === `fx-${inv.id}` ? "bg-cpx-green-50/60" : ""}`}
                     >
                       <span
                         className="min-w-0 flex-1 truncate text-xs"
@@ -368,20 +360,24 @@ function IntelligenceInner() {
 
       {section === "ask" && (
         <>
-      <div className="flex flex-1 flex-col space-y-8 py-6">
+      <div className="flex flex-1 flex-col space-y-6 py-4">
         {turns.length === 0 && (
           // Centred in the space above the composer: an empty console that
           // stacks its openers against the bottom edge reads as a broken feed.
-          <div className="flex flex-1 flex-col justify-end gap-2 pb-2">
-            {STARTER_PROMPTS.map((p) => (
-              <button
-                key={p}
-                onClick={() => ask(p)}
-                className="border border-cpx-grey-100 bg-white px-4 py-2.5 text-left text-sm transition-colors duration-150 hover:border-cpx-green"
-              >
-                {p}
-              </button>
-            ))}
+          <div className="flex flex-1 flex-col justify-end pb-1">
+            <ul className="overflow-hidden rounded-sm border border-cpx-grey-100 bg-white">
+              {STARTER_PROMPTS.map((p, i) => (
+                <li key={p} className="enter border-b border-cpx-grey-100 last:border-b-0" style={{ "--i": i } as React.CSSProperties}>
+                  <button
+                    onClick={() => ask(p)}
+                    className="row-link flex w-full items-center gap-3 px-3 py-2 text-left text-sm"
+                  >
+                    <span className="min-w-0 flex-1">{p}</span>
+                    <IconArrowRight className="lean shrink-0 text-cpx-grey-300" />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
         {turns.map((t) => (
@@ -404,9 +400,9 @@ function IntelligenceInner() {
         <div ref={endRef} />
       </div>
 
-      <div className="sticky bottom-0 bg-canvas pb-6 pt-2">
+      <div className="sticky bottom-0 bg-canvas pb-4 pt-2">
         <form
-          className="border border-cpx-grey-100 bg-white"
+          className="rounded-sm border border-cpx-grey-200 bg-white transition-colors duration-150 focus-within:border-cpx-grey-300 has-[.ring-on-frame:focus-visible]:outline-2 has-[.ring-on-frame:focus-visible]:outline-offset-2 has-[.ring-on-frame:focus-visible]:outline-cpx-bright has-[.ring-on-frame:focus-visible]:outline-solid"
           onSubmit={(e) => {
             e.preventDefault();
             if (draft.trim()) ask(draft.trim());
@@ -421,34 +417,33 @@ function IntelligenceInner() {
             workflows={workflows}
             availability={workflowAvailability}
           />
-          <div className="border-b border-cpx-grey-100 px-4 py-3">
+          <div className="border-b border-cpx-grey-100 px-3 py-2">
             <EvidenceUploader value={attachments} onChange={setAttachments} tlp={options.tlpCeiling ?? "AMBER"} clientId={options.clientId} onBusy={setUploadBusy} />
             {attachments.some((f) => f.status === "partial") && <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={allowPartial} onChange={(e) => setAllowPartial(e.target.checked)} />Use extracted portions and show coverage gaps</label>}
           </div>
-          <div className="flex items-center gap-2 pl-4 pr-2">
+          <div className="flex items-center gap-2 pl-3 pr-1.5">
             <input
               autoFocus
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Ask a question"
               aria-label="Question"
-              className="h-12 flex-1 bg-transparent text-base focus:outline-none"
+              className="ring-on-frame h-11 flex-1 bg-transparent text-base placeholder:text-cpx-grey-400"
             />
             <button
               type="submit"
               aria-label="Send"
               disabled={!draft.trim() || uploadBusy || evidencePending(attachments) || attachments.some((f) => f.status === "failed") || (attachments.some((f) => f.status === "partial") && !allowPartial)}
-              className="flex h-9 w-9 items-center justify-center bg-cpx-green text-cpx-black disabled:bg-cpx-grey-50 disabled:text-cpx-grey-400"
+              className="flex h-8 w-8 items-center justify-center rounded-sm bg-cpx-green text-cpx-purple transition duration-150 ease-out-quart hover:bg-cpx-green-600 enabled:active:scale-[0.94] disabled:bg-cpx-grey-100 disabled:text-cpx-grey-400"
             >
               <IconSend />
             </button>
           </div>
         </form>
-        {askError && <p role="alert" className="mt-2 text-xs text-cpx-red-700">{askError}</p>}
+        {askError && <Banner className="mt-2">{askError}</Banner>}
         {!optionsAreDefault(options) && (
           <p className="mt-1.5 text-2xs text-cpx-grey-500">
-            These settings are sent with the question and change the answer. They
-            do not filter what is already on screen.
+            Settings apply to the next question, not to answers on screen.
           </p>
         )}
       </div>

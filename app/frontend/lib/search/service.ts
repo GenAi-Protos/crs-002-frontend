@@ -21,6 +21,7 @@ import { assembleAdvisories } from "../access";
 import { getInvestigations, getPirs, getReports } from "../api";
 import type { ConsoleUser } from "../types";
 import type { SearchCorpus } from "./types";
+import type { IntelligenceDataset } from "../dashboard/types";
 
 export interface CorpusResult {
   corpus: SearchCorpus;
@@ -30,19 +31,19 @@ export interface CorpusResult {
 
 // The fallback records load on demand. This module sits in the shell (the
 // search box is in the top bar), so a static import here would put every
-// fixture and the dashboard projector into the chunk of every route. The
-// corpus is only built once, on the first open, and only then does this run.
+// fixture into the chunk of every route. The corpus is only built once, on the
+// first open, and only then does this run.
 const fallback = () =>
   Promise.all([
     import("../fixtures"),
     import("../lookup"),
-    import("../dashboard/service"),
-  ]).then(([fixtures, lookup, dashboard]) => ({
+    import("@/fixtures/intelligence-dataset.json"),
+  ]).then(([fixtures, lookup, dataset]) => ({
     advisories: fixtures.ADVISORIES,
     investigations: fixtures.INVESTIGATIONS,
     pirs: fixtures.PIRS,
     lookups: lookup.LOOKUPS,
-    dataset: dashboard.MOCK_DATASET,
+    dataset: dataset.default as unknown as IntelligenceDataset,
   }));
 
 /**

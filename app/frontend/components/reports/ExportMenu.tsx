@@ -6,7 +6,7 @@
 // them.
 
 import { useCallback, useState } from "react";
-import { IconChevronDown } from "@/components/icons";
+import { IconChevronDown, IconMore } from "@/components/icons";
 import { buttonClass, useMenu } from "@/components/ui";
 
 export interface MenuItem<T extends string> {
@@ -55,14 +55,12 @@ export function Menu<T extends string>({
         }}
         className={
           trigger === "icon"
-            ? "flex h-7 w-7 items-center justify-center text-cpx-grey-500 hover:bg-cpx-grey-50 disabled:text-cpx-grey-400"
+            ? "flex h-7 w-7 items-center justify-center rounded-sm text-cpx-grey-500 transition-colors duration-150 hover:bg-cpx-grey-100 hover:text-cpx-black disabled:text-cpx-grey-400 aria-expanded:bg-cpx-grey-100"
             : buttonClass("secondary", "sm")
         }
       >
         {trigger === "icon" ? (
-          <span aria-hidden className="text-md leading-none">
-            &#8942;
-          </span>
+          <IconMore />
         ) : (
           <>
             {label}
@@ -74,8 +72,8 @@ export function Menu<T extends string>({
       {open && (
         <div
           role="menu"
-          className={`reveal absolute z-50 mt-1 min-w-[13rem] border border-cpx-grey-100 bg-white py-1 shadow-pop ${
-            align === "right" ? "right-0" : "left-0"
+          className={`pop absolute z-50 mt-1 min-w-[13rem] border border-cpx-grey-100 bg-white py-1 shadow-pop ${
+            align === "right" ? "right-0 origin-top-right" : "left-0 origin-top-left"
           }`}
         >
           {items.map((it) => (
@@ -89,7 +87,7 @@ export function Menu<T extends string>({
                   setOpen(false);
                   onSelect(it.key);
                 }}
-                className="block w-full px-3 py-1.5 text-left text-xs hover:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
+                className="block w-full px-3 py-1.5 text-left text-xs transition-colors duration-100 hover:bg-cpx-grey-50 focus-visible:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
               >
                 {it.label}
                 {it.hint && (

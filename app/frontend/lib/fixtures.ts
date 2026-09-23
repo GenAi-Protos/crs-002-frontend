@@ -12,12 +12,10 @@ import watchesJson from "@/fixtures/keyword-watches.json";
 import requestsJson from "@/fixtures/source-requests.json";
 import deliveriesJson from "@/fixtures/deliveries.json";
 import drpJson from "@/fixtures/drp-items.json";
-import agentsJson from "@/fixtures/agents.json";
 import workflowsJson from "@/fixtures/workflows.json";
 
 import type {
   Advisory,
-  Agent,
   Client,
   Connector,
   Delivery,
@@ -42,8 +40,6 @@ export const WATCHES = watchesJson as KeywordWatch[];
 export const REQUESTS = requestsJson as SourceRequest[];
 export const DELIVERIES = deliveriesJson as Delivery[];
 export const DRP_ITEMS = drpJson as DrpItem[];
-// The agent roster. Offline fallback only: Manage reads the backend first.
-export const AGENTS = agentsJson as Agent[];
 // The workflow library. Same rule: the backend wins once /workflows exists.
 export const WORKFLOWS = workflowsJson as Workflow[];
 

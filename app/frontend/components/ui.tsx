@@ -2,15 +2,23 @@
 
 // Shared primitives. PageHeader deliberately has no description prop:
 // if a screen needs explaining, it is the wrong screen.
+//
+// Density is set for a Teams tab viewed at about 90% zoom: 32px controls,
+// 32px table rows, 36px panel headers, 13px body. Motion comes from the
+// utilities in app/globals.css (enter, pop, row-link, tip, changed); nothing
+// here loops or pulses, and reduced motion collapses all of it.
 
 import Link from "next/link";
 import { defang } from "@/lib/defang";
 import type { Tlp } from "@/lib/types";
+import type { Severity } from "@/lib/dashboard/types";
 import {
   IconCheck,
+  IconChevronRight,
   IconClose,
   IconCritical,
   IconDash,
+  IconInfo,
   IconSearch,
   IconWarn,
   IconExport,
@@ -20,12 +28,48 @@ import {
   useId,
   useLayoutEffect,
   useRef,
+  useState,
   type ButtonHTMLAttributes,
+  type CSSProperties,
+  type InputHTMLAttributes,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
   type ReactNode,
   type RefObject,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
 } from "react";
+
+// ---------------------------------------------------------------------------
+// Page structure.
+
+/**
+ * A page's content column. `@container/page` lets every grid inside respond to
+ * the width it actually has (the tab minus the rail), not to the viewport.
+ * `band` puts the page on the grey canvas, for pages built from white Panels.
+ * Full-bleed layouts (the Intelligence composer, the report editor, Clients)
+ * do not use it.
+ */
+export function Page({
+  children,
+  narrow = false,
+  band = false,
+  className = "",
+}: {
+  children: ReactNode;
+  narrow?: boolean;
+  band?: boolean;
+  className?: string;
+}) {
+  const inner = (
+    <div
+      className={`@container/page mx-auto w-full ${narrow ? "max-w-[880px]" : "max-w-[1600px]"} px-4 py-4 ${className}`}
+    >
+      {children}
+    </div>
+  );
+  return band ? <div className="flex-1 bg-band">{inner}</div> : inner;
+}
 
 export function PageHeader({
   title,
@@ -40,14 +84,94 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <div className={`mb-5 flex items-center justify-between gap-4 ${className}`}>
-      <div className="flex min-w-0 items-center gap-3">
-        <h1 className="text-xl font-semibold tracking-tightish">{title}</h1>
+    <div
+      className={`mb-3 flex min-h-8 flex-wrap items-center justify-between gap-x-4 gap-y-2 ${className}`}
+    >
+      <div className="flex min-w-0 items-center gap-2.5">
+        <h1 className="truncate text-lg font-semibold tracking-tightish">{title}</h1>
         {meta}
       </div>
-      {action}
+      {action && <div className="flex flex-wrap items-center gap-2">{action}</div>}
     </div>
   );
+}
+
+/**
+ * The console's one surface: white, a hairline, 4px corners, no shadow. A
+ * 36px header carries the title (Inter, not the display face: panel titles
+ * are eyebrows, not headings to read first), an optional count, a caption
+ * that states the figures' scope, and one action.
+ *
+ * `enter` is the panel's place in the page's arrival order; it staggers the
+ * first-mount rise and is never replayed by a data refresh.
+ */
+export function Panel({
+  title,
+  count,
+  aside,
+  action,
+  children,
+  flush = false,
+  enter,
+  className = "",
+  bodyClassName = "",
+  ariaLabel,
+}: {
+  title?: ReactNode;
+  count?: number;
+  aside?: ReactNode;
+  action?: ReactNode;
+  children: ReactNode;
+  flush?: boolean;
+  enter?: number;
+  className?: string;
+  bodyClassName?: string;
+  ariaLabel?: string;
+}) {
+  const id = useId();
+  const style = enter === undefined ? undefined : ({ "--i": enter } as CSSProperties);
+  return (
+    <section
+      aria-labelledby={title ? id : undefined}
+      aria-label={title ? undefined : ariaLabel}
+      style={style}
+      className={`flex min-w-0 flex-col border border-cpx-grey-100 bg-white ${enter === undefined ? "" : "enter"} ${className}`}
+    >
+      {(title || aside || action) && (
+        <header className="flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-cpx-grey-100 px-3 py-1.5">
+          {title && (
+            <h2 id={id} className="min-w-0 truncate font-sans text-sm font-semibold tracking-tightish">
+              {title}
+            </h2>
+          )}
+          {count !== undefined && <CountBadge n={count} />}
+          <span className="ml-auto flex shrink-0 items-center gap-3">
+            {aside && <span className="whitespace-nowrap text-2xs text-cpx-grey-500">{aside}</span>}
+            {action}
+          </span>
+        </header>
+      )}
+      <div className={`min-h-0 flex-1 ${flush ? "" : "p-3"} ${bodyClassName}`}>{children}</div>
+    </section>
+  );
+}
+
+/** "View all ›": the panel header's one way out. The chevron leans on hover. */
+export function PanelLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="group/pl inline-flex items-center gap-0.5 text-xs font-medium text-link transition-colors duration-150 hover:text-cpx-purple"
+    >
+      {children}
+      <IconChevronRight className="transition-transform duration-150 ease-out-quart group-hover/pl:translate-x-0.5" />
+    </Link>
+  );
+}
+
+/** Search, filters and the list's honest total, on one row that wraps. */
+export function Toolbar({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <div className={`mb-3 flex flex-wrap items-center gap-2 ${className}`}>{children}</div>;
 }
 
 // ---------------------------------------------------------------------------
@@ -63,7 +187,7 @@ const BUTTON_VARIANT: Record<ButtonVariant, string> = {
   primary:
     "bg-cpx-green font-medium text-cpx-purple hover:bg-cpx-green-600 disabled:opacity-50 disabled:hover:bg-cpx-green",
   secondary:
-    "border border-cpx-grey-100 bg-white font-medium hover:bg-cpx-grey-50 disabled:opacity-50 disabled:hover:bg-white",
+    "border border-cpx-grey-100 bg-white font-medium hover:border-cpx-grey-200 hover:bg-cpx-grey-50 disabled:opacity-50 disabled:hover:border-cpx-grey-100 disabled:hover:bg-white",
   ghost:
     "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple disabled:opacity-50 disabled:hover:bg-transparent",
   // Accent Red text is 3.2:1 on white, so destructive actions carry red-700.
@@ -72,7 +196,7 @@ const BUTTON_VARIANT: Record<ButtonVariant, string> = {
 };
 
 const BUTTON_SIZE: Record<ButtonSize, string> = {
-  md: "h-8 px-3 text-base",
+  md: "h-8 px-3 text-sm",
   sm: "h-7 px-2.5 text-xs",
 };
 
@@ -82,9 +206,9 @@ export function buttonClass(
   size: ButtonSize = "md",
   className = "",
 ) {
-  // 150ms on colour, and a 2% press so a click reads as a click. The press
+  // 150ms on colour, and a 3% press so a click reads as a click. The press
   // needs :enabled, so a disabled button stays still.
-  return `inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap transition duration-150 ease-out-quart enabled:active:scale-[0.98] disabled:cursor-not-allowed ${BUTTON_SIZE[size]} ${BUTTON_VARIANT[variant]} ${className}`;
+  return `inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm transition duration-150 ease-out-quart enabled:active:scale-[0.97] disabled:cursor-not-allowed ${BUTTON_SIZE[size]} ${BUTTON_VARIANT[variant]} ${className}`;
 }
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -100,6 +224,91 @@ export function Button({
   ...rest
 }: ButtonProps) {
   return <button type={type} className={buttonClass(variant, size, className)} {...rest} />;
+}
+
+/** A square icon-only button. The label is its accessible name and tooltip. */
+export function IconButton({
+  label,
+  size = "md",
+  className = "",
+  children,
+  ...rest
+}: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; size?: "sm" | "md" }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      className={`inline-flex ${size === "sm" ? "h-6 w-6" : "h-7 w-7"} shrink-0 items-center justify-center rounded-sm text-cpx-grey-500 transition duration-150 ease-out-quart hover:bg-cpx-grey-100 hover:text-cpx-black enabled:active:scale-[0.94] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Form fields. One recipe for every input, select and textarea: 32px, the
+// hairline, a darker hairline on hover, green on focus.
+
+// Height is set apart so a compact (28px) control in a toolbar or panel header
+// does not fight the default.
+const FIELD =
+  "rounded-sm border border-cpx-grey-100 bg-white px-2.5 text-sm text-cpx-black transition-colors duration-150 placeholder:text-cpx-grey-400 hover:border-cpx-grey-200 focus:border-cpx-green focus:outline-none disabled:cursor-not-allowed disabled:bg-cpx-grey-50 disabled:text-cpx-grey-500";
+
+export const inputClass = `h-8 w-full ${FIELD}`;
+
+/** A field under its own label (`mt-1`), for forms whose inputs, selects and
+ *  textareas share one recipe and size to their content. */
+export const fieldClass = `mt-1 w-full ${FIELD} py-1.5`;
+
+type FieldSize = "sm" | "md";
+const fieldSize = (size: FieldSize) => (size === "sm" ? "h-7 text-xs" : "h-8");
+
+export function Input({
+  className = "",
+  fieldSize: size = "md",
+  ...rest
+}: InputHTMLAttributes<HTMLInputElement> & { fieldSize?: FieldSize }) {
+  return <input className={`${fieldSize(size)} w-full ${FIELD} ${className}`} {...rest} />;
+}
+
+export function Select({
+  className = "",
+  fieldSize: size = "md",
+  ...rest
+}: SelectHTMLAttributes<HTMLSelectElement> & { fieldSize?: FieldSize }) {
+  return <select className={`${fieldSize(size)} ${FIELD} pl-2 pr-1 ${className}`} {...rest} />;
+}
+
+export function Textarea({ className = "", ...rest }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      className={`w-full ${FIELD} min-h-20 py-2 leading-relaxed ${className}`}
+      {...rest}
+    />
+  );
+}
+
+/** A visible label over its control, with an optional one-line hint. */
+export function Field({
+  label,
+  hint,
+  children,
+  className = "",
+}: {
+  label: string;
+  hint?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <label className={`block min-w-0 ${className}`}>
+      <span className="mb-1 block text-xs font-medium text-cpx-grey-700">{label}</span>
+      {children}
+      {hint && <span className="mt-1 block text-2xs text-cpx-grey-500">{hint}</span>}
+    </label>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -165,19 +374,14 @@ export function Dialog({
       onClick={closeOnBackdrop(onClose)}
       className={`m-auto w-full ${className.includes("max-w-") ? "" : "max-w-md"} border border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-pop ${className}`}
     >
-      <div className="p-5">
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 id={id} className="text-md font-semibold tracking-tightish">
+      <div className="p-4">
+        <div className="mb-3 flex items-start justify-between gap-4">
+          <h2 id={id} className="font-sans text-md font-semibold tracking-tightish">
             {title}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
-          >
+          <IconButton label="Close" onClick={onClose} className="-mr-1 -mt-0.5">
             <IconClose />
-          </button>
+          </IconButton>
         </div>
         {children}
       </div>
@@ -205,22 +409,17 @@ export function Drawer({
       aria-labelledby={id}
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className={`drawer fixed bottom-0 left-auto right-0 top-[60px] m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-xl ${className}`}
+      className={`drawer fixed bottom-0 left-auto right-0 top-12 m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-xl ${className}`}
     >
-      <div className="flex items-center justify-between gap-4 border-b border-cpx-grey-100 px-5 py-3">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-cpx-grey-100 bg-white px-4 py-2.5">
         <div id={id} className="min-w-0">
           {title}
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="flex h-7 w-7 shrink-0 items-center justify-center text-cpx-grey-400 hover:bg-cpx-grey-50 hover:text-cpx-black"
-        >
+        <IconButton label="Close" onClick={onClose}>
           <IconClose />
-        </button>
+        </IconButton>
       </div>
-      <div className="p-5">{children}</div>
+      <div className="p-4">{children}</div>
     </dialog>
   );
 }
@@ -271,17 +470,70 @@ export function StatusPill({ tone, label }: { tone: StatusTone; label: string })
       icon: <IconCritical />,
     },
     idle: {
-      box: "border-cpx-grey-300 bg-cpx-grey-200 text-cpx-grey-700",
+      box: "border-cpx-grey-200 bg-cpx-grey-100 text-cpx-grey-700",
       icon: <IconDash />,
     },
   };
   const m = map[tone];
   return (
     <span
-      className={`inline-flex h-5 items-center gap-1 rounded-sm border px-1.5 text-2xs font-medium ${m.box}`}
+      className={`inline-flex h-5 shrink-0 items-center gap-1 whitespace-nowrap rounded-sm border px-1.5 text-2xs font-medium ${m.box}`}
     >
       {m.icon}
       {label}
+    </span>
+  );
+}
+
+const SEVERITY: Record<Severity, { box: string; label: string }> = {
+  critical: { box: "border-cpx-red-200 bg-cpx-red-100 text-cpx-red-700", label: "Critical" },
+  high: { box: "border-cpx-red-100 bg-cpx-red-50 text-cpx-red-700", label: "High" },
+  medium: { box: "border-cpx-blue-100 bg-cpx-blue-50 text-cpx-blue-700", label: "Medium" },
+  low: { box: "border-cpx-grey-200 bg-cpx-grey-100 text-cpx-grey-700", label: "Low" },
+};
+
+/** The square pip is the CPX building block, in the severity scale's ink. */
+export function SeverityPip({ level, className = "" }: { level: Severity; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`inline-block h-2 w-2 shrink-0 ${className}`}
+      style={{ background: `var(--color-sev-${level})` }}
+    />
+  );
+}
+
+/** Severity: a word, a pip, a tint. Never colour alone. */
+export function SeverityBadge({ level }: { level: Severity }) {
+  const s = SEVERITY[level];
+  return (
+    <span
+      className={`inline-flex h-5 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border px-1.5 text-2xs font-medium ${s.box}`}
+    >
+      <SeverityPip level={level} />
+      {s.label}
+    </span>
+  );
+}
+
+/** Case priority: the same ordinal ladder as severity, drawn as an outline so
+ *  a priority (someone's call) never reads as a severity (the record's). */
+export function PriorityBadge({ level }: { level: Severity }) {
+  return (
+    <span className="inline-flex h-5 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border border-cpx-grey-200 bg-white px-1.5 text-2xs font-medium text-cpx-grey-700">
+      <SeverityPip level={level} />
+      {SEVERITY[level].label}
+    </span>
+  );
+}
+
+/** A small count beside a title, tab or chip. One style everywhere. */
+export function CountBadge({ n, className = "" }: { n: number; className?: string }) {
+  return (
+    <span
+      className={`inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-sm bg-cpx-grey-100 px-1 text-2xs font-medium tabular-nums text-cpx-grey-700 ${className}`}
+    >
+      {n.toLocaleString("en-GB")}
     </span>
   );
 }
@@ -294,7 +546,7 @@ export function OfflineNote() {
   return (
     <span
       role="status"
-      className="reveal inline-flex h-5 items-center gap-1 rounded-sm border border-cpx-blue-100 bg-cpx-blue-50 px-1.5 text-2xs font-medium text-cpx-blue-700"
+      className="reveal inline-flex h-5 items-center gap-1 whitespace-nowrap rounded-sm border border-cpx-blue-100 bg-cpx-blue-50 px-1.5 text-2xs font-medium text-cpx-blue-700"
     >
       <IconWarn />
       Demonstration data. Backend unreachable.
@@ -303,12 +555,120 @@ export function OfflineNote() {
 }
 
 // Loading at final geometry, no motion: hard rule 4 bans the pulse.
-export function SkeletonRows({ rows = 6, className = "" }: { rows?: number; className?: string }) {
+export function SkeletonRows({
+  rows = 6,
+  height = "h-8",
+  className = "",
+}: {
+  rows?: number;
+  height?: string;
+  className?: string;
+}) {
   return (
-    <div aria-busy="true" aria-label="Loading" className={`space-y-2 ${className}`}>
+    <div aria-busy="true" aria-label="Loading" className={`space-y-1.5 ${className}`}>
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="h-8 bg-cpx-grey-100" style={{ width: `${100 - (i % 3) * 8}%` }} />
+        <div key={i} className={`${height} bg-cpx-grey-100`} style={{ width: `${100 - (i % 3) * 8}%` }} />
       ))}
+    </div>
+  );
+}
+
+/** A Panel-shaped placeholder: the header band and a few rows, still. */
+export function SkeletonPanel({ rows = 4, className = "" }: { rows?: number; className?: string }) {
+  return (
+    <div
+      aria-busy="true"
+      aria-label="Loading"
+      className={`flex flex-col border border-cpx-grey-100 bg-white ${className}`}
+    >
+      <div className="flex h-9 items-center border-b border-cpx-grey-100 px-3">
+        <div className="h-3 w-32 bg-cpx-grey-100" />
+      </div>
+      <div className="space-y-2 p-3">
+        {Array.from({ length: rows }, (_, i) => (
+          <div key={i} className="h-5 bg-cpx-grey-50" style={{ width: `${100 - (i % 3) * 12}%` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// States. Error, warning, note and info each have one look; an error names the
+// thing and the fix, and the fix is usually a Retry beside it.
+
+type BannerTone = "error" | "warn" | "note" | "info";
+
+const BANNER: Record<BannerTone, { box: string; icon: ReactNode }> = {
+  error: { box: "border-cpx-red-200 bg-cpx-red-50 text-cpx-red-700", icon: <IconCritical /> },
+  warn: { box: "border-cpx-bright-200 bg-cpx-bright-50 text-cpx-bright-700", icon: <IconWarn /> },
+  note: { box: "border-cpx-grey-100 bg-cpx-grey-50 text-cpx-grey-700", icon: <IconInfo /> },
+  info: { box: "border-cpx-blue-100 bg-cpx-blue-50 text-cpx-blue-700", icon: <IconInfo /> },
+};
+
+export function Banner({
+  tone = "error",
+  children,
+  action,
+  className = "",
+}: {
+  tone?: BannerTone;
+  children: ReactNode;
+  action?: ReactNode;
+  className?: string;
+}) {
+  const b = BANNER[tone];
+  return (
+    <div
+      role={tone === "error" ? "alert" : "status"}
+      className={`reveal flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-sm border px-3 py-2 text-sm ${b.box} ${className}`}
+    >
+      <span className="shrink-0">{b.icon}</span>
+      <span className="min-w-0 flex-1">{children}</span>
+      {action}
+    </div>
+  );
+}
+
+/** The centred one-line state for a whole page: not permitted, not found,
+ *  unreachable. One sentence and one way out. */
+export function CenterMessage({
+  children,
+  action,
+}: {
+  children: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="flex min-h-[50vh] flex-1 flex-col items-center justify-center gap-3 px-4 text-center">
+      <p className="text-base">{children}</p>
+      {action ?? (
+        <Link href="/" className="link-quiet text-sm">
+          Dashboard
+        </Link>
+      )}
+    </div>
+  );
+}
+
+export function NotPermitted() {
+  return <CenterMessage>Not permitted at this access level.</CenterMessage>;
+}
+
+/** An empty list or panel: the fact, in eight words or fewer, and an action. */
+export function EmptyState({
+  children,
+  action,
+  className = "",
+}: {
+  children: ReactNode;
+  action?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`flex flex-col items-center gap-2 px-3 py-6 text-center ${className}`}>
+      <p className="text-sm text-cpx-grey-500">{children}</p>
+      {action}
     </div>
   );
 }
@@ -317,7 +677,7 @@ export function TlpBadge({ tlp }: { tlp: Tlp }) {
   const dark = tlp === "RED" || tlp === "AMBER+STRICT";
   return (
     <span
-      className={`inline-flex h-5 items-center rounded-sm px-1.5 font-mono text-2xs ${
+      className={`inline-flex h-5 shrink-0 items-center whitespace-nowrap rounded-sm px-1.5 font-mono text-2xs ${
         dark
           ? "bg-cpx-red text-white"
           : tlp === "AMBER"
@@ -350,6 +710,45 @@ export function InertUrl({ url }: { url: string }) {
   );
 }
 
+/**
+ * A tooltip on hover or keyboard focus, after 300ms so sweeping across a
+ * table does not flicker them open. The trigger keeps its own accessible
+ * name; this adds the detail sighted pointer users would otherwise miss.
+ */
+export function Tooltip({
+  content,
+  children,
+  side = "top",
+  align = "center",
+  className = "",
+}: {
+  content: ReactNode;
+  children: ReactNode;
+  side?: "top" | "bottom";
+  align?: "center" | "start" | "end";
+  className?: string;
+}) {
+  const pos =
+    align === "start"
+      ? "left-0"
+      : align === "end"
+        ? "right-0"
+        : "left-1/2 -translate-x-1/2";
+  return (
+    <span className={`group relative inline-flex ${className}`}>
+      {children}
+      <span
+        role="tooltip"
+        className={`tip absolute z-40 ${pos} ${
+          side === "top" ? "bottom-full mb-1.5 origin-bottom" : "top-full mt-1.5 origin-top"
+        } w-max max-w-64 rounded-sm bg-cpx-purple px-2 py-1 text-left font-sans text-2xs font-medium normal-case leading-4 tracking-normal whitespace-normal text-white shadow-pop`}
+      >
+        {content}
+      </span>
+    </span>
+  );
+}
+
 export function SearchBox({
   value,
   onChange,
@@ -363,14 +762,14 @@ export function SearchBox({
 }) {
   return (
     <div className={`relative ${className}`}>
-      <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-cpx-grey-500" />
+      <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-cpx-grey-500" />
       <input
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-8 w-full rounded-sm border border-cpx-grey-100 bg-white pl-8 pr-3 text-sm focus:border-cpx-green focus:outline-none"
+        className={`${inputClass} pl-8 pr-2.5`}
       />
     </div>
   );
@@ -391,13 +790,15 @@ export function ListMeta({
   note?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3 text-xs text-cpx-grey-500">
-      <span>
-        Showing <span className="font-medium text-cpx-black">{shown}</span> of{" "}
-        <span className="font-medium text-cpx-black">{total}</span>
+    <div className="flex flex-wrap items-center gap-2 text-xs text-cpx-grey-500">
+      <span className="whitespace-nowrap">
+        Showing <span className="font-medium text-cpx-black tabular-nums">{shown}</span> of{" "}
+        <span className="font-medium text-cpx-black tabular-nums">{total}</span>
       </span>
-      <span className="text-cpx-grey-400">·</span>
-      <span>{sort}</span>
+      <span className="text-cpx-grey-300" aria-hidden>
+        ·
+      </span>
+      <span className="whitespace-nowrap">{sort}</span>
       {onExport && (
         <Button variant="secondary" size="sm" onClick={onExport} className="ml-1">
           <IconExport />
@@ -407,6 +808,29 @@ export function ListMeta({
       {note}
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Selection indicators. One element slides to the selected option instead of
+// each option drawing its own, so the eye follows the change (180ms). The
+// measurement re-runs when the selection or the container's size changes.
+
+function useIndicator<T extends HTMLElement>(selected: string) {
+  const ref = useRef<T>(null);
+  const [box, setBox] = useState<{ x: number; w: number; cw: number } | null>(null);
+  useLayoutEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const measure = () => {
+      const el = root.querySelector<HTMLElement>('[data-selected="true"]');
+      setBox(el ? { x: el.offsetLeft, w: el.offsetWidth, cw: root.scrollWidth } : null);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(root);
+    return () => ro.disconnect();
+  }, [selected]);
+  return [ref, box] as const;
 }
 
 // Tab ids are derived from one base so a tab and its panel can name each
@@ -427,6 +851,7 @@ export function Tabs<T extends string>({
   onChange,
   label,
   id,
+  className = "",
 }: {
   tabs: { key: T; label: string; count?: number }[];
   value: T;
@@ -434,9 +859,11 @@ export function Tabs<T extends string>({
   label?: string;
   /** Base for the tab and panel ids. Pass one when the panels use tabPanelProps. */
   id?: string;
+  className?: string;
 }) {
   const auto = useId();
   const base = id ?? auto;
+  const [ref, box] = useIndicator<HTMLDivElement>(value);
 
   // Roving focus: one tab stop for the list, arrows move between tabs and
   // select as they go, Home and End jump. Standard tablist keyboard model.
@@ -456,10 +883,11 @@ export function Tabs<T extends string>({
 
   return (
     <div
+      ref={ref}
       role="tablist"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="flex items-end gap-1 border-b border-cpx-grey-100"
+      className={`relative flex items-end gap-0.5 overflow-x-auto shadow-[inset_0_-1px_0_var(--color-cpx-grey-100)] ${className}`}
     >
       {tabs.map((t) => {
         const selected = value === t.key;
@@ -471,127 +899,214 @@ export function Tabs<T extends string>({
             role="tab"
             aria-selected={selected}
             aria-controls={`${base}-panel-${t.key}`}
+            data-selected={selected}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(t.key)}
-            className={`-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-base transition-colors duration-150 ${
+            className={`flex h-8 shrink-0 items-center gap-1.5 rounded-t-sm px-2.5 text-sm font-medium transition-colors duration-150 ${
               selected
-                ? "border-cpx-green font-semibold text-cpx-purple"
-                : "border-transparent text-cpx-grey-500 hover:text-cpx-purple"
+                ? "text-cpx-purple"
+                : "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple"
             }`}
           >
             {t.label}
-            {t.count !== undefined && (
-              <span className="rounded-sm bg-cpx-grey-100 px-1 text-2xs text-cpx-grey-700">{t.count}</span>
-            )}
+            {t.count !== undefined && <CountBadge n={t.count} />}
           </button>
         );
       })}
+      {box && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 left-0 h-0.5 w-px origin-left bg-cpx-green transition-[translate,scale] duration-200 ease-out-quart"
+          style={{ translate: `${box.x}px 0`, scale: `${box.w} 1` }}
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * A small set of mutually exclusive options (a period, a mode). The selected
+ * segment is a Dark Purple block revealed by clip-path, so the text colour
+ * crosses over with the block instead of snapping (Emil's clip-path tabs).
+ */
+export function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
+  label,
+}: {
+  options: { key: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+  label: string;
+}) {
+  const [ref, box] = useIndicator<HTMLDivElement>(value);
+  const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const keys = options.map((o) => o.key);
+    const i = keys.indexOf(value);
+    let next: number | null = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (i + 1) % keys.length;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (i - 1 + keys.length) % keys.length;
+    if (next === null) return;
+    e.preventDefault();
+    onChange(keys[next]);
+    (ref.current?.querySelectorAll<HTMLElement>('[role="radio"]')[next])?.focus();
+  };
+  const segment = "flex h-full items-center px-2.5 text-xs font-medium whitespace-nowrap";
+  return (
+    <div
+      ref={ref}
+      role="radiogroup"
+      aria-label={label}
+      onKeyDown={onKeyDown}
+      className="relative inline-flex h-7 shrink-0 items-stretch rounded-sm border border-cpx-grey-100 bg-white p-0.5"
+    >
+      {options.map((o) => {
+        const selected = o.key === value;
+        return (
+          <button
+            key={o.key}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            data-selected={selected}
+            tabIndex={selected ? 0 : -1}
+            onClick={() => onChange(o.key)}
+            className={`${segment} rounded-sm text-cpx-grey-500 transition-colors duration-150 hover:text-cpx-purple`}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+      {box && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0.5 flex items-stretch overflow-hidden rounded-sm bg-cpx-purple transition-[clip-path] duration-200 ease-out-quart"
+          style={{
+            clipPath: `inset(0 ${Math.max(0, box.cw - box.x - box.w - 2)}px 0 ${Math.max(0, box.x - 2)}px round 3px)`,
+          }}
+        >
+          {options.map((o) => (
+            <span key={o.key} className={`${segment} text-white`}>
+              {o.label}
+            </span>
+          ))}
+        </span>
+      )}
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// The KPI card. One definition for every dashboard: both of them used to carry
-// a byte-identical private copy.
+// The KPI cell. The dashboard lays several in one StatStrip rather than as a
+// row of separate cards: one bordered bar, hairline dividers, 64px tall.
 //
-// The card answers three questions in reading order: what is counted, how many,
-// and whether that is going the wrong way. The change is a chip rather than a
-// sentence, because a sentence in colour reads as a link, and it carries an
-// arrow and a word as well as a colour: colour never says anything on its own.
+// A value that changed since the previous refresh washes green once
+// (`changed`): the figure says what moved without a delta the backend does
+// not send. Null is a measurement nobody recorded, and says so.
 
-export interface KpiCardProps {
-  label: string;
-  value: number;
-  /** What the number counts, in the analyst's words. */
-  unit: string;
-  /** The period the number covers, where it has one. */
-  window?: string;
-  /** Prior-period value. No previous, no chip: a change is never inferred. */
-  previous?: number;
-  /** True where an increase is bad. Decides which direction reads as worse. */
-  higherIsWorse?: boolean;
-  href?: string;
-}
+export type StatTone = "neutral" | "critical" | "high" | "warn" | "good";
 
-export function KpiCard({
+const STAT_INK: Record<StatTone, string> = {
+  neutral: "text-cpx-black",
+  critical: "text-cpx-red-700",
+  high: "text-cpx-red-700",
+  warn: "text-cpx-bright-700",
+  good: "text-green-contrast",
+};
+
+const STAT_PIP: Record<StatTone, string | null> = {
+  neutral: null,
+  critical: "var(--color-sev-critical)",
+  high: "var(--color-sev-high)",
+  warn: "var(--color-cpx-bright)",
+  good: "var(--color-green-contrast)",
+};
+
+export function Stat({
   label,
   value,
-  unit,
-  window,
-  previous,
-  higherIsWorse,
+  caption,
   href,
-}: KpiCardProps) {
-  const delta = previous === undefined ? null : value - previous;
-  const worse =
-    delta === null || delta === 0 ? false : higherIsWorse ? delta > 0 : delta < 0;
-  const better = delta !== null && delta !== 0 && !worse;
+  tone = "neutral",
+  size = "md",
+}: {
+  label: string;
+  value: number | string | null;
+  caption?: ReactNode;
+  href?: string;
+  tone?: StatTone;
+  /** "sm" for figures that sit under a headline strip, so they never compete with it. */
+  size?: "sm" | "md";
+}) {
+  const prev = useRef(value);
+  const [flash, setFlash] = useState(0);
+  useEffect(() => {
+    if (prev.current !== value) {
+      prev.current = value;
+      setFlash((n) => n + 1);
+    }
+  }, [value]);
 
-  // The accent carries the same judgement as the chip, so the card can be read
-  // from the edge of the eye. Flat, or no prior period, stays neutral.
-  const accent = worse
-    ? "border-l-cpx-red-400"
-    : better
-      ? "border-l-cpx-green"
-      : "border-l-cpx-grey-300";
-
-  const chipTone = worse
-    ? "bg-cpx-red-50 text-cpx-red-700"
-    : better
-      ? "bg-cpx-green-50 text-cpx-green-800"
-      : "bg-cpx-grey-50 text-cpx-grey-700";
-
-  const sentence =
-    delta === null
-      ? undefined
-      : delta === 0
-        ? "unchanged on the previous period"
-        : `${delta > 0 ? "up" : "down"} ${Math.abs(delta).toLocaleString(
-            "en-GB",
-          )} on the previous period`;
-
+  const pip = STAT_PIP[tone];
+  const shown =
+    value === null ? null : typeof value === "number" ? value.toLocaleString("en-GB") : value;
   const body = (
-    <div
-      className={`flex h-full min-h-[100px] flex-col justify-between border border-l-4 border-cpx-grey-100 bg-white p-4 transition-colors ${accent} ${
-        href ? "hover:border-cpx-green-200 hover:bg-cpx-green-50/40" : ""
-      }`}
-    >
-      <span className="text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
-        {label}
-      </span>
-      <span className="mt-2 flex flex-wrap items-baseline gap-2">
-        <span className="font-display text-2xl font-semibold leading-none tracking-tightish tabular-nums">
-          {value.toLocaleString("en-GB")}
+    <>
+      <span className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-cpx-grey-600">
+        {pip && <span aria-hidden className="inline-block h-2 w-2 shrink-0" style={{ background: pip }} />}
+        <span className="truncate" title={label}>
+          {label}
         </span>
-        {delta !== null && (
-          <span
-            title={sentence}
-            className={`inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-2xs font-medium tabular-nums ${chipTone}`}
-          >
-            {delta === 0 ? (
-              "no change"
-            ) : (
-              <>
-                <span aria-hidden>{delta > 0 ? "↑" : "↓"}</span>
-                {Math.abs(delta).toLocaleString("en-GB")}{" "}
-                {delta > 0 ? "more" : "fewer"}
-              </>
-            )}
-          </span>
-        )}
       </span>
-      <span className="mt-2 text-xs text-cpx-grey-500">
-        {unit}
-        {window && <> · {window}</>}
-      </span>
-    </div>
+      {shown === null ? (
+        <span
+          className={`mt-1 block text-sm font-medium text-cpx-grey-500 ${size === "sm" ? "leading-6" : "leading-7"}`}
+        >
+          Not recorded
+        </span>
+      ) : (
+        <span
+          className={`mt-1 block truncate font-display font-semibold tracking-tightish tabular-nums ${size === "sm" ? "text-lg leading-6" : "text-xl leading-7"} ${STAT_INK[tone]}`}
+        >
+          {shown}
+        </span>
+      )}
+      {caption && <span className="mt-0.5 block truncate text-2xs text-cpx-grey-500">{caption}</span>}
+    </>
   );
+  const cell = `relative block min-w-0 bg-white px-3 ${size === "sm" ? "py-2" : "py-2.5"} ${flash ? "changed" : ""}`;
   return href ? (
-    <Link href={href} className="block">
+    <Link key={flash} href={href} className={`${cell} row-link group/stat`}>
       {body}
+      <IconChevronRight className="lean absolute bottom-2.5 right-2 text-cpx-grey-300 opacity-0 transition-opacity duration-150 group-hover/stat:opacity-100 group-focus-visible/stat:opacity-100" />
     </Link>
   ) : (
-    body
+    <div key={flash} className={cell}>
+      {body}
+    </div>
+  );
+}
+
+/** Stats in one bordered bar. Dividers are the 1px gap over the hairline
+ *  colour, so they stay right however the grid wraps. Pass the column
+ *  classes: `grid-cols-2 @3xl/page:grid-cols-4`, and so on. */
+export function StatStrip({
+  children,
+  className = "",
+  label,
+}: {
+  children: ReactNode;
+  className?: string;
+  label?: string;
+}) {
+  return (
+    <section
+      aria-label={label}
+      className={`grid gap-px overflow-hidden border border-cpx-grey-100 bg-cpx-grey-100 ${className}`}
+    >
+      {children}
+    </section>
   );
 }
 
@@ -613,21 +1128,18 @@ export function FilterChip({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex h-7 items-center gap-1.5 border px-2.5 text-xs transition-colors duration-150 ${
+      className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs transition-colors duration-150 enabled:active:scale-[0.97] ${
         active
           ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-          : `border-cpx-grey-100 hover:bg-cpx-grey-50 ${count === 0 ? "text-cpx-grey-500" : ""}`
+          : `border-cpx-grey-100 bg-white hover:border-cpx-grey-200 hover:bg-cpx-grey-50 ${count === 0 ? "text-cpx-grey-500" : ""}`
       }`}
     >
       {label}
       {count !== undefined && (
-        <span
-          className={`px-1 text-2xs ${active ? "bg-cpx-green-100" : "bg-cpx-grey-50"}`}
-        >
-          {count}
-        </span>
+        <CountBadge n={count} className={active ? "bg-cpx-green-100 text-cpx-green-900" : ""} />
       )}
     </button>
   );
@@ -648,7 +1160,7 @@ export function Fact({
   return (
     <div className="min-w-0" title={title}>
       <dt className="text-2xs text-cpx-grey-500">{label}</dt>
-      <dd className={`font-medium ${truncate ? "truncate" : ""}`}>{value}</dd>
+      <dd className={`text-sm font-medium ${truncate ? "truncate" : ""}`}>{value}</dd>
     </div>
   );
 }
@@ -664,15 +1176,39 @@ export function DetailRow({
   children: ReactNode;
 }) {
   return (
-    <div className="mt-5 border-t border-cpx-grey-100 pt-4">
-      <span className="flex items-baseline gap-2 text-xs text-cpx-grey-500">
+    <div className="mt-4 border-t border-cpx-grey-100 pt-3">
+      <span className="flex items-center gap-2 text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
         {label}
-        {count !== undefined && (
-          <span className="bg-cpx-grey-50 px-1 text-2xs text-cpx-black">{count}</span>
-        )}
+        {count !== undefined && <CountBadge n={count} />}
       </span>
       <div className="mt-2">{children}</div>
     </div>
+  );
+}
+
+/** One item in a master list: a 2px green edge and a wash when selected. */
+export function MasterListItem({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-current={selected || undefined}
+      className={`block w-full border-l-2 px-3 py-2 text-left transition-colors duration-150 ${
+        selected
+          ? "border-cpx-green bg-cpx-green-50/60"
+          : "border-transparent hover:border-cpx-grey-200 hover:bg-cpx-grey-50"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -795,7 +1331,7 @@ export function StepRail({ steps }: { steps: Step[] }) {
               <StepMarker state={s.state} />
               {!last && <span className="w-px flex-1 bg-cpx-grey-100" />}
             </span>
-            <span className={`min-w-0 flex-1 ${last ? "" : "pb-4"}`}>
+            <span className={`min-w-0 flex-1 ${last ? "" : "pb-3"}`}>
               <span className="flex flex-wrap items-baseline gap-2">
                 <span className="text-sm font-medium">
                   {i + 1}. {s.title}

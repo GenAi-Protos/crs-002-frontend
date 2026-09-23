@@ -104,6 +104,15 @@
   --color-seq-8: #3c3c86;
   --color-seq-9: #1e1847;
 
+  /* Severity, an ordinal scale. One map for every badge, bar and chart
+     (docs/03 section 2). Validated with the dataviz palette check: adjacent
+     pairs separate under protan, deutan and tritan simulation. Low is a
+     deliberate neutral and, like every severity, always ships its word. */
+  --color-sev-critical: #b00030;
+  --color-sev-high: #ff3666;
+  --color-sev-medium: #0593db;
+  --color-sev-low: #9a9aa2;
+
   --shadow-pop: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --tracking-tightish: -0.01em;
 
@@ -115,8 +124,9 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 
-  /* The rail collapses to icons below this width (docs/01). */
-  --breakpoint-rail: 1100px;
+  /* The rail collapses to icons below this viewport width (docs/01). At 1280px
+     the full rail still leaves 1000px of content for a Teams tab. */
+  --breakpoint-rail: 1280px;
 
   /* Type scale: eight steps, the only sizes the console uses. Note text-base is 14px. */
   --text-*: initial;
@@ -146,6 +156,14 @@
   --font-display: var(--font-unbounded), var(--font-inter), sans-serif;
   --font-arabic: var(--font-plex-arabic), var(--font-inter), sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+:root {
+  /* Motion budget by frequency (docs/03 section 6): hover and chips take the
+     fast step, state changes the base step, arrivals the slow step. */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 240ms;
 }
 
 body {
@@ -280,6 +298,13 @@ body {
   outline-offset: 2px;
 }
 
+/* A field inside a framed control (the Intelligence composer) hands its ring
+   to the frame, so focus reads as one ring round the whole control rather than
+   a second one inside it. Unlayered, like the rule above, so it can win. */
+.ring-on-frame:focus-visible {
+  outline: none;
+}
+
 /* Preview is the PDF path: the browser writes the file from the previewed
    markup, so what is checked and what is exported cannot drift apart. */
 @media print {
@@ -356,7 +381,16 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    /* A staggered arrival holds its first frame for its delay; without this
+       it would sit invisible for up to 240ms and then snap in. */
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+  /* The changed flash cannot play, so the change is marked still instead and
+     clears when the value next renders unchanged. */
+  .changed {
+    box-shadow: inset 2px 0 0 var(--color-green-contrast);
   }
 }
 
@@ -385,7 +419,134 @@ body {
   transform-origin: left center;
   animation: bar-grow 400ms var(--ease-out-quart) both;
 }
+.bar-rise {
+  transform-origin: center bottom;
+  animation: bar-rise 360ms var(--ease-out-quart) both;
+}
+@keyframes bar-rise {
+  from {
+    transform: scaleY(0);
+  }
+}
 .line-draw {
   stroke-dasharray: 1;
   animation: line-draw 500ms var(--ease-out-quart) both;
+}
+
+/* ---------------------------------------------------------------------------
+   Arrival, hover and feedback (docs/03 section 6). Emil-weighted: fast and
+   purposeful; nothing loops, nothing pulses, only opacity, translate, scale
+   and filter move, and the reduced-motion block above collapses all of it.
+   --------------------------------------------------------------------------- */
+
+/* A panel arriving on first mount: rises 6px out of a 2px blur, staggered by
+   --i (30ms a step, capped at eight steps). A data refresh never replays it,
+   because the panel is not remounted. */
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+    filter: blur(2px);
+  }
+}
+@utility enter {
+  animation: enter 220ms var(--ease-out-quart) both;
+  animation-delay: calc(min(var(--i, 0), 8) * 30ms);
+}
+
+/* Rail labels settle in just after the rail widens (the width itself switches
+   instantly: layout is never animated). */
+@keyframes label-in {
+  from {
+    opacity: 0;
+    translate: -4px 0;
+  }
+}
+@utility label-in {
+  animation: label-in 120ms var(--ease-out-quart) 60ms both;
+}
+
+/* Menus, popovers and tooltips grow from their trigger (set the origin on the
+   element). Entry only: closing is instant, the subtler exit. */
+@utility pop {
+  transition:
+    opacity 140ms var(--ease-out-quart),
+    scale 140ms var(--ease-out-quart);
+  @starting-style {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+/* A value that changed since the last refresh washes green once. It answers
+   "what moved" without a delta the backend does not send. */
+@keyframes changed {
+  from {
+    background-color: var(--color-cpx-green-100);
+  }
+}
+.changed {
+  animation: changed 900ms var(--ease-out-quart);
+}
+
+/* Navigable rows and list items: the wash, a 2px green rule on the leading
+   edge (an inset shadow, so nothing reflows), and a chevron that leans in. */
+@utility row-link {
+  transition:
+    background-color var(--duration-fast) var(--ease-out-quart),
+    box-shadow var(--duration-fast) var(--ease-out-quart);
+  &:hover,
+  &:focus-within {
+    background-color: color-mix(in srgb, var(--color-cpx-green-50) 60%, transparent);
+    box-shadow: inset 2px 0 0 var(--color-cpx-green);
+  }
+  & .lean {
+    transition:
+      translate var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart);
+  }
+  &:hover .lean,
+  &:focus-within .lean {
+    translate: 2px 0;
+    color: var(--color-cpx-purple);
+  }
+}
+
+/* Links in content: the underline strengthens rather than appears. */
+@utility link-quiet {
+  color: var(--color-link);
+  text-decoration-line: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, var(--color-link) 35%, transparent);
+  transition: text-decoration-color var(--duration-fast) var(--ease-out-quart);
+  &:hover {
+    text-decoration-color: var(--color-link);
+  }
+}
+
+/* A chart mark under the pointer keeps full ink; its siblings step back. */
+@utility chart-marks {
+  & > * {
+    transition: opacity var(--duration-fast) var(--ease-out-quart);
+  }
+  &:hover > *:not(:hover) {
+    opacity: 0.45;
+  }
+}
+
+/* Tooltip body: shown on hover or focus of the nearest .group, after a short
+   delay so sweeping the pointer across a table does not flicker them open. */
+@utility tip {
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.97;
+  transition:
+    opacity 140ms var(--ease-out-quart),
+    scale 140ms var(--ease-out-quart);
+  :where(.group):hover &,
+  :where(.group):focus-within & {
+    opacity: 1;
+    scale: 1;
+    transition-delay: 300ms;
+  }
 }

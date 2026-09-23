@@ -62,7 +62,9 @@ Every brand colour carries the 50 to 900 scale the other CPX consoles use (CSD-0
 
 ### Shell, shape and focus
 
-The console wears the same light shell as every other CPX console: a white 60px top bar and a white 176px rail, both with a `#ECECEF` hairline, the active destination on a green-50 wash with a 3px green bar. Corners are 4px everywhere (`rounded-sm`), set once in the base layer. Cards are white with the hairline border and no shadow; menus, popovers and dialogs carry `shadow-pop`, the drawer `shadow-xl`.
+The console wears the light CPX shell, compacted for a Teams tab (approved 23 September 2026): a white 48px top bar and a white 176px rail (56px icons below 1280px, pinnable), both with a `#ECECEF` hairline, the active destination on a green-50 wash with a 3px green bar. Panel pages sit on the `band` grey (`#F7F7F8`) with white `Panel` surfaces: hairline border, 4px corners, a 36px header, no shadow. Corners are 4px everywhere (`rounded-sm`), set once in the base layer. Menus, popovers and dialogs carry `shadow-pop`, the drawer `shadow-xl`.
+
+The primitives in `components/ui.tsx` carry the shell: `Page` (content column, `@container/page`, optional `band`), `PageHeader`, `Panel` and `PanelLink`, `Stat` and `StatStrip`, `Banner` (error, warn, note, info), `CenterMessage` and `NotPermitted`, `EmptyState`, `SeverityBadge` and `PriorityBadge`, `Tooltip`, `SegmentedControl`, `IconButton`, `Field`, `Input`, `Select`. Layouts respond to the width the page actually has (container queries on `@container/page`), never to the viewport, because the rail and the Teams chrome decide that width.
 
 One deliberate deviation from the CSD-007 guide: the keyboard focus outline stays Bright Purple (5.6:1), because a green ring is 1.5:1 on white and fails the 3:1 a focus indicator needs. Inputs still turn their border green on focus.
 
@@ -84,7 +86,7 @@ One deliberate deviation from the CSD-007 guide: the keyboard focus outline stay
 
 Six categorical slots, fixed order, never cycled, all from the CPX scales: `#5C5CC0` · `#18A845` · `#0593DB` · `#1E1847` · `#F50E47` · `#6E6E78`. No orange, no yellow slot, deliberately.
 
-Severity in a chart: critical `#D60039`, high `#FF7095`, medium `#14ABF5`, low `#BFBFC6`.
+Severity, everywhere (badge pip, bar, chart): the `--color-sev-*` tokens, critical `#B00030`, high `#FF3666`, medium `#0593DB`, low `#9A9AA2`. Validated with the dataviz palette check (adjacent pairs separate under protan, deutan and tritan simulation); low is a deliberate neutral and, like every severity, always ships its word. Badges follow the CSD-007 ladder: critical red-100/700, high red-50/700, medium blue-50/700, low grey-100/700. Case priority uses the same pips on an outline badge, so a person's call never reads as the record's severity.
 
 Seven PIR categories exceed the cap, so wherever they are the dimension use small multiples, never a seven-series stack.
 
@@ -115,9 +117,11 @@ Headings 600 Semibold, `tracking-tightish` at `-0.01em`, like the other CPX cons
 | `text-sm` | 13 / 20 | body, table cells, buttons |
 | `text-base` | 14 / 20 | nav, empty states, emphasis body (14px, not the Tailwind 16px) |
 | `text-md` | 16 / 24 | dialog and section titles |
-| `text-lg` | 18 / 24 | panel titles |
-| `text-xl` | 20 / 28 | page `h1`, document titles |
-| `text-2xl` | 28 / 32 | KPI numbers |
+| `text-lg` | 18 / 24 | page `h1` (display face), detail titles |
+| `text-xl` | 20 / 28 | KPI numbers (display face), document titles |
+| `text-2xl` | 28 / 32 | reserved; nothing in the dense console uses it today |
+
+Panel titles are `text-sm` Inter semibold (an `h2` with `font-sans`): at Teams density a display-face title on every panel shouts. Stat labels are `text-xs` sentence case; table headers stay `text-2xs` uppercase.
 
 Buttons go through `Button` / `buttonClass` in `components/ui.tsx`, the CSD-007 recipes: primary (CPX Green, Dark Purple text, one per view), secondary (white outline), ghost, danger (red-700 outline, because Accent Red text fails AA on white). Modals go through `Dialog` / `Drawer` on the native `<dialog>`, which gives the focus trap, Escape and focus return for free.
 
@@ -178,7 +182,15 @@ Motion is CSS only, from the tokens in `app/globals.css`. No animation library, 
 | Disclosures, menus, popovers, notices | `reveal`: opacity and a 4px rise over 160ms via `@starting-style` |
 | An answer landing | `reveal-up`: 200ms, 6px |
 | Dialog, drawer, preview (`dialog[open]`) | entry only, 180 to 220ms; closing stays instant |
-| Charts | draw once on arrival: slices fade, bars grow, lines trace. Never on hover or update |
+| Charts | draw once on arrival: bars grow and columns rise, staggered 40ms. Hovering a mark steps its siblings to 45% and shows a tooltip with the exact value |
+| Panels (`enter`) | first mount only: opacity, 6px rise and a 2px blur settling over 220ms, staggered 30ms by `--i`, capped at eight steps. A data refresh never replays it |
+| Menus, popovers, tooltips (`pop`) | scale 0.97 to 1 and opacity over 140ms from the trigger's corner; tooltips open after 300ms so sweeping a table does not flicker them |
+| Rows and clickable surfaces (`row-link`) | 150ms: green-50 wash, a 2px green inset rule on the leading edge, a chevron that leans 2px |
+| Tabs, segmented controls, rail | one indicator slides to the selection (180 to 200ms) instead of each option drawing its own |
+| Changed figures (`changed`) | a dashboard figure that moved since the last refresh washes green once over 900ms; under reduced motion it keeps a still 2px green rule instead |
+| Refresh | the icon turns half a revolution per click; it never spins while waiting |
+
+Deliberately not animated: number count-ups (the in-between values are counts nobody sent, rule 8), skeleton shimmer (a loop), anything on typing or filtering, the rail's width, focus rings. Reduced motion also zeroes every animation and transition delay, so a staggered item is never stranded invisible.
 
 Animate `opacity`, `translate`, `scale` and `stroke-dashoffset` only, never a layout property. Loading stays still: `SkeletonRows` and `AnswerSkeleton` hold the final geometry. Nothing animates on a keystroke or a filter. `prefers-reduced-motion: reduce` collapses every transition and animation to its final state, and programmatic scrolling snaps.
 
