@@ -142,7 +142,7 @@ export function TurnView({
         <p className="pt-0.5 text-base font-medium">{turn.question}</p>
       </div>
       {turn.status === "streaming" ? (
-        <PendingCard onStop={onStop} />
+        <PendingCard onStop={onStop} steps={turn.progress ?? []} />
       ) : turn.status === "failed" ? (
         <Outcome text="The backend did not answer. Ask again." onRetry={onRetry} />
       ) : turn.status === "stopped" ? (
@@ -161,10 +161,12 @@ export function TurnView({
   );
 }
 
-// The answer is being composed. The one live state is said in a word and a
-// still marker, and the analyst can stop it: `stopped` is a state the turn
-// already has. No step-by-step progress is drawn, because none is reported.
-function PendingCard({ onStop }: { onStop?: () => void }) {
+// The answer is being composed. The live state is said in a word and a still
+// marker, and the analyst can stop it: `stopped` is a state the turn already
+// has. Beneath it, one line: the step the backend last reported. Only reported
+// work is shown, and only the current step, so it reads as a status, not a feed.
+function PendingCard({ onStop, steps }: { onStop?: () => void; steps: string[] }) {
+  const current = steps.at(-1);
   return (
     <div className="border border-cpx-grey-100 bg-white p-5" aria-busy="true">
       <div className="flex items-center justify-between gap-3">
@@ -181,6 +183,9 @@ function PendingCard({ onStop }: { onStop?: () => void }) {
           </Button>
         )}
       </div>
+      <p aria-live="polite" className="mt-3 min-h-5 truncate text-sm text-cpx-grey-500">
+        {current ?? ""}
+      </p>
       <div className="mt-4">
         <AnswerSkeleton />
       </div>

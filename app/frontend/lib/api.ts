@@ -193,12 +193,16 @@ export async function getSource(userId: string, id: string): Promise<Source> {
 export const getInvestigations = (userId: string) => listApi<Investigation>(userId, "/intelligence", "items");
 export const getPirs = (userId: string) => listApi<Pir>(userId, "/pirs", "items");
 
-// `signal` is the analyst's Stop: aborting it ends the request and the turn
-// records itself as stopped, which is a state the model already carries.
-export async function askIntelligence(userId: string, question: string, investigationId?: string, options?: AskOptions, signal?: AbortSignal, attachmentIds: string[] = [], allowPartialEvidence = false): Promise<{ investigationId: string; turn: Turn }> {
+// `signal` is the analyst's Stop: aborting it ends the stream and the turn
+// records itself as stopped, which is a state the model already carries. The
+// backend still finishes the run and saves it to the conversation.
+//
+// The answer arrives as server-sent events: `progress` ({stage, label}) while
+// the run works, then one `turn` ({investigationId, turn}) or one `error`.
+export async function askIntelligence(userId: string, question: string, investigationId?: string, options?: AskOptions, signal?: AbortSignal, attachmentIds: string[] = [], allowPartialEvidence = false, onProgress?: (label: string) => void): Promise<{ investigationId: string; turn: Turn }> {
   const response = await request(`${apiBase()}/intelligence/ask`, {
     method: "POST",
-    headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
+    headers: { "X-Nestor-User": userId, "Content-Type": "application/json", Accept: "text/event-stream" },
     body: JSON.stringify({ question, investigationId, options, attachmentIds, allowPartialEvidence }),
     signal,
   });
@@ -206,7 +210,37 @@ export async function askIntelligence(userId: string, question: string, investig
     const detail = await response.json().catch(() => null);
     throw new Error(typeof detail?.detail === "string" ? detail.detail : `Backend returned ${response.status}`);
   }
-  return response.json() as Promise<{ investigationId: string; turn: Turn }>;
+  if (!response.body) throw new Error("The backend sent no answer stream.");
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buffer = "";
+  for (;;) {
+    let chunk: ReadableStreamReadResult<string>;
+    try {
+      chunk = await reader.read();
+    } catch {
+      // Stop, or the connection dropped mid-run: same shape as a failed fetch.
+      throw new BackendUnreachable(unreachable());
+    }
+    if (chunk.done) break;
+    buffer = (buffer + chunk.value).replace(/\r\n?/g, "\n");
+    let end: number;
+    while ((end = buffer.indexOf("\n\n")) >= 0) {
+      const block = buffer.slice(0, end);
+      buffer = buffer.slice(end + 2);
+      let event = "message";
+      const data: string[] = [];
+      for (const line of block.split("\n")) {
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) data.push(line.slice(5).trim());
+      }
+      if (!data.length) continue; // a keep-alive ping
+      const payload = JSON.parse(data.join("\n"));
+      if (event === "progress") onProgress?.(payload.label);
+      else if (event === "turn") return payload as { investigationId: string; turn: Turn };
+      else if (event === "error") throw new Error(payload.detail ?? "The backend did not answer.");
+    }
+  }
+  throw new Error("The answer stream ended before the answer arrived.");
 }
 
 export async function reputationLookup(userId: string, observable: string) {

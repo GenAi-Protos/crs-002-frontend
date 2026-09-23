@@ -27,6 +27,16 @@ const responseFor = (suffix, method = "POST") => page.waitForResponse((response)
 const role = async (value) => { await page.getByLabel("Role", { exact: true }).selectOption(value); };
 async function record(name) { results.push({ name, passed: true }); console.log(`PASS ${name}`); }
 async function apiGet(url, userId = analyst) { return page.request.get(`${api}${url}`, { headers: { "X-Nestor-User": userId } }); }
+// /intelligence/ask answers as server-sent events; the final `turn` event is the conversation turn.
+async function askTurn(response) {
+  const events = (await response.text()).replace(/\r\n/g, "\n").split("\n\n").map((block) => ({
+    event: block.split("\n").find((line) => line.startsWith("event:"))?.slice(6).trim(),
+    data: block.split("\n").filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trim()).join("\n"),
+  }));
+  const final = events.find((e) => e.event === "turn");
+  assert(final, `no turn event in the answer stream: ${JSON.stringify(events.map((e) => e.event))}`);
+  return JSON.parse(final.data);
+}
 
 try {
   await page.goto(base, { waitUntil: "networkidle" });
@@ -90,7 +100,7 @@ try {
   await page.getByRole("button", { name: "Send", exact: true }).click();
   const answerResponse = await answerReady;
   assert.equal(answerResponse.status(), 200, await answerResponse.text());
-  const conversation = await answerResponse.json();
+  const conversation = await askTurn(answerResponse);
   assert(conversation.turn.attachmentIds.includes(file.id));
   assert.equal((await apiGet(`/evidence/${file.id}`, lead)).status(), 404, "Query uploads must remain private before promotion.");
   await visible(page.getByRole("button", { name: "Add to investigation", exact: true }));
@@ -99,7 +109,7 @@ try {
   await page.getByRole("button", { name: "Send", exact: true }).click();
   const followupResponse = await followupReady;
   assert.equal(followupResponse.status(), 200, await followupResponse.text());
-  const followup = await followupResponse.json();
+  const followup = await askTurn(followupResponse);
   assert.equal(followup.investigationId, conversation.investigationId);
   assert(followup.turn.attachmentIds.includes(file.id), "Follow-ups must retain selected private evidence.");
   const followupRun = await (await apiGet(`/intelligence/runs/${followup.turn.answer.runId}`)).json();
