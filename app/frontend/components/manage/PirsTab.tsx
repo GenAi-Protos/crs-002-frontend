@@ -20,7 +20,16 @@ import { canAdminister } from "@/lib/access";
 import { createPir, patchPir } from "@/lib/api";
 import { useConsoleUser } from "@/lib/role-context";
 import type { ParameterKey, Pir, PirCategory } from "@/lib/types";
-import { downloadCsv, ListMeta, SearchBox, buttonClass } from "@/components/ui";
+import {
+  Banner,
+  Button,
+  buttonClass,
+  downloadCsv,
+  ListMeta,
+  Panel,
+  SearchBox,
+  Select,
+} from "@/components/ui";
 import { IconPlus } from "@/components/icons";
 import {
   TypeBadge,
@@ -30,6 +39,7 @@ import {
   T_TABLE,
   T_TD,
   T_TH,
+  EmptyRow,
 } from "@/components/table";
 
 /** CPX's categories. Not a suggestion list: a PIR belongs to one of these. */
@@ -151,13 +161,34 @@ export function PirsTab({
   };
 
   return (
-    <div className="mt-4">
-      <div className="flex flex-wrap items-center gap-3">
+    <div>
+      <Panel
+        title="Priority intelligence requirements"
+        count={pirs.length}
+        action={
+          editable ? (
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => {
+                setAdding((a) => !a);
+                setEditingRef(null);
+              }}
+            >
+              <IconPlus />
+              Add PIR
+            </Button>
+          ) : undefined
+        }
+        enter={0}
+        flush
+      >
+      <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
         <SearchBox
           value={q}
           onChange={setQ}
           placeholder="Search ref, category or PIR"
-          className="w-80"
+          className="w-full max-w-72"
         />
         <Filter
           label="Category"
@@ -171,25 +202,11 @@ export function PirsTab({
           options={coverages}
           onChange={setCoverage}
         />
-        {editable && (
-          <button
-            onClick={() => {
-              setAdding((a) => !a);
-              setEditingRef(null);
-            }}
-            className={buttonClass("primary", "md", "ml-auto")}
-          >
-            <IconPlus />
-            Add PIR
-          </button>
-        )}
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex-1" />
         <ListMeta
           shown={rows.length}
           total={pirs.length}
-          sort="ref ascending"
+          sort="Ref ascending"
           onExport={() =>
             downloadCsv(
               "pirs.csv",
@@ -201,7 +218,7 @@ export function PirsTab({
       </div>
 
       {adding && (
-        <div className="mt-3 border border-cpx-grey-100 bg-cpx-grey-50 p-4">
+        <div className="reveal border-b border-cpx-grey-100 bg-cpx-grey-50 p-4">
           <PirForm
             heading="Add PIR"
             initial={blankDraft()}
@@ -211,11 +228,11 @@ export function PirsTab({
         </div>
       )}
 
-      <div className={`mt-3 ${T_SCROLL}`}>
-        <table className={`${T_TABLE} min-w-[56rem] bg-white text-sm`}>
+      <div className={T_SCROLL}>
+        <table className={`${T_TABLE} table-fixed bg-white text-sm`}>
           <colgroup>
-            <col className="w-56" />
-            <col className="w-20" />
+            <col className="w-44" />
+            <col className="w-16" />
             <col />
             <col className="w-44" />
             {editable && <col className="w-20" />}
@@ -235,21 +252,16 @@ export function PirsTab({
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr>
-                <td
-                  colSpan={editable ? 5 : 4}
-                  className="px-3 py-8 text-center"
-                >
-                  <span className="font-medium">0 PIRs</span> matched
-                </td>
-              </tr>
+              <EmptyRow colSpan={editable ? 5 : 4}>
+                <span className="font-medium text-cpx-black">0 PIRs</span> matched
+              </EmptyRow>
             )}
             {rows.map((p) => {
               const editing = editingRef === p.ref;
               return (
                 <RowGroup key={p.ref}>
-                  <tr className={T_ROW}>
-                    <td className={`${T_TD}`}>{p.category}</td>
+                  <tr className={`${T_ROW} ${editing ? "bg-cpx-green-50/60" : ""}`}>
+                    <td className={`${T_TD} text-cpx-grey-700`}>{p.category}</td>
                     <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
                       {p.ref}
                     </td>
@@ -271,7 +283,8 @@ export function PirsTab({
                             setEditingRef(editing ? null : p.ref);
                             setAdding(false);
                           }}
-                          className={buttonClass("secondary", "sm")}
+                          aria-expanded={editing}
+                          className={buttonClass("ghost", "sm", "text-link hover:text-cpx-purple")}
                         >
                           {editing ? "Close" : "Edit"}
                         </button>
@@ -296,6 +309,7 @@ export function PirsTab({
           </tbody>
         </table>
       </div>
+      </Panel>
     </div>
   );
 }
@@ -319,10 +333,10 @@ function Filter({
   return (
     <label className="flex items-center gap-1.5 text-xs text-cpx-grey-500">
       {label}
-      <select
+      <Select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-8 max-w-[15rem] border border-cpx-grey-100 bg-white px-2 text-sm text-cpx-black focus:border-cpx-green focus:outline-none"
+        className="max-w-[15rem]"
       >
         <option value={ALL}>{ALL}</option>
         {options.map((o) => (
@@ -330,7 +344,7 @@ function Filter({
             {o}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }
@@ -451,26 +465,13 @@ function PirForm({
         </span>
       </div>
 
-      {error && (
-        <p className="mt-3 border border-cpx-red/40 bg-status-warn-fill px-3 py-2 text-xs text-status-warn-ink">
-          {error}
-        </p>
-      )}
+      {error && <Banner className="mt-3">{error}</Banner>}
 
       <div className="mt-3 flex items-center gap-2">
-        <button
-          onClick={submit}
-          disabled={!valid || saving}
-          className="h-8 bg-cpx-green px-3 text-base font-medium text-cpx-purple hover:bg-cpx-green-600 disabled:opacity-40"
-        >
+        <Button variant="primary" onClick={submit} disabled={!valid || saving}>
           {saving ? "Saving" : "Save"}
-        </button>
-        <button
-          onClick={onCancel}
-          className={buttonClass()}
-        >
-          Cancel
-        </button>
+        </Button>
+        <Button onClick={onCancel}>Cancel</Button>
       </div>
     </div>
   );

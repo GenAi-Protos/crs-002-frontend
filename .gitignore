@@ -4,3 +4,6 @@
 # Next.js build output
 /app/frontend/.next/
 *.tsbuildinfo
+
+# Design review screenshots (app/frontend/scripts/ui-snapshots.mjs)
+/app/frontend/.ui-snapshots/

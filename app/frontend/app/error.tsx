@@ -5,7 +5,7 @@
 // and the fix (docs/03 writing rules), and the fix is a button.
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui";
+import { Button, CenterMessage } from "@/components/ui";
 
 export default function RouteError({
   error,
@@ -20,11 +20,14 @@ export default function RouteError({
   }, [error]);
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-      <p className="text-base">This page did not load. Try again.</p>
-      <Button variant="primary" onClick={reset}>
-        Try again
-      </Button>
-    </div>
+    <CenterMessage
+      action={
+        <Button variant="primary" onClick={reset}>
+          Try again
+        </Button>
+      }
+    >
+      This page did not load. Try again.
+    </CenterMessage>
   );
 }

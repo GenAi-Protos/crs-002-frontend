@@ -13,3 +13,10 @@ export function userForRole(role: ConsoleUser["role"]): ConsoleUser {
   if (!u) throw new Error(`No fixture user for role ${role}`);
   return u;
 }
+
+/** A display name for a user id; anything unknown (a name already, an
+ *  external id) is shown as it came. */
+export function userName(id: string | null | undefined): string {
+  if (!id) return "-";
+  return USERS.find((u) => u.id === id)?.name ?? id;
+}

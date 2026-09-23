@@ -8,7 +8,7 @@ import { CONNECTORS } from "@/lib/fixtures";
 import { captureModeLabel } from "@/lib/derive";
 import { agoFromNow } from "@/lib/format";
 import type { Connector } from "@/lib/types";
-import { StatusPill } from "@/components/ui";
+import { Panel, StatusPill } from "@/components/ui";
 import { IconEgress } from "@/components/icons";
 
 export function ConnectorsTab({ initialRows = CONNECTORS }: { initialRows?: Connector[] }) {
@@ -17,44 +17,46 @@ export function ConnectorsTab({ initialRows = CONNECTORS }: { initialRows?: Conn
   const noRoute = initialRows.filter((c) => c.noRouteYet);
 
   return (
-    <div className="mt-4 space-y-6">
-      <Group label={`Named by CPX · ${commercial.length}`} rows={commercial} />
-      <Group label={`Our proposal · ${proposal.length}`} rows={proposal} />
-      <Group label={`No route yet · ${noRoute.length}`} rows={noRoute} />
+    <div className="space-y-3">
+      <Group label="Named by CPX" rows={commercial} enter={0} />
+      <Group label="Our proposal" rows={proposal} enter={1} />
+      <Group label="No route yet" rows={noRoute} enter={2} />
     </div>
   );
 }
 
-function Group({ label, rows }: { label: string; rows: Connector[] }) {
+function Group({ label, rows, enter }: { label: string; rows: Connector[]; enter: number }) {
   return (
-    <section>
-      <h2 className="font-sans text-xs font-semibold uppercase tracking-wide text-cpx-grey-500">
-        {label}
-      </h2>
-      <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {rows.map((c) => (
-          <ConnectorCard key={c.id} c={c} />
-        ))}
-      </div>
-    </section>
+    <Panel title={label} count={rows.length} enter={enter} flush bodyClassName="overflow-hidden">
+      {rows.length === 0 ? (
+        <p className="px-3 py-3 text-sm text-cpx-grey-500">0 connectors.</p>
+      ) : (
+        // Each card draws its own right and bottom hairline; the grid is pulled
+        // 1px past the clipped body so the outer ones disappear under the frame.
+        <div className="-mb-px -mr-px grid grid-cols-1 @xl/page:grid-cols-2 @4xl/page:grid-cols-3 @6xl/page:grid-cols-4">
+          {rows.map((c) => (
+            <ConnectorCard key={c.id} c={c} />
+          ))}
+        </div>
+      )}
+    </Panel>
   );
 }
 
 function ConnectorCard({ c }: { c: Connector }) {
   return (
-    <div className="border border-cpx-grey-100 bg-white p-4">
-      <div className="flex items-start justify-between gap-2">
-        <h3 className="text-base font-medium tracking-tightish">{c.name}</h3>
+    <div className="flex min-w-0 flex-col gap-1.5 border-b border-r border-cpx-grey-100 bg-white px-3 py-2.5 transition-colors duration-150 hover:bg-cpx-grey-50">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="min-w-0 truncate text-sm font-semibold tracking-tightish" title={c.name}>
+          {c.name}
+        </h3>
         {!c.verified && (
-          <span className="bg-status-warn-fill px-1.5 py-0.5 text-2xs font-medium text-status-warn-ink">
-            UNVERIFIED
+          <span className="shrink-0 rounded-sm border border-cpx-bright-200 bg-cpx-bright-50 px-1.5 text-2xs font-medium text-cpx-bright-700">
+            Unverified
           </span>
         )}
       </div>
-      <p className="mt-1 text-xs text-cpx-grey-500">
-        {captureModeLabel[c.captureMode]}
-      </p>
-      <div className="mt-3">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         {c.connected ? (
           <StatusPill
             tone="good"
@@ -65,17 +67,18 @@ function ConnectorCard({ c }: { c: Connector }) {
         ) : (
           <StatusPill tone="idle" label="Not connected" />
         )}
+        <span className="text-2xs text-cpx-grey-500">{captureModeLabel[c.captureMode]}</span>
+        <span className="flex items-center gap-1 text-2xs text-cpx-grey-500">
+          {c.residency === "egress" ? (
+            <>
+              <IconEgress />
+              Egress
+            </>
+          ) : (
+            "In region"
+          )}
+        </span>
       </div>
-      <p className="mt-2 flex items-center gap-1 text-2xs text-cpx-grey-500">
-        {c.residency === "egress" ? (
-          <>
-            <IconEgress />
-            Egress
-          </>
-        ) : (
-          "In region"
-        )}
-      </p>
     </div>
   );
 }

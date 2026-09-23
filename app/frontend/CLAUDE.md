@@ -32,12 +32,12 @@ Dashboard  ·  Intelligence  ·  Investigations  ·  Reports  ·  Clients  ·  C
 | **Reports** | `/reports` | Analysts write, lead approves | Judge a client-facing artefact and release it |
 | **Clients** | `/clients` | Lead analyst | Keep the facts current that decide what each client receives |
 | **Collection** | `/collection` | Technical roles; lead manages connectors | Submit intelligence, inspect sources and collection health |
-| **Manage** | `/manage` | Analysts read, lead analyst edits | See what an agent is made of, and keep PIRs and workflows current |
+| **Manage** | `/manage` | Analysts read, lead analyst edits | Keep PIRs current, and see who changed what |
 
 Detail routes include `/reports/[ref]`, `/clients/[id]`, `/collection/sources/[id]` and `/investigations/[id]`.
 One addressable-but-never-navigated route: `/intelligence/[id]`, so a conversation can be linked from an RFI row. **No thread list, no session sidebar, no history rail.**
 
-**Manage is one destination with tabs**, not four: Agents, Workflows, PIRs, Audit. CPX grouped them the same way in the 2 September mockup.
+**Manage is one destination with two tabs**: PIRs and Audit. CPX's 2 September mockup also carried Agents and Workflows; the user removed both on 23 September 2026. The run behind an answer or a case stays openable where the work is (hard rule 4, AC-13); only the standalone agent and workflow catalogue is gone.
 
 Superseded, 2 September 2026: earlier versions of this file said "do not add a sixth destination". CPX asked for an agent-specification view, PIR management and an audit trail in the same session, so Manage is the sixth. The user approved Investigations as the seventh destination on 23 September 2026. Private Intelligence conversations remain separate from shared cases.
 
@@ -82,7 +82,7 @@ Six console roles. **Client is not one of them** - no login, no route, no role.
 | CEO / Executive | ✓ | - | - | - | - | - |
 | Sales | ✓ | - | read published, own clients only, IOCs stripped | - | - | - |
 
-**Read means read.** Every console user who can reach Manage sees what an agent is made of; only the administrator changes it (Praveen Singh 15:17). Lead Analyst carries the administrator rights until CPX confirms the definitive user-type list at **open item H1** - if H1 names a separate TI Administrator, that is a role addition, not a rewrite.
+**Read means read.** Every console user who can reach Manage sees the PIRs and the audit trail; only the administrator changes a PIR (Praveen Singh 15:17). Lead Analyst carries the administrator rights until CPX confirms the definitive user-type list at **open item H1** - if H1 names a separate TI Administrator, that is a role addition, not a rewrite.
 
 Everyone lands on `/`. The Dashboard resolves its content from the role.
 
@@ -114,6 +114,7 @@ Everyone lands on `/`. The Dashboard resolves its content from the role.
 - Where the screen shows agent output, the run behind it is openable: workflow, agents invoked, evidence, status
 - No credential value is displayed or accepted anywhere on it
 - Text sizes from the eight-step scale only; buttons via `Button` or `buttonClass`; overlays via `Dialog` or `Drawer`
+- Built from the shared shell: `Page` (with `band` where the content is panels), `Panel`, `Banner` for errors and notices, `CenterMessage`/`NotPermitted` for whole-page states, `lib/status.ts` for every status word and tone; grids respond to `@container/page`, not the viewport
 - Colours from the `cpx-*` tokens and scales only: no `black/N` greys, no hex in a component
 - While a fetch is in flight `SkeletonRows` holds the geometry; when it fell back to fixtures `OfflineNote` is visible
 - Motion only through the tokens and utilities in `app/globals.css` (`reveal`, `ease-out-quart`, the chart draw-ins); nothing pulses or loops, and reduced motion is honoured (docs/03 §6)

@@ -9,7 +9,8 @@ import { useConsoleUser } from "@/lib/role-context";
 import type { Pir, SourceRequest } from "@/lib/types";
 import { gstDate } from "@/lib/format";
 import { defang } from "@/lib/defang";
-import { StatusPill, type StatusTone, Dialog, buttonClass } from "@/components/ui";
+import { Button, Dialog, ListMeta, Panel, SearchBox, StatusPill, type StatusTone, buttonClass } from "@/components/ui";
+import { TypeBadge } from "@/components/table";
 import { IconPlus } from "@/components/icons";
 
 const STATUS_META: Record<SourceRequest["status"], { tone: StatusTone; label: string }> = {
@@ -24,61 +25,67 @@ export function RequestsTab({ initialRows = [] }: { requestedBy?: string; initia
   const { user } = useConsoleUser();
   const [rows, setRows] = useState<SourceRequest[]>(initialRows);
   const [showForm, setShowForm] = useState(false);
+  const [q, setQ] = useState("");
 
   useEffect(() => setRows(initialRows), [initialRows]);
 
-  return (
-    <div className="mt-4 max-w-3xl xl:max-w-none">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-cpx-grey-500">
-          <span className="font-medium text-cpx-black">{rows.length}</span> requests ·
-          Newest first
-        </span>
-        <button
-          onClick={() => setShowForm(true)}
-          className={buttonClass("primary")}
-        >
-          <IconPlus />
-          Request a source
-        </button>
-      </div>
+  const needle = q.toLowerCase();
+  const shown = [...rows]
+    .filter((r) => !needle || `${r.reason} ${r.pirRef} ${defang(r.url)} ${r.requestedBy}`.toLowerCase().includes(needle))
+    .sort((a, b) => +new Date(b.requestedAt) - +new Date(a.requestedAt));
 
-      {/* One column: a two-column grid of cards that differ in height leaves a
-          hole beside every short card, and the rows read newest-first anyway. */}
-      <div className="mt-3 flex max-w-[880px] flex-col gap-2">
-        {rows.length === 0 && (
-          <p className="text-sm">
-            <span className="font-medium">0 requests</span>
+  return (
+    <div>
+      <Panel
+        title="Source requests"
+        count={rows.length}
+        action={
+          <Button size="sm" variant="primary" onClick={() => setShowForm(true)}>
+            <IconPlus />
+            Request a source
+          </Button>
+        }
+        enter={0}
+        flush
+      >
+        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+          <SearchBox value={q} onChange={setQ} placeholder="Search requests" className="w-full max-w-72" />
+          <div className="flex-1" />
+          <ListMeta shown={shown.length} total={rows.length} sort="Newest first" />
+        </div>
+        {shown.length === 0 && (
+          <p className="px-3 py-6 text-center text-sm text-cpx-grey-500">
+            <span className="font-medium text-cpx-black">0 requests</span>
+            {q ? " match." : "."}
           </p>
         )}
-        {[...rows]
-          .sort((a, b) => +new Date(b.requestedAt) - +new Date(a.requestedAt))
-          .map((r) => (
-            <div key={r.id} className="border border-cpx-grey-100 bg-white px-4 py-3">
+        <ul>
+          {shown.map((r) => (
+            <li key={r.id} className="row-link border-b border-cpx-grey-100 px-3 py-2 last:border-b-0">
               {/* The reason names the request; the URL is the evidence under it.
-                  Leading with the URL made every card read as an address. */}
-              <div className="flex items-baseline gap-3">
-                <p className="min-w-0 flex-1 text-sm font-medium">{r.reason}</p>
-                <span className="shrink-0 rounded-sm bg-cpx-grey-50 px-1.5 py-0.5 text-2xs text-cpx-grey-700">
-                  {r.pirRef}
-                </span>
+                  Leading with the URL made every row read as an address. */}
+              <div className="flex items-center gap-2">
+                <p className="min-w-0 flex-1 truncate text-sm font-medium" title={r.reason}>
+                  {r.reason}
+                </p>
+                <TypeBadge label={r.pirRef} />
                 <StatusPill {...STATUS_META[r.status]} />
               </div>
               {/* The tooltip carries the defanged form too: an inventory URL
                   is never shown, copied or logged in its live form. */}
-              <p
-                className="mt-1.5 truncate font-mono text-xs text-cpx-grey-500"
-                title={defang(r.url)}
-              >
-                {defang(r.url)}
+              <p className="mt-0.5 flex items-center gap-2 text-2xs text-cpx-grey-500">
+                <span className="min-w-0 flex-1 truncate font-mono" title={defang(r.url)}>
+                  {defang(r.url)}
+                </span>
+                <span className="shrink-0">
+                  {r.requestedBy} · {gstDate(r.requestedAt)}
+                </span>
               </p>
-              <p className="mt-1 text-2xs text-cpx-grey-500">
-                {r.requestedBy} · {gstDate(r.requestedAt)}
-                {r.note ? ` · ${r.note}` : ""}
-              </p>
-            </div>
+              {r.note && <p className="mt-0.5 text-2xs text-cpx-grey-500">{r.note}</p>}
+            </li>
           ))}
-      </div>
+        </ul>
+      </Panel>
 
       {showForm && (
         <RequestDialog

@@ -12,10 +12,29 @@ import { CLIENTS } from "@/lib/fixtures";
 import { createClient, getClient, getClients, getPirs, patchClient, type ClientDetail, type ClientPatch, isUnreachable } from "@/lib/api";
 import type { Client, Delivery, DrpItem, Pir } from "@/lib/types";
 import { gstDate, gstDateTime } from "@/lib/format";
-import { TypeBadge, T_HEAD, T_NUM, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
+import { EmptyRow, TypeBadge, T_HEAD, T_NUM, T_ROW, T_TABLE, T_TD, T_TH } from "@/components/table";
 import { defang } from "@/lib/defang";
-import { downloadCsv, ListMeta, SearchBox, StatusPill, Tabs, type StatusTone, Dialog, buttonClass, OfflineNote } from "@/components/ui";
-import { IconPlus } from "@/components/icons";
+import {
+  Banner,
+  Button,
+  CenterMessage,
+  Dialog,
+  downloadCsv,
+  fieldClass,
+  IconButton,
+  ListMeta,
+  NotPermitted,
+  OfflineNote,
+  Panel,
+  SearchBox,
+  Select,
+  SkeletonPanel,
+  SkeletonRows,
+  StatusPill,
+  Tabs,
+  type StatusTone,
+} from "@/components/ui";
+import { IconCheck, IconClose, IconPlus } from "@/components/icons";
 
 const DRP_KIND_LABEL: Record<DrpItem["kind"], string> = {
   "leaked-credential": "Leaked credential",
@@ -44,6 +63,10 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   const [showAdd, setShowAdd] = useState(false);
   const [offline, setOffline] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  // Loading is not "no clients": the empty sentence waits for an answer.
+  const [loaded, setLoaded] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [detailTry, setDetailTry] = useState(0);
 
   useEffect(() => {
     // Fixtures stand in when the backend is down, labelled as such (hard rule 1).
@@ -61,7 +84,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         if (!live) return;
         setApiClients(CLIENTS);
         setOffline(isUnreachable(e));
-      });
+      })
+      .finally(() => live && setLoaded(true));
     getPirs(user.id).then((p) => live && setPirs(p)).catch(() => live && setPirs([]));
     return () => {
       live = false;
@@ -116,44 +140,52 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   useEffect(() => {
     if (!targetId) return;
     let live = true;
+    setDetailError(null);
     getClient(user.id, targetId)
       .then((d) => live && setDetail(d))
-      .catch(() => live && setDetail(null));
+      .catch((e: Error) => {
+        if (!live) return;
+        // Not zeros: a detail that did not load says so (rule 8).
+        setDetail(null);
+        setDetailError(e.message);
+      });
     return () => {
       live = false;
     };
-  }, [user.id, targetId]);
+  }, [user.id, targetId, detailTry]);
 
-  if (!canSee(user.role, "clients")) {
+  if (!canSee(user.role, "clients")) return <NotPermitted />;
+
+  if (!loaded) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-base">Not permitted at this access level.</p>
-        <Link href="/" className="text-sm text-link underline underline-offset-2">
-          Dashboard
-        </Link>
+      <div className="flex min-h-0 flex-1">
+        <aside className="w-72 shrink-0 border-r border-cpx-grey-100 bg-white p-4">
+          <div className="mb-3 h-6 w-24 bg-cpx-grey-100" />
+          <SkeletonRows rows={5} height="h-10" />
+        </aside>
+        <section className="flex-1 space-y-3 bg-band p-4">
+          <SkeletonPanel rows={2} />
+          <SkeletonPanel rows={5} />
+        </section>
       </div>
     );
   }
 
   if (allClients.length === 0) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-base">No clients yet.</p>
-      </div>
-    );
+    return <CenterMessage action={<span />}>No clients yet.</CenterMessage>;
   }
 
   if (selectedId && !allClients.some((c) => c.id === selectedId)) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-base">No client with this reference.</p>
-        <Link
-          href="/clients"
-          className="text-sm text-link underline underline-offset-2"
-        >
-          Clients
-        </Link>
-      </div>
+      <CenterMessage
+        action={
+          <Link href="/clients" className="link-quiet text-sm">
+            Clients
+          </Link>
+        }
+      >
+        No client with this reference.
+      </CenterMessage>
     );
   }
 
@@ -180,20 +212,16 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
 
   return (
     <div className="flex min-h-0 flex-1">
-      <aside className="w-80 shrink-0 border-r border-cpx-grey-100 bg-white">
-        <div className="flex items-center justify-between px-4 pb-2 pt-5">
-          <h1 className="text-xl font-semibold tracking-tightish">Clients</h1>
-          <span className="flex items-center gap-2">
-            <span className="text-xs text-cpx-grey-500">
-              {allClients.length}
+      <aside className="w-72 shrink-0 border-r border-cpx-grey-100 bg-white">
+        <div className="flex items-center justify-between px-4 pb-2 pt-4">
+          <h1 className="text-lg font-semibold tracking-tightish">Clients</h1>
+          <span className="flex items-center gap-1.5">
+            <span className="text-xs tabular-nums text-cpx-grey-500">
+              {list.length} of {allClients.length}
             </span>
-            <button
-              onClick={() => setShowAdd(true)}
-              aria-label="Add client"
-              className="flex h-6 w-6 items-center justify-center border border-cpx-grey-100 text-cpx-grey-500 hover:bg-cpx-grey-50"
-            >
+            <IconButton label="Add client" onClick={() => setShowAdd(true)}>
               <IconPlus />
-            </button>
+            </IconButton>
           </span>
         </div>
         {offline && (
@@ -206,26 +234,26 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         </div>
         <ul>
           {list.length === 0 && (
-            <li className="px-4 py-3 text-sm">
-              <span className="font-medium">0 clients</span> matched
+            <li className="px-4 py-3 text-sm text-cpx-grey-500">
+              <span className="font-medium text-cpx-black">0 clients</span> matched
             </li>
           )}
           {list.map((c) => (
             <li key={c.id}>
               <Link
                 href={`/clients/${c.id}`}
-                className={`block border-l-2 px-4 py-2.5 ${
+                aria-current={c.id === client.id ? "page" : undefined}
+                className={`block border-l-2 px-4 py-2 transition-colors duration-150 ${
                   c.id === client.id
-                    ? "border-cpx-green bg-cpx-green-50/40"
-                    : "border-transparent hover:bg-cpx-grey-50"
+                    ? "border-cpx-green bg-cpx-green-50/60"
+                    : "border-transparent hover:border-cpx-grey-200 hover:bg-cpx-grey-50"
                 }`}
               >
-                <span className="font-mono text-xs font-medium">{c.id}</span>
-                <span
-                  className="mt-0.5 block truncate text-sm"
-                  title={c.name}
-                >
+                <span className="block truncate text-sm font-medium" title={c.name}>
                   {c.name}
+                </span>
+                <span className="mt-0.5 flex items-center gap-1.5 text-2xs text-cpx-grey-500">
+                  <span className="font-mono">{c.id}</span>· {c.sector} · {c.region}
                 </span>
               </Link>
             </li>
@@ -233,48 +261,45 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         </ul>
       </aside>
 
-      <section className="min-w-0 flex-1 px-6 py-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold tracking-tightish">
-              {client.id} · {client.name}
-            </h2>
-            <p className="mt-1 text-xs text-cpx-grey-500">
-              {client.sector} · {client.region} · {client.products.length} products ·{" "}
-              {client.subscribedPirRefs.length} PIRs
+      <section className="@container/page min-w-0 flex-1 space-y-3 bg-band px-4 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-semibold tracking-tightish">{client.name}</h2>
+            <p className="mt-0.5 text-xs text-cpx-grey-500">
+              <span className="font-mono">{client.id}</span> · {client.sector} · {client.region} ·{" "}
+              {client.products.length} products · {client.subscribedPirRefs.length} PIRs
             </p>
           </div>
-          <span className="flex items-center gap-3">
-            {/* A write that did not land must say so: the edit is still on screen. */}
-            {saveError && (
-              <span className="text-xs text-status-warn-ink">Not saved: {saveError}</span>
-            )}
-            <button
+          <span className="flex items-center gap-2">
+            <Button
+              variant={editing ? "primary" : "secondary"}
+              aria-pressed={editing}
               onClick={() => setEditing(!editing)}
-              className={`h-8 px-3 text-sm ${
-                editing
-                  ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-                  : "border border-cpx-grey-100 hover:bg-cpx-grey-50"
-              }`}
             >
               {editing ? "Done" : "Edit"}
-            </button>
+            </Button>
           </span>
         </div>
+        {/* A write that did not land must say so: the edit is still on screen. */}
+        {saveError && <Banner tone="warn">Not saved: {saveError}</Banner>}
+        {detailError && (
+          <Banner action={<Button size="sm" onClick={() => setDetailTry((n) => n + 1)}>Retry</Button>}>
+            This client&apos;s items and deliveries could not be loaded. {detailError}
+          </Banner>
+        )}
 
-        <div className="mt-5 border border-cpx-grey-100 bg-white p-4">
-          <span className="text-xs text-cpx-grey-500">
-            Open against this client
-          </span>
-          {drp.length === 0 ? (
-            <p className="mt-2 text-sm">
+        <Panel title="Open against this client" count={detailError ? undefined : drp.length} flush enter={0}>
+          {detailError ? (
+            <p className="px-3 py-3 text-sm text-cpx-grey-500">Not loaded.</p>
+          ) : drp.length === 0 ? (
+            <p className="px-3 py-3 text-sm">
               <span className="font-medium">0 open items</span>
             </p>
           ) : (
-            <ul className="mt-2 divide-y divide-cpx-grey-100">
+            <ul>
               {drp.map((d) => (
-                <li key={d.id} className="flex items-center gap-3 py-2 text-sm">
-                  <span className="w-44 shrink-0 font-medium">
+                <li key={d.id} className="flex items-center gap-3 border-b border-cpx-grey-100 px-3 py-1.5 text-sm last:border-b-0">
+                  <span className="w-36 shrink-0 font-medium @3xl/page:w-44">
                     {DRP_KIND_LABEL[d.kind]}
                   </span>
                   <span
@@ -295,18 +320,18 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
               ))}
             </ul>
           )}
-        </div>
+        </Panel>
 
-        <div className="mt-5">
+        <Panel flush enter={1}>
           <Tabs
+            className="px-2 pt-1"
             tabs={[
               { key: "profile" as const, label: "Profile" },
-              { key: "sent" as const, label: "Sent", count: sent.length },
+              { key: "sent" as const, label: "Sent", count: detailError ? undefined : sent.length },
             ]}
             value={tab}
             onChange={setTab}
           />
-        </div>
 
         {showAdd && (
           <AddClientDialog
@@ -321,35 +346,35 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         )}
 
         {tab === "profile" ? (
-          <div className="mt-4 max-w-2xl space-y-4">
+          <div className="max-w-3xl space-y-3 p-3">
             <Row label="Sector">
               {editing ? (
-                <select
+                <Select
+                  aria-label="Sector"
                   value={client.sector}
                   onChange={(e) => update((c) => ({ ...c, sector: e.target.value }))}
-                  className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
                 >
                   {["Banking", "Energy", "Transport", "Aviation", "Government", "Telecom"].map(
                     (s) => (
                       <option key={s}>{s}</option>
                     ),
                   )}
-                </select>
+                </Select>
               ) : (
                 <span className="text-sm">{client.sector}</span>
               )}
             </Row>
             <Row label="Region">
               {editing ? (
-                <select
+                <Select
+                  aria-label="Region"
                   value={client.region}
                   onChange={(e) => update((c) => ({ ...c, region: e.target.value }))}
-                  className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
                 >
                   {["UAE", "GCC", "MENA"].map((s) => (
                     <option key={s}>{s}</option>
                   ))}
-                </select>
+                </Select>
               ) : (
                 <span className="text-sm">{client.region}</span>
               )}
@@ -364,21 +389,23 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 {client.products.map((p) => (
                   <span
                     key={p}
-                    className="flex items-center gap-1 bg-cpx-grey-50 px-2 py-0.5 text-xs"
+                    className="flex h-6 items-center gap-1 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 pl-2 pr-1 text-xs"
                   >
                     {p}
                     {editing && (
-                      <button
+                      <IconButton
+                        size="sm"
+                        label={`Remove ${p}`}
+                        className="h-4 w-4 hover:bg-cpx-red-50 hover:text-cpx-red-700"
                         onClick={() =>
                           update((c) => ({
                             ...c,
                             products: c.products.filter((x) => x !== p),
                           }))
                         }
-                        className="text-cpx-grey-400 hover:text-cpx-red"
                       >
-                        ×
-                      </button>
+                        <IconClose />
+                      </IconButton>
                     )}
                   </span>
                 ))}
@@ -397,6 +424,9 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
             </Row>
             <Row label="PIRs">
               <div>
+                {pirs.length === 0 && (
+                  <p className="pt-1 text-sm text-cpx-grey-500">{offline ? "Not loaded." : "0 PIRs held."}</p>
+                )}
                 <div className="flex flex-wrap gap-1.5">
                   {pirs.map((p) => {
                     const ticked = client.subscribedPirRefs.includes(p.ref);
@@ -415,19 +445,22 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                             setExpandedPir(expandedPir === p.ref ? null : p.ref);
                           }
                         }}
-                        className={`px-2 py-1 text-xs ${
+                        aria-pressed={ticked}
+                        title={p.question}
+                        className={`inline-flex h-7 min-w-11 items-center justify-center gap-1 rounded-sm border px-2 text-xs tabular-nums transition-colors duration-150 ${
                           ticked
-                            ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-                            : "border border-cpx-grey-100 text-cpx-grey-500"
-                        } ${expandedPir === p.ref ? "outline outline-1 outline-cpx-green" : ""}`}
+                            ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
+                            : "border-cpx-grey-100 bg-white text-cpx-grey-500 hover:border-cpx-grey-200 hover:text-cpx-black"
+                        } ${expandedPir === p.ref ? "ring-1 ring-cpx-green" : ""}`}
                       >
-                        {ticked ? "☑" : "☐"} {p.ref.replace("PIR", "")}
+                        {ticked && <IconCheck className="text-green-contrast" />}
+                        {p.ref.replace("PIR", "")}
                       </button>
                     );
                   })}
                 </div>
                 {expandedPir && (
-                  <div className="mt-3 border border-cpx-grey-100 bg-cpx-grey-50 p-3">
+                  <div className="reveal mt-3 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 p-3">
                     <span className="font-mono text-2xs font-medium">{expandedPir}</span>
                     <p className="mt-1 text-sm leading-relaxed">
                       {pirs.find((p) => p.ref === expandedPir)?.question}
@@ -447,6 +480,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         ) : (
           <SentLedger clientId={client.id} deliveries={sent} />
         )}
+        </Panel>
       </section>
     </div>
   );
@@ -473,20 +507,20 @@ function AddClientDialog({
     <Dialog title="New client" onClose={onClose} className="max-w-sm">
         <div className="space-y-3">
           <label className="block">
-            <span className="text-xs text-cpx-grey-500">Name</span>
+            <span className="text-xs font-medium text-cpx-grey-700">Name</span>
             <input
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:border-cpx-green focus:outline-none"
+              className={fieldClass}
             />
           </label>
           <label className="block">
-            <span className="text-xs text-cpx-grey-500">Sector</span>
+            <span className="text-xs font-medium text-cpx-grey-700">Sector</span>
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="mt-1 h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+              className={fieldClass}
             >
               {["Banking", "Energy", "Transport", "Aviation", "Government", "Telecom"].map(
                 (s) => (
@@ -496,11 +530,11 @@ function AddClientDialog({
             </select>
           </label>
           <label className="block">
-            <span className="text-xs text-cpx-grey-500">Region</span>
+            <span className="text-xs font-medium text-cpx-grey-700">Region</span>
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
-              className="mt-1 h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+              className={fieldClass}
             >
               {["UAE", "GCC", "MENA"].map((s) => (
                 <option key={s}>{s}</option>
@@ -508,15 +542,11 @@ function AddClientDialog({
             </select>
           </label>
         </div>
-        {error && <p className="mt-3 text-xs text-status-warn-ink">{error}</p>}
-        <div className="mt-5 flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className={buttonClass()}
-          >
-            Cancel
-          </button>
-          <button
+        {error && <Banner className="mt-3">{error}</Banner>}
+        <div className="mt-4 flex justify-end gap-2">
+          <Button onClick={onClose}>Cancel</Button>
+          <Button
+            variant="primary"
             disabled={!name.trim() || busy}
             onClick={async () => {
               setBusy(true);
@@ -528,10 +558,9 @@ function AddClientDialog({
                 setBusy(false);
               }
             }}
-            className={buttonClass("primary")}
           >
             Create
-          </button>
+          </Button>
         </div>
     </Dialog>
   );
@@ -539,8 +568,8 @@ function AddClientDialog({
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-4">
-      <span className="w-24 shrink-0 pt-1 text-xs text-cpx-grey-500">
+    <div className="flex items-start gap-4 border-b border-cpx-grey-100 pb-3 last:border-b-0 last:pb-0">
+      <span className="w-20 shrink-0 pt-1 text-xs font-medium text-cpx-grey-600">
         {label}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
@@ -553,12 +582,9 @@ function AddProduct({ onAdd }: { onAdd: (p: string) => void }) {
   const [open, setOpen] = useState(false);
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="flex h-6 w-6 items-center justify-center border border-cpx-grey-100 text-cpx-grey-500 hover:bg-cpx-grey-50"
-      >
+      <IconButton label="Add product" size="sm" className="border border-dashed border-cpx-grey-200" onClick={() => setOpen(true)}>
         <IconPlus />
-      </button>
+      </IconButton>
     );
   }
   return (
@@ -577,7 +603,8 @@ function AddProduct({ onAdd }: { onAdd: (p: string) => void }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={() => setOpen(false)}
-        className="h-6 w-40 border border-cpx-green px-1.5 text-xs focus:outline-none"
+        aria-label="Product name"
+        className="h-6 w-40 rounded-sm border border-cpx-green px-1.5 text-xs focus:outline-none"
       />
     </form>
   );
@@ -591,13 +618,13 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
     (d) => q === "" || d.advisoryRef.toLowerCase().includes(q.toLowerCase()),
   );
   return (
-    <div className="mt-4">
-      <div className="flex items-center gap-3">
-        <SearchBox value={q} onChange={setQ} className="w-64" />
+    <div>
+      <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+        <SearchBox value={q} onChange={setQ} className="w-full max-w-64" />
         <div className="flex-1" />
         <ListMeta
           shown={rows.length}
-          total={rows.length}
+          total={deliveries.length}
           sort="Most recent first"
           onExport={() =>
             downloadCsv(
@@ -614,13 +641,13 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
           }
         />
       </div>
-      <div className="mt-3 overflow-x-auto">
-      <table className={`${T_TABLE} min-w-[42rem] bg-white text-sm`}>
+      <div className="overflow-x-auto">
+      <table className={`${T_TABLE} table-fixed bg-white text-sm`}>
         <colgroup>
-          <col className="w-52" />
+          <col className="w-48" />
           <col className="w-20" />
           <col />
-          <col className="w-24" />
+          <col className="w-20" />
           <col className="w-44" />
         </colgroup>
         <thead>
@@ -634,18 +661,16 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
         </thead>
         <tbody>
           {rows.length === 0 && (
-            <tr>
-              <td colSpan={5} className="px-3 py-6 text-center">
-                <span className="font-medium">0 deliveries</span>
-              </td>
-            </tr>
+            <EmptyRow colSpan={5}>
+              <span className="font-medium text-cpx-black">0 deliveries</span>
+            </EmptyRow>
           )}
           {rows.map((d, i) => (
             <tr key={i} className={T_ROW}>
               <td className={`${T_TD} whitespace-nowrap`}>
                 <Link
                   href={`/reports/${encodeURIComponent(d.advisoryRef)}`}
-                  className="font-mono text-xs text-link underline underline-offset-2"
+                  className="link-quiet font-mono text-xs"
                 >
                   {d.advisoryRef}
                 </Link>
@@ -655,7 +680,7 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
               <td className={`${T_TD}`}>
                 <TypeBadge label={d.format.toUpperCase()} />
               </td>
-              <td className={`${T_TD} whitespace-nowrap`}>
+              <td className={`${T_TD} whitespace-nowrap text-xs text-cpx-grey-700`}>
                 {gstDateTime(d.sentAt)}
               </td>
             </tr>

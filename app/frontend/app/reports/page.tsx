@@ -9,10 +9,27 @@ import { useConsoleUser } from "@/lib/role-context";
 import { assembleAdvisories, canSee, canWriteReports, publishedOnly } from "@/lib/access";
 import { ADVISORIES } from "@/lib/fixtures";
 import type { Advisory, Client } from "@/lib/types";
-import { downloadCsv, ListMeta, PageHeader, SearchBox, StatusPill, Tabs, type StatusTone, buttonClass, OfflineNote, SkeletonRows, tabPanelProps } from "@/components/ui";
-import { IconChevronDown, IconPlus } from "@/components/icons";
+import {
+  Button,
+  downloadCsv,
+  FilterChip,
+  ListMeta,
+  NotPermitted,
+  OfflineNote,
+  Page,
+  PageHeader,
+  Panel,
+  SearchBox,
+  Select,
+  SkeletonRows,
+  StatusPill,
+  Tabs,
+  tabPanelProps,
+} from "@/components/ui";
+import { IconCheck, IconChevronDown, IconPlus } from "@/components/icons";
 import {
   Clipped,
+  EmptyRow,
   TypeBadge,
   T_HEAD,
   T_ROW,
@@ -20,6 +37,7 @@ import {
   T_TD,
   T_TH,
 } from "@/components/table";
+import { ADVISORY_STATE } from "@/lib/status";
 import { gstDate } from "@/lib/format";
 import { archiveReport, createReport, getDashboardData, getReports, isUnreachable } from "@/lib/api";
 import { NewReportDialog } from "@/components/reports/NewReportDialog";
@@ -28,18 +46,6 @@ import { ReportPreview } from "@/components/reports/ReportPreview";
 import { sectionsFrom, type ReportType } from "@/lib/report-templates";
 
 type TabKey = "review" | "drafts" | "published" | "all";
-
-const STATE_LABEL: Record<Advisory["status"], { label: string; tone: StatusTone }> = {
-  draft: { label: "Draft", tone: "idle" },
-  "in-review": { label: "In review", tone: "warn" },
-  published: { label: "Published", tone: "good" },
-  superseded: { label: "Superseded", tone: "idle" },
-  withdrawn: { label: "Withdrawn", tone: "idle" },
-  abandoned: { label: "Abandoned", tone: "idle" },
-  retracted: { label: "Retracted", tone: "critical" },
-  "did-not-run": { label: "Did not run", tone: "critical" },
-  archived: { label: "Archived", tone: "idle" },
-};
 
 // The badge is two letters; the tooltip is what they stand for.
 const TYPE_TITLE: Record<string, string> = {
@@ -155,38 +161,28 @@ export default function ReportsPage() {
     }
   };
 
-  if (!canSee(user.role, "reports")) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-base">Not permitted at this access level.</p>
-        <Link href="/" className="text-sm text-link underline underline-offset-2">
-          Dashboard
-        </Link>
-      </div>
-    );
-  }
+  if (!canSee(user.role, "reports")) return <NotPermitted />;
 
   const visible = filtered.slice(0, shown);
   const tabCount = (k: TabKey) => tabCounts[k];
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
+    <Page band>
       <PageHeader
         title="Reports"
         action={
           writable ? (
-            <button
-              onClick={() => setShowNew(true)}
-              className={buttonClass("primary")}
-            >
+            <Button variant="primary" onClick={() => setShowNew(true)}>
               <IconPlus />
               New report
-            </button>
+            </Button>
           ) : undefined
         }
       />
 
+      <Panel flush enter={0} bodyClassName="@container">
       <Tabs<TabKey>
+        className="px-2 pt-1"
         label="Report state"
         tabs={
           readOnly
@@ -204,37 +200,26 @@ export default function ReportsPage() {
       />
 
       <div {...tabPanelProps("reports", effectiveTab)}>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <SearchBox value={q} onChange={setQ} className="w-72" />
-        <select
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          aria-label="Year"
-          className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
-        >
+      <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+        <SearchBox value={q} onChange={setQ} className="w-full max-w-72" />
+        <Select value={year} onChange={(e) => setYear(e.target.value)} aria-label="Year">
           {years.map((y) => (
             <option key={y}>{y}</option>
           ))}
-        </select>
-        <div className="flex gap-1">
+        </Select>
+        <div className="flex gap-1" role="group" aria-label="Report types">
           {(["IA", "VA", "TAP", "DG", "RFI"] as const).map((t) => (
-            <button
+            <FilterChip
               key={t}
+              label={t}
+              active={types.has(t)}
               onClick={() => {
                 const next = new Set(types);
                 if (next.has(t)) next.delete(t);
                 else next.add(t);
                 setTypes(next);
               }}
-              aria-pressed={types.has(t)}
-              className={`h-8 px-2.5 text-xs transition-colors duration-150 ${
-                types.has(t)
-                  ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-                  : "border border-cpx-grey-100 text-cpx-grey-500"
-              }`}
-            >
-              {t}
-            </button>
+            />
           ))}
         </div>
         <div className="flex-1" />
@@ -261,16 +246,16 @@ export default function ReportsPage() {
       </div>
 
       {loading ? (
-        <SkeletonRows className="mt-4" />
+        <SkeletonRows className="p-3" />
       ) : (
-      <div className="mt-4 overflow-x-auto">
-      <table className={`${T_TABLE} min-w-[52rem] bg-white text-sm`}>
+      <div>
+      <table className={`${T_TABLE} table-fixed bg-white text-sm`}>
         <colgroup>
-          <col className="w-52" />
-          <col className="w-24" />
+          <col className="w-48" />
+          <col className="w-16" />
           <col />
-          <col className="w-32" />
-          <col className="w-36" />
+          <col className="hidden w-36 @3xl:table-column" />
+          <col className="w-40" />
           <col className="w-10" />
         </colgroup>
         <thead>
@@ -278,7 +263,7 @@ export default function ReportsPage() {
             <th scope="col" className={T_TH}>Ref</th>
             <th scope="col" className={T_TH}>Type</th>
             <th scope="col" className={T_TH}>Title</th>
-            <th scope="col" className={T_TH}>Owner</th>
+            <th scope="col" className={`${T_TH} hidden @3xl:table-cell`}>Owner</th>
             <th scope="col" className={T_TH}>State</th>
             <th className={T_TH}>
               <span className="sr-only">Actions</span>
@@ -287,15 +272,13 @@ export default function ReportsPage() {
         </thead>
         <tbody>
           {visible.length === 0 && (
-            <tr>
-              <td colSpan={6} className="px-3 py-8 text-center">
-                <span className="font-medium">0 reports</span> matched
-              </td>
-            </tr>
+            <EmptyRow colSpan={6}>
+              <span className="font-medium text-cpx-black">0 reports</span> matched
+            </EmptyRow>
           )}
           {visible.map((a) => {
             const ghost = ["withdrawn", "abandoned"].includes(a.status);
-            const st = STATE_LABEL[a.status];
+            const st = ADVISORY_STATE[a.status];
             const rfiOpen = openRfi === a.ref;
             return (
               <RowGroup key={a.ref}>
@@ -305,9 +288,9 @@ export default function ReportsPage() {
                       ? setOpenRfi(rfiOpen ? null : a.ref)
                       : router.push(`/reports/${encodeURIComponent(a.ref)}`)
                   }
-                  className={`${T_ROW} cursor-pointer ${ghost ? "opacity-45" : ""}`}
+                  className={`${T_ROW} cursor-pointer ${ghost ? "opacity-50" : ""} ${rfiOpen ? "bg-cpx-green-50/60" : ""}`}
                 >
-                  <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
+                  <td className={`${T_TD} truncate whitespace-nowrap font-mono text-xs`}>
                     {a.type === "RFI" && a.rfi ? (
                       <button
                         onClick={() => setOpenRfi(rfiOpen ? null : a.ref)}
@@ -319,7 +302,8 @@ export default function ReportsPage() {
                     ) : (
                       <Link
                         href={`/reports/${encodeURIComponent(a.ref)}`}
-                        className="text-link underline underline-offset-2"
+                        className="link-quiet"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {a.ref}
                       </Link>
@@ -338,12 +322,12 @@ export default function ReportsPage() {
                       }
                     />
                   </td>
-                  <td className={`${T_TD}`}>
+                  <td className={`${T_TD} hidden text-cpx-grey-700 @3xl:table-cell`}>
                     <Clipped text={a.owner ?? "-"} />
                   </td>
                   <td className={T_TD}>
                     {a.type === "RFI" && a.rfi && a.status !== "published" ? (
-                      <span className="">
+                      <span className="text-xs text-cpx-grey-700">
                         In progress, {a.rfi.steps.filter((s) => s.done).length} of{" "}
                         {a.rfi.steps.length} done
                       </span>
@@ -352,7 +336,7 @@ export default function ReportsPage() {
                     )}
                   </td>
                   <td
-                    className={`${T_TD} py-1`}
+                    className="px-3 py-1 text-right"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <RowActions
@@ -379,26 +363,26 @@ export default function ReportsPage() {
                 </tr>
                 {a.type === "RFI" && rfiOpen && a.rfi && (
                   <tr className="border-b border-cpx-grey-100 bg-cpx-grey-50">
-                    <td colSpan={6} className="px-6 py-3">
+                    <td colSpan={6} className="px-4 py-3">
                      <div className="reveal">
                       <p className="text-xs text-cpx-grey-500">
                         {a.rfi.requester} · due {gstDate(a.rfi.dueAt)} ·{" "}
                         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
                       </p>
-                      <p className="mt-1 text-sm">{a.rfi.question}</p>{a.caseId && <Link href={`/investigations/${a.caseId}`} className="mt-2 inline-block text-xs text-link underline">Open investigation</Link>}
+                      <p className="mt-1 text-sm">{a.rfi.question}</p>{a.caseId && <Link href={`/investigations/${a.caseId}`} className="link-quiet mt-2 inline-block text-xs">Open investigation</Link>}
                       <ul className="mt-2 space-y-1">
                         {a.rfi.steps.map((s) => (
                           <li key={s.label} className="flex items-center gap-2 text-xs">
                             <span
-                              className={`flex h-4 w-4 items-center justify-center text-2xs ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-100"}`}
+                              className={`flex h-4 w-4 items-center justify-center ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-200 bg-white"}`}
                             >
-                              {s.done ? "✓" : ""}
+                              {s.done && <IconCheck />}
                             </span>
                             <span className="">{s.label}</span>
                             {s.investigationId && (
                               <Link
                                 href={`/intelligence/${s.investigationId}`}
-                                className="text-link underline underline-offset-2"
+                                className="link-quiet"
                               >
                                 Conversation
                               </Link>
@@ -418,14 +402,14 @@ export default function ReportsPage() {
       </div>
       )}
       {filtered.length > shown && (
-        <button
-          onClick={() => setShown(shown + 50)}
-          className={buttonClass("secondary", "sm", "mt-3")}
-        >
-          Show more
-        </button>
+        <div className="flex justify-center border-t border-cpx-grey-100 px-3 py-2">
+          <Button size="sm" onClick={() => setShown(shown + 50)}>
+            Show 50 more
+          </Button>
+        </div>
       )}
       </div>
+      </Panel>
 
       {showNew && (
         <NewReportDialog
@@ -458,18 +442,15 @@ export default function ReportsPage() {
       {notice && (
         <div
           role="status"
-          className="reveal fixed bottom-4 left-1/2 z-50 -translate-x-1/2 border border-cpx-grey-100 bg-white px-4 py-2 text-xs shadow-pop"
+          className="pop fixed bottom-4 left-1/2 z-50 flex origin-bottom -translate-x-1/2 items-center gap-3 rounded-sm border border-cpx-grey-100 bg-white px-3 py-2 text-sm shadow-pop"
         >
           {notice}
-          <button
-            onClick={() => setNotice(null)}
-            className="ml-3 text-cpx-grey-500 hover:text-cpx-black"
-          >
+          <Button variant="ghost" size="sm" onClick={() => setNotice(null)}>
             Dismiss
-          </button>
+          </Button>
         </div>
       )}
-    </div>
+    </Page>
   );
 }
 

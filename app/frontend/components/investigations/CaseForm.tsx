@@ -5,9 +5,12 @@ import { createCase, workspaceRequest } from "@/lib/workspace-api";
 import { useConsoleUser } from "@/lib/role-context";
 import type { Client } from "@/lib/types";
 import type { InvestigationCase, CaseOptions } from "@/lib/workspace-types";
-import { Button, Dialog } from "@/components/ui";
+import { Button, Dialog, fieldClass } from "@/components/ui";
+import { statusLabel } from "@/lib/status";
 
-export const fieldClass = "mt-1 w-full rounded-sm border border-cpx-grey-100 bg-white px-3 py-2 text-sm focus:border-cpx-green focus:outline-none";
+// The shared field recipe lives in components/ui; re-exported for the forms
+// that import it from here.
+export { fieldClass };
 export const SPECIALISTS = [
   ["osint", "Open-source intelligence"], ["vuln", "Vulnerabilities"], ["actor", "Threat actors"],
   ["ioc", "Indicators"], ["mitre", "ATT&CK mapping"],
@@ -51,11 +54,11 @@ export function CaseForm({ onClose, onCreated, initialTitle = "", initialObjecti
       <label className="block text-xs">Title<input aria-label="Title" required maxLength={200} value={title} onChange={(e) => setTitle(e.target.value)} className={fieldClass} /></label>
       <label className="block text-xs">Objective<textarea aria-label="Objective" required maxLength={4000} rows={3} value={objective} onChange={(e) => setObjective(e.target.value)} className={fieldClass} /></label>
       <fieldset><legend className="text-xs">Starting entities</legend><div className="space-y-2">{entities.map((entity, i) => <div key={i} className="flex gap-2">
-        <select aria-label={`Entity ${i + 1} type`} className={`${fieldClass} max-w-40`} value={entity.type} onChange={(e) => setEntities(entities.map((x, n) => n === i ? { ...x, type: e.target.value } : x))}>{["indicator", "threat-actor", "campaign", "organisation", "vulnerability", "malware"].map((v) => <option key={v}>{v}</option>)}</select>
+        <select aria-label={`Entity ${i + 1} type`} className={`${fieldClass} max-w-40`} value={entity.type} onChange={(e) => setEntities(entities.map((x, n) => n === i ? { ...x, type: e.target.value } : x))}>{["indicator", "threat-actor", "campaign", "organisation", "vulnerability", "malware"].map((v) => <option key={v} value={v}>{statusLabel(v)}</option>)}</select>
         <input aria-label={`Entity ${i + 1} value`} value={entity.value} className={fieldClass} onChange={(e) => setEntities(entities.map((x, n) => n === i ? { ...x, value: e.target.value } : x))} />
         {entities.length > 1 && <Button size="sm" variant="ghost" onClick={() => setEntities(entities.filter((_, n) => i !== n))} aria-label={`Remove entity ${i + 1}`}>Remove</Button>}
       </div>)}</div><Button size="sm" className="mt-2" onClick={() => setEntities([...entities, { type: "indicator", value: "" }])}>Add entity</Button></fieldset>
-      <div className="grid grid-cols-2 gap-4"><label className="text-xs">Client scope<select aria-label="Client scope" value={clientId} onChange={(e) => setClientId(e.target.value)} className={fieldClass}><option value="">Global</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label className="text-xs">Priority<select aria-label="Priority" value={priority} onChange={(e) => setPriority(e.target.value as InvestigationCase["priority"])} className={fieldClass}>{["low", "medium", "high", "critical"].map((p) => <option key={p}>{p}</option>)}</select></label></div>
+      <div className="grid grid-cols-2 gap-4"><label className="text-xs">Client scope<select aria-label="Client scope" value={clientId} onChange={(e) => setClientId(e.target.value)} className={fieldClass}><option value="">Global</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label className="text-xs">Priority<select aria-label="Priority" value={priority} onChange={(e) => setPriority(e.target.value as InvestigationCase["priority"])} className={fieldClass}>{["low", "medium", "high", "critical"].map((p) => <option key={p} value={p}>{statusLabel(p)}</option>)}</select></label></div>
       <p className="text-xs text-cpx-grey-500">Workflow: {options?.workflows[0]?.label ?? "Deep investigation"}</p>
       <SpecialistPicker value={specialists} onChange={setSpecialists} options={options?.specialists} />
       <SourcePicker value={selectedSourceIds} onChange={setSelectedSourceIds} sources={options?.sources ?? []} disabled={!options} />

@@ -3,14 +3,13 @@
 // Connect a feed, see what went quiet. Four tabs, default Connectors.
 
 import { Suspense, useEffect, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { REQUESTS, WATCHES } from "@/lib/fixtures";
 import { getConnectors, getHealth, getRequests, getWatches, isUnreachable } from "@/lib/api";
 import type { Connector, KeywordWatch, SourceRequest } from "@/lib/types";
-import { PageHeader, Tabs, OfflineNote, tabPanelProps } from "@/components/ui";
+import { NotPermitted, OfflineNote, Page, PageHeader, Tabs, tabPanelProps } from "@/components/ui";
 import { ConnectorsTab } from "@/components/collection/ConnectorsTab";
 import { IntelligenceSourcesTab } from "@/components/collection/IntelligenceSourcesTab";
 import { WatchesTab } from "@/components/collection/WatchesTab";
@@ -48,19 +47,10 @@ function CollectionInner() {
     };
   }, [user.id]);
 
-  if (!canSee(user.role, "collection")) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3">
-        <p className="text-base">Not permitted at this access level.</p>
-        <Link href="/" className="text-sm text-link underline underline-offset-2">
-          Dashboard
-        </Link>
-      </div>
-    );
-  }
+  if (!canSee(user.role, "collection")) return <NotPermitted />;
 
   return (
-    <div className="mx-auto w-full max-w-[1400px] px-6 py-6">
+    <Page band>
       <PageHeader title="Collection" meta={offline ? <OfflineNote /> : undefined} />
       <Tabs<TabKey>
         tabs={[
@@ -73,6 +63,7 @@ function CollectionInner() {
         onChange={setTab}
         id="collection"
         label="Collection"
+        className="mb-3"
       />
       <div {...tabPanelProps("collection", tab)}>
         {tab === "connectors" && <ConnectorsTab initialRows={connectors} />}
@@ -86,7 +77,7 @@ function CollectionInner() {
         {tab === "watches" && <WatchesTab initialRows={watches} />}
         {tab === "requests" && <RequestsTab initialRows={requests} requestedBy={user.name} />}
       </div>
-    </div>
+    </Page>
   );
 }
 

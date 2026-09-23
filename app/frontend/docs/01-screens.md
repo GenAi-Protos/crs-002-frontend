@@ -19,7 +19,7 @@ generated charts and diagrams remain follow-on work.
   Conversation memory and files remain owner-private. Add to investigation
   explicitly promotes a selected answer/lookup and selected files. Unavailable
   workflows cannot be selected; deep investigation belongs in the case section.
-- **Dashboard** uses six distinct server payloads at `/dashboard/views/{role}`.
+- **Dashboard** uses six distinct server payloads at `/dashboard/views/{role}`, plus the role-scoped `/dashboard/intelligence` for the three technical roles (section 1).
   Analyst: own cases/drafts and PIR triage. Lead: approval/change queues, team
   workload and failures. IR: observable cases, detection guidance and source
   limitations. Leadership: releases and delivery coverage. Executive: published
@@ -43,7 +43,7 @@ acceptance instructions are in [06-workspace-verification.md](06-workspace-verif
 
 Seven destinations: Dashboard, Intelligence, Investigations, Reports, Clients, Collection and Manage. Read the layouts, not the prose.
 
-**Shell:** white 60px top bar and white 176px left rail, both with a hairline (64px icons below 1100px); the active destination sits on a green wash with a 3px green bar. The CSD-007 style guide is the visual reference.
+**Shell:** white 48px top bar and white 176px left rail, both with a hairline; the rail drops to 56px icons below 1280px and the analyst can pin it either way (remembered per browser). The active destination sits on a green wash with a 3px green bar that slides between items. Pages built from panels sit on the grey `band` canvas. A deliberate deviation from the CSD-007 60px bar, approved 23 September 2026: the Teams app bar and tab strip already sit above the tab, and at 90% zoom every pixel of height is content.
 
 The console runs inside a Microsoft Teams tab, so the shell is the same fixed-height box the other CPX Teams tab uses (CSD-007 style guide §5): the body never scrolls, `<main>` is the one scroll region and is keyboard-scrollable (`tabIndex=0`), sticky bars and the composer measure against the tab rather than the window, and the scrollbar gutter is always reserved so a long table never looks like it ends. Nothing on a screen may assume it owns the browser viewport: no `fixed` chrome inside a page, no `100vh` page roots; a page that wants the full height takes `flex-1` of the template wrapper.
 Top bar: CPX primary logo · Nestor mark and wordmark · Live chip · search · role switcher (dev only) · user chip.
@@ -64,42 +64,57 @@ Top bar: CPX primary logo · Nestor mark and wordmark · Live chip · search · 
 
 ## 1 · Dashboard `/`
 
-Everyone lands here. Content resolves from the role. **Maximum four blocks per role.** Each block is a number with a trend, or one chart, or one short list. Not a gallery.
+Everyone lands here. Content resolves from the role. Redesigned on 23 September 2026 (user-approved): the "maximum four blocks per role" rule is retired. The same day the user found the single long page too congested to read, so the technical roles now get **one headline strip and three views**, each answering one question, and no figure is said twice on the page.
 
-Every view carries an `as of HH:MM GST` stamp so it is an addressable, refreshable object rather than a frozen snapshot. Leadership and Sales views carry `Export this view`.
+**Two feeds, two scopes, and every panel says which it shows.**
+
+| Feed | Scope | Used for |
+|---|---|---|
+| `/dashboard/views/{role}?days&clientId` | The role's own work. Honours the period (7/30/90 segmented control) and client filter. | Role metrics, work queues, list and bar insights |
+| `/dashboard/intelligence` | Everything held, role-scoped on the server. Ignores period and client; only `trend` is windowed (30 days). | Threat posture, findings, breakdown, campaigns, latest reports, exposure, trend, activity, collection health, withheld counts |
+
+The intelligence feed is fetched **only for the analyst, lead analyst and incident responder**. For the executive it still carries unpublished advisory titles and for sales it carries finding titles, and rule 5 filters in the payload, not the DOM, so the browser never asks for it (docs/04). Neither feed falls back to fixtures; each panel owns its skeleton, error banner with Retry, and empty line.
+
+**Technical roles.** The threat posture strip (threat level, critical and high findings, active campaigns, emerging) stays above three tabs. The tab is in the address (`/?tab=threats`), so a posture figure links straight to its view and a view can be shared.
+
+| View | Question | Panels |
+|---|---|---|
+| **Overview** (default) | Where do I start? | Needs your attention (role metrics, queue tabs, filters) · the worst six critical and high findings · latest reports |
+| **Threats** | What does the held picture look like? | Critical and high findings table · findings breakdown (by severity, by PIR category) · campaigns · exposure (sector, region) |
+| **Operations** | Is collection and the team running? | Collection health (enabled, failing, silent, last collection) · collection activity (30 days) · team workload (lead) · recent activity, linked to Manage › Audit |
 
 ```
-┌──────┬────────────────────────────────────────────────────┐
-│ Dash◄│  Dashboard                        as of 08:15 GST  │
-│ Int  │  ┌──────────────────┐ ┌───────────────────────────┐│
-│ Rep  │  │ Waiting on you   │ │ Fired today by PIR        ││
-│ Cli  │  │        7         │ │ Enterprise         12     ││
-│ Col  │  │   → Reports      │ │ Vulnerabilities     8     ││
-│      │  └──────────────────┘ │ Deep and Dark Web   3     ││
-│      │                       └───────────────────────────┘│
-│      │  ┌────────────────────────────────────────────────┐│
-│      │  │ Relevant today                                 ││
-│      │  │  wp2shell RCE          CLT-027  PIR13  92%  →  ││
-│      │  │  DPRK supply chain     CLT-014  PIR08  87%  →  ││
-│      │  └────────────────────────────────────────────────┘│
-│      │  ⚠ 4 sources silent                   → Collection │
-└──────┴────────────────────────────────────────────────────┘
+┌──────┬─────────────────────────────────────────────────────────────────────┐
+│ Dash◄│ Dashboard · Lead Analyst · as of 23 Sep 2026, 17:03 GST   [↻ Refresh]│
+│ Int  │ ┌ Threat posture ───────────────────────────── All held intelligence┐│
+│ Inv  │ │▌Severe  3 critical hits… │Critical 10│High 15│Campaigns 0│Emerg. 0││
+│ Rep  │ └───────────────────────────────────────────────────────────────────┘│
+│ Cli  │  Overview  Threats  Operations                                       │
+│ Col  │ ┌ Needs your attention ─ [client▾][7d|30d|90d]┐ ┌ Critical and high ┐│
+│ Man  │ │ Role metrics (4 small stats)                 │ │ ■ PAN-OS public…  ││
+│      │ │ Review and release 6 · Follow up 0 · …       │ │   Critical · Vuln…││
+│      │ │ ▲ In review  Smishing surge…  Praveen  58d › │ │ ■ …    View all › ││
+│      │ └──────────────────────────────────────────────┘ └───────────────────┘│
+│      │ ┌ Latest reports ── TYPE REPORT REFERENCE STATUS OWNER UPDATED ─────┐│
+└──────┴─────────────────────────────────────────────────────────────────────┘
 ```
 
-| Role | Blocks |
+Wide tabs (a Teams tab at 90%) set the queue beside the findings, 8 and 4 columns, with reports beneath. Below a 1152px page (a laptop at 150% scaling, the chat pane open) the queue takes the full width so its four figures never truncate, and the findings sit beside the reports; on Threats the table likewise goes full width with its breakdown beneath. Below 1024px everything stacks.
+
+| Role | Content |
 |---|---|
-| Analyst, Lead | Waiting on you · Fired today by PIR · Relevant today · Collection health **only when something is silent** |
-| Leadership | Published this period · Client coverage · Time to publish · Export |
-| CEO | Posture in one sentence · Regional versus global · Sector exposure |
-| Sales | Delivered to my clients · Cadence by month · Sector benchmark · Export |
+| Analyst | Posture · my cases, drafts and PIR triage (each triage row: `Draft advisory` → `/intelligence?draft={hitId}`) · threat and operations views |
+| Lead analyst | Posture · review and release, follow up, execution failures · team workload on Operations |
+| Incident responder | Posture · observables, guidance, source limitations |
+| Leadership, executive, sales | One page, no tabs: Overview (their KPIs) · their queues and insights as panels (releases, themes with published summaries, sector and region bars, publication trend, client briefings) |
 
-The current dashboard uses `/dashboard/views/{role}`. Each role has a distinct payload. The period selector supports 7/30/90 days; client filtering preserves backend scope. Absent measurements are labelled Not recorded. Summary drilldowns fetch published, reduced content; raw analyst payloads are not supplied to Sales or Executive.
+**Honest captions.** The posture strip reads `All held intelligence`: findings, campaigns, sectors and the threat level count every held record. Only the trend says `30 days`; Emerging says `Hits under 72 hours`. Finding severity is banded from match confidence (85/70/50) and says so in the column's info tooltip. Campaigns and advisories show no severity, because the backend maps it from TLP. Hours of 48 or more read in days. Relative ages use the real clock.
 
-**Row action on Relevant today:** `Draft advisory` pre-fills the Intelligence composer. Without it the analyst reads a hit then retypes its subject, which is the dead end that made the last design unusable.
+**Refresh** keeps the figures on screen while it refetches (60s while visible, on `nestor:workspace-changed`, and on the button); a changed figure washes green once. Only a role change clears the page.
 
-**Empty:** `Nothing waiting.` Nothing else.
+**Drill-downs.** Posture stats open the Threats view; queue rows open the case or report; campaigns and latest reports open the report (roles that can see Reports only); Draft is shown only to roles that can see Intelligence.
 
----
+**Empty:** a queue with nothing reads `Nothing waiting.`; an empty insight reads `0 records` (leadership source gaps keep the backend's sentence, the only place their count exists).
 
 ## 2 · Intelligence `/intelligence`
 
