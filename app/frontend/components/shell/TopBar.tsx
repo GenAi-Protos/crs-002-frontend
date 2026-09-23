@@ -64,7 +64,7 @@ export function TopBar() {
     .join("");
 
   return (
-    <header className="z-40 flex h-[60px] shrink-0 items-center gap-3 border-b border-cpx-grey-100 bg-white px-6 text-cpx-black">
+    <header className="z-40 flex h-[60px] shrink-0 items-center gap-2 border-b border-cpx-grey-100 bg-white px-3 text-cpx-black sm:gap-3 sm:px-6">
       <Image
         src="/cpx-logo-primary.svg"
         alt="CPX"
@@ -76,7 +76,7 @@ export function TopBar() {
       <span className="h-5 w-px bg-cpx-grey-100" aria-hidden />
       <span className="flex items-center gap-2">
         <Image src="/nestor-mark.svg" alt="" width={24} height={24} aria-hidden />
-        <span className="font-display text-base font-bold uppercase tracking-tightish text-cpx-purple">
+        <span className="hidden font-display text-base font-bold uppercase tracking-tightish text-cpx-purple sm:inline">
           Nestor
         </span>
       </span>

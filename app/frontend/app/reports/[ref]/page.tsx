@@ -5,10 +5,12 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { assembleAdvisory, canApprove, canSee, canWriteReports } from "@/lib/access";
 import { advisoryByRef } from "@/lib/fixtures";
-import { changeReport, getDashboardData, getReport, sendBackReport, isUnreachable } from "@/lib/api";
+import { getDashboardData, getReport, isUnreachable } from "@/lib/api";
+import { saveReport, workspaceWrite } from "@/lib/workspace-api";
 import type { Advisory, Client, Delivery, SendBackReason } from "@/lib/types";
 import { resolveTechnique, TACTICS } from "@/lib/mitre";
 import { gstDate, gstDateTime, recordCount } from "@/lib/format";
@@ -62,12 +64,17 @@ export default function ReportPage({
 }) {
   const { ref } = use(params);
   const { user } = useConsoleUser();
+  const router = useRouter();
   const decoded = decodeURIComponent(ref);
   const [base, setBase] = useState<Advisory | null>(null);
   const [loading, setLoading] = useState(true);
   const [offline, setOffline] = useState(false);
   const [local, setLocal] = useState<Advisory | null>(null);
   const [showSendBack, setShowSendBack] = useState(false);
+  const [showUpdate, setShowUpdate] = useState(false);
+  const [changeNote, setChangeNote] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
   // Preview is not a view of its own any more: it is the markup a PDF export
   // prints, which is what keeps the exported file and the screen identical.
   const [preview, setPreview] = useState(false);
@@ -76,19 +83,34 @@ export default function ReportPage({
   const [clients, setClients] = useState<Client[]>([]);
 
   useEffect(() => {
+    setLoading(true);
+    setBase(null);
+    setLocal(null);
+    setReportError(null);
+    let active = true;
     getReport(user.id, decoded)
       .then(({ advisory, deliveries }) => {
+        if (!active) return;
         setBase(advisory);
         setSent(deliveries);
         setOffline(false);
       })
       .catch((e) => {
+        if (!active) return;
         setBase(advisoryByRef(decoded) ?? null);
         setOffline(isUnreachable(e));
       })
-      .finally(() => setLoading(false));
-    getDashboardData(user.id).then((d) => setClients(d.clients)).catch(() => setClients([]));
+      .finally(() => { if (active) setLoading(false); });
+    getDashboardData(user.id).then((d) => { if (active) setClients(d.clients); }).catch(() => { if (active) setClients([]); });
+    return () => { active = false; };
   }, [user.id, decoded]);
+
+  useEffect(() => {
+    if (!local) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [local]);
 
   const assembled = useMemo(() => {
     const src = local ?? base;
@@ -131,7 +153,7 @@ export default function ReportPage({
     canWriteReports(user.role) && (a.status === "draft" || a.status === "in-review");
   // Whoever may edit this report edits it in place. There is no reading mode
   // to step out of: the status already says whether it can be changed.
-  const editable = canEdit;
+  const editable = canEdit && !saving;
   const lead = canApprove(user.role);
   const failedChecks = a.checks.filter((c) => !c.passed);
   const blockingFailed = failedChecks.filter((c) => c.blocking);
@@ -141,22 +163,56 @@ export default function ReportPage({
   );
   const isDigest = a.type === "DG";
   const template = templateFor(a.type);
-  // There is no updatedAt on an advisory, so the latest thing that actually
-  // happened to it is the honest answer rather than an invented field.
+  // Older reports may not carry updatedAt; use the latest recorded event.
   const lastUpdated =
-    [a.publishedAt, a.approvedAt, ...a.sendBacks.map((b) => b.at), a.createdAt]
+    [a.updatedAt, a.publishedAt, a.approvedAt, ...a.sendBacks.map((b) => b.at), a.createdAt]
       .filter((d): d is string => Boolean(d))
       .sort()
       .at(-1) ?? a.createdAt;
   const publishedState = ["published", "superseded", "retracted"].includes(a.status);
 
-  const update = async (fn: (d: Advisory) => Advisory, action?: "submit" | "approve") => {
-    const next = fn(local ?? base);
-    if (action) await changeReport(user.id, next.ref, action);
-    setLocal(next);
+  const update = (fn: (d: Advisory) => Advisory) => {
+    setLocal((current) => fn(current ?? base));
+  };
+  const persist = async () => {
+    const draft = local ?? base;
+    if (!local) return draft;
+    const { advisory } = await saveReport(user.id, draft.ref, {
+      expectedRevision: base.revision ?? 0, title: draft.title,
+      sections: draft.sections, clientIds: draft.clientIds, tlp: draft.tlp,
+      techniques: draft.techniques, diamond: draft.diamond, cvss: draft.cvss,
+    });
+    setBase(advisory);
+    setLocal(null);
+    return advisory;
+  };
+  const save = async () => {
+    setSaving(true); setReportError(null);
+    try { await persist(); }
+    catch (error) { setReportError(error instanceof Error ? error.message : "The report could not be saved."); }
+    finally { setSaving(false); }
+  };
+  const transition = async (action: "submit" | "approve" | "send-back", reason?: SendBackReason) => {
+    setSaving(true); setReportError(null);
+    try {
+      const saved = await persist();
+      await workspaceWrite(user.id, `/reports/${encodeURIComponent(saved.ref)}/${action}?expectedRevision=${saved.revision ?? 0}`, reason ? { reason } : {});
+      const result = await getReport(user.id, saved.ref);
+      setBase(result.advisory); setLocal(null); setSent(result.deliveries); setShowSendBack(false);
+    } catch (error) { setReportError(error instanceof Error ? error.message : "The report action could not be completed."); }
+    finally { setSaving(false); }
+  };
+  const issueUpdate = async () => {
+    setSaving(true); setReportError(null);
+    try {
+      const result = await workspaceWrite<Advisory>(user.id, `/reports/${encodeURIComponent(a.ref)}/new-version`, { changeNote: changeNote.trim() });
+      router.push(`/reports/${encodeURIComponent(result.ref)}`);
+      setShowUpdate(false);
+    } catch (error) { setReportError(error instanceof Error ? error.message : "The update could not be created."); }
+    finally { setSaving(false); }
   };
 
-  if (a.type === "RFI") {
+  if (a.type === "RFI" && a.sections.length === 0) {
     return <RfiView a={a} clients={clients} />;
   }
 
@@ -217,6 +273,7 @@ export default function ReportPage({
         </span>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
+          {editable && <><span className="hidden text-2xs text-cpx-grey-500 sm:inline" role="status">{local ? "Unsaved changes" : `Saved · revision ${a.revision ?? 0}`}</span><Button disabled={!local || saving || offline} onClick={save}>{saving ? "Saving…" : "Save"}</Button></>}
           <Menu<ReportFormat>
             label="Export report"
             items={formatsFor(a).map((f) => ({
@@ -233,6 +290,8 @@ export default function ReportPage({
           />
         </div>
       </div>
+
+      {reportError && <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-cpx-grey-100 bg-status-warn-fill px-6 py-3 text-sm text-status-warn-ink"><span>{reportError}{local ? " Your unsaved changes remain in this page." : ""}</span><Button size="sm" disabled={saving} onClick={async () => { setSaving(true); try { const result = await getReport(user.id, a.ref); setBase(result.advisory); setLocal(null); setSent(result.deliveries); setReportError(null); } catch (cause) { setReportError((cause as Error).message); } finally { setSaving(false); } }}>{local ? "Discard edits and reload" : "Reload report"}</Button></div>}
 
       {preview && (
         <ReportPreview
@@ -303,9 +362,7 @@ export default function ReportPage({
       )}
 
       <article className="mx-auto max-w-[720px] px-6 py-8">
-        <h1 className="text-xl font-semibold leading-snug tracking-tightish">
-          {a.title}
-        </h1>
+        {editable ? <input aria-label="Report title" value={a.title} onChange={(event) => update((draft) => ({ ...draft, title: event.target.value }))} className="w-full border border-transparent bg-transparent text-xl font-semibold leading-snug tracking-tightish focus:border-cpx-grey-100 focus:outline-none" /> : <h1 className="text-xl font-semibold leading-snug tracking-tightish">{a.title}</h1>}
 
         <div className="mt-6 space-y-7">
           {a.sections.map((s) => (
@@ -341,8 +398,8 @@ export default function ReportPage({
                 </div>
               ) : editable ? (
                 <textarea
-                  defaultValue={s.body}
-                  onBlur={(e) =>
+                  value={s.body}
+                  onChange={(e) =>
                     update((d) => ({
                       ...d,
                       sections: d.sections.map((x) =>
@@ -392,55 +449,34 @@ export default function ReportPage({
         )}
       </article>
 
-      {!isDigest && (lead || (publishedState && editable === false && canWriteReports(user.role))) && (
+      {!isDigest && canWriteReports(user.role) && (
         <footer className="sticky bottom-0 z-20 mt-6 flex h-14 items-center gap-2 border-t border-cpx-grey-100 bg-white px-6">
           {publishedState ? (
             <button
-                onClick={() =>
-                update((d) => ({ ...d, status: "draft", version: d.version + 1 }))
-              }
+              onClick={() => setShowUpdate(true)}
+              disabled={saving || offline}
               className={buttonClass()}
             >
               Issue an update
             </button>
-          ) : lead && (a.status === "in-review" || a.status === "draft") ? (
+          ) : a.status === "draft" ? (
+            <Button variant="primary" disabled={saving || offline} onClick={() => transition("submit")}>Submit for review</Button>
+          ) : lead && a.status === "in-review" ? (
             <>
               <button
-                disabled={blockingFailed.length > 0}
-                onClick={() =>
-                  update((d) => ({
-                    ...d,
-                    status: "published",
-                    publishedAt: "2026-08-02T04:15:00Z",
-                    approvedAt: "2026-08-02T04:15:00Z",
-                    approvedBy: user.name,
-                  }), "approve")
-                }
+                disabled={saving || offline || (blockingFailed.length > 0 && !local)}
+                onClick={() => transition("approve")}
                 title={blockingFailed.map((c) => c.label).join("; ")}
                 className={buttonClass("primary")}
               >
                 Approve & publish
               </button>
               <button
+                disabled={saving || offline}
                 onClick={() => setShowSendBack(true)}
                 className={buttonClass()}
               >
                 Send back
-              </button>
-              <button
-                disabled={blockingFailed.length === 0}
-                onClick={() =>
-                  update((d) => ({
-                    ...d,
-                    status: "published",
-                    publishedAt: "2026-08-02T04:15:00Z",
-                    approvedAt: "2026-08-02T04:15:00Z",
-                    approvedBy: user.name,
-                  }))
-                }
-                className={buttonClass("danger")}
-              >
-                Override
               </button>
             </>
           ) : null}
@@ -453,17 +489,8 @@ export default function ReportPage({
               {SEND_BACK_REASONS.map((r) => (
                 <li key={r.key}>
                   <button
-                    onClick={() => {
-                      sendBackReport(user.id, a.ref, r.key).then(() => update((d) => ({
-                        ...d,
-                        status: "draft",
-                        sendBacks: [
-                          ...d.sendBacks,
-                          { at: "2026-08-02T04:15:00Z", by: user.name, reason: r.key },
-                        ],
-                      })));
-                      setShowSendBack(false);
-                    }}
+                    disabled={saving}
+                    onClick={() => transition("send-back", r.key)}
                     className="w-full border border-cpx-grey-100 px-3 py-2 text-left text-sm hover:border-cpx-green"
                   >
                     {r.label}
@@ -476,6 +503,7 @@ export default function ReportPage({
             </Button>
         </Dialog>
       )}
+      {showUpdate && <Dialog title="Issue an update" onClose={() => setShowUpdate(false)} className="max-w-lg"><p className="text-sm text-cpx-grey-500">Create a new draft while keeping the published version available.</p><label className="mt-4 block text-sm">Change note<textarea value={changeNote} onChange={(event) => setChangeNote(event.target.value)} required rows={3} className="mt-1 w-full border border-cpx-grey-100 p-2" /></label><div className="mt-4 flex justify-end gap-2"><Button disabled={saving} onClick={() => setShowUpdate(false)}>Cancel</Button><Button variant="primary" disabled={saving || !changeNote.trim()} onClick={issueUpdate}>{saving ? "Creating…" : "Create update draft"}</Button></div></Dialog>}
     </div>
   );
 }
@@ -807,7 +835,7 @@ function CvssTable({
                     value: parseFloat(score),
                     source: source.trim(),
                     authorityClass: "vendor",
-                    assessedAt: "2026-08-02T04:15:00Z",
+                    assessedAt: new Date().toISOString(),
                   },
                 ],
               }));
@@ -840,6 +868,7 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
         {a.rfi.requester} · due {gstDateTime(a.rfi.dueAt)} ·{" "}
         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
       </p>
+      {a.caseId && <Link href={`/investigations/${a.caseId}`} className="mt-4 inline-block text-sm text-link underline">Open investigation</Link>}
       <ul className="mt-6 space-y-2">
         {a.rfi.steps.map((s) => (
           <li key={s.label} className="flex items-center gap-2.5 text-sm">

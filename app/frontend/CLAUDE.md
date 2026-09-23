@@ -4,7 +4,7 @@ Frontend. Next.js App Router + TypeScript + Tailwind v4; no component library, t
 
 Read `docs/01-screens.md` before writing a screen. Read `docs/03-brand-and-copy.md` before writing any copy.
 
-**Basis: BRD v0.5 (26 August 2026) and the CRS-002 BRD walkthrough of 2 September 2026.** Where this file and the BRD disagree, the BRD wins and this file is wrong. The rules below that carry an FR reference are contractual.
+**Basis: BRD v0.9 and the CRS-002 BRD walkthrough of 2 September 2026, with the requested-features-first implementation approved on 23 September 2026.** Where this file and the BRD disagree, the BRD wins and this file is wrong. The rules below that carry an FR reference are contractual.
 
 ---
 
@@ -18,33 +18,34 @@ Roughly a dozen CPX TI analysts live in it daily, plus a lead analyst who approv
 
 ---
 
-## Six destinations
+## Seven destinations
 
 ```
-Dashboard  ·  Intelligence  ·  Reports  ·  Clients  ·  Collection  ·  Manage
+Dashboard  ·  Intelligence  ·  Investigations  ·  Reports  ·  Clients  ·  Collection  ·  Manage
 ```
 
 | Destination | Route | Who | The one job |
 |---|---|---|---|
 | **Dashboard** | `/` | Everyone, resolved per role | Where do I start today |
 | **Intelligence** | `/intelligence` | Analysts, SOC, IR | Ask a question, get a cited answer, turn it into a draft |
+| **Investigations** | `/investigations` | Analysts, lead analyst, IR | Manage shared cases, evidence, specialist runs and report drafts |
 | **Reports** | `/reports` | Analysts write, lead approves | Judge a client-facing artefact and release it |
 | **Clients** | `/clients` | Lead analyst | Keep the facts current that decide what each client receives |
-| **Collection** | `/collection` | Lead analyst, our engineer | Connect a feed, see what went quiet |
+| **Collection** | `/collection` | Technical roles; lead manages connectors | Submit intelligence, inspect sources and collection health |
 | **Manage** | `/manage` | Analysts read, lead analyst edits | See what an agent is made of, and keep PIRs and workflows current |
 
-Two detail routes: `/reports/[ref]` and `/clients/[id]`.
+Detail routes include `/reports/[ref]`, `/clients/[id]`, `/collection/sources/[id]` and `/investigations/[id]`.
 One addressable-but-never-navigated route: `/intelligence/[id]`, so a conversation can be linked from an RFI row. **No thread list, no session sidebar, no history rail.**
 
 **Manage is one destination with tabs**, not four: Agents, Workflows, PIRs, Audit. CPX grouped them the same way in the 2 September mockup.
 
-Superseded, 2 September 2026: earlier versions of this file said "do not add a sixth destination". CPX asked for an agent-specification view, PIR management and an audit trail in the same session, so Manage is the sixth. Adding a **seventh** still needs a decision, not a commit.
+Superseded, 2 September 2026: earlier versions of this file said "do not add a sixth destination". CPX asked for an agent-specification view, PIR management and an audit trail in the same session, so Manage is the sixth. The user approved Investigations as the seventh destination on 23 September 2026. Private Intelligence conversations remain separate from shared cases.
 
 ---
 
 ## Hard rules
 
-**1. The backend is the contract; fixtures are the fallback.** Screens read through `lib/api.ts`. A screen must still render honestly when the backend is down: show what it has, say what it could not reach, never present demo data as live. See `docs/02-data.md`.
+**1. The backend is the contract.** New dashboard, investigation, upload, source-submission and IOC lookup flows have explicit loading/error/empty states and never fall back to demo results. Legacy screens may use a clearly labelled offline fallback. Screens read through `lib/api.ts`. A screen must still render honestly when the backend is down: show what it has, say what it could not reach, never present demo data as live. See `docs/02-data.md`.
 
 **2. Never fetch a URL from the source inventory.** It contains live malware repositories, IOC blocklists, dark-web indexes and TOR node lists, and at least one URL carries an embedded API key in its path. Render them as **inert plain text**: no `<a href>`, no `next/link`, no prefetch, nothing that triggers a favicon fetch, and never write one to a log or an export unredacted. Indicators render defanged at every rendering site.
 

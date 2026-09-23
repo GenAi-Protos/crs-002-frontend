@@ -18,12 +18,14 @@ export function AskOptionsBar({
   onChange,
   clients,
   workflows,
+  availability,
   disabled,
 }: {
   options: AskOptions;
   onChange: (next: AskOptions) => void;
   clients: Client[];
   workflows: Workflow[];
+  availability: { ref: string; available: boolean; mode: string; reason?: string | null }[];
   disabled?: boolean;
 }) {
   const set = <K extends keyof AskOptions>(key: K, value: AskOptions[K]) =>
@@ -31,8 +33,7 @@ export function AskOptionsBar({
 
   // Only a published workflow can be asked for by name. A draft is listed as
   // unavailable rather than hidden, so the roster stays honest.
-  const published = workflows.filter((w) => w.status === "published");
-  const draftCount = workflows.length - published.length;
+  const selectable = availability.filter((item) => item.mode !== "investigation");
 
   const depthHint = DEPTHS.find((d) => d.value === options.depth)?.hint;
   const outputHint = OUTPUTS.find((o) => o.value === options.output)?.hint;
@@ -42,11 +43,13 @@ export function AskOptionsBar({
       <div className="grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-3 lg:grid-cols-5">
         <Field label="Client">
           <select
+            aria-label="Client"
             disabled={disabled}
-            value={options.clientId ?? ""}
-            onChange={(e) => set("clientId", e.target.value || null)}
+            value={options.globalOnly ? "__global__" : options.clientId ?? ""}
+            onChange={(e) => onChange({ ...options, clientId: e.target.value === "__global__" ? null : e.target.value || null, globalOnly: e.target.value === "__global__" })}
           >
-            <option value="">Global</option>
+            <option value="">All permitted clients</option>
+            <option value="__global__">Global intelligence</option>
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -57,6 +60,7 @@ export function AskOptionsBar({
 
         <Field label="TLP ceiling">
           <select
+            aria-label="TLP ceiling"
             disabled={disabled}
             value={options.tlpCeiling ?? ""}
             onChange={(e) => set("tlpCeiling", (e.target.value || null) as Tlp | null)}
@@ -72,6 +76,7 @@ export function AskOptionsBar({
 
         <Field label="Depth">
           <select
+            aria-label="Depth"
             disabled={disabled}
             value={options.depth}
             onChange={(e) => set("depth", e.target.value as AskOptions["depth"])}
@@ -86,14 +91,15 @@ export function AskOptionsBar({
 
         <Field label="Workflow">
           <select
+            aria-label="Workflow"
             disabled={disabled}
             value={options.workflow ?? ""}
             onChange={(e) => set("workflow", e.target.value || null)}
           >
             <option value="">Auto-select</option>
-            {published.map((w) => (
-              <option key={w.ref} value={w.ref}>
-                {w.name}
+            {selectable.map((w) => (
+              <option key={w.ref} value={w.ref} disabled={!w.available}>
+                {workflows.find((workflow) => workflow.ref === w.ref)?.name ?? w.ref}{!w.available ? " — unavailable" : ""}
               </option>
             ))}
           </select>
@@ -101,6 +107,7 @@ export function AskOptionsBar({
 
         <Field label="Output">
           <select
+            aria-label="Output"
             disabled={disabled}
             value={options.output}
             onChange={(e) => set("output", e.target.value as AskOptions["output"])}
@@ -118,13 +125,7 @@ export function AskOptionsBar({
         {options.tlpCeiling
           ? `Evidence above TLP:${options.tlpCeiling} is excluded and counted. The ceiling does not mark the answer.`
           : `${depthHint} ${outputHint}`}
-        {options.workflow === null && draftCount > 0 && (
-          <>
-            {" "}
-            {draftCount} further {draftCount === 1 ? "workflow is" : "workflows are"}{" "}
-            in draft and cannot be requested by name.
-          </>
-        )}
+        {options.workflow && availability.find((item) => item.ref === options.workflow)?.reason}
       </p>
     </div>
   );

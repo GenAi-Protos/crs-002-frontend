@@ -1,4 +1,4 @@
-// Shapes per docs/02-data.md. Fixtures are the contract: no API exists.
+// Shared API shapes. Workspace evidence and case models live in workspace-types.ts.
 
 export type Tlp = "CLEAR" | "GREEN" | "AMBER" | "AMBER+STRICT" | "RED";
 export type RoleKey =
@@ -153,9 +153,12 @@ export interface DiamondModel {
 }
 
 export interface Advisory {
+  caseId?: string;
   ref: string; // "CPX-TIC-IA-2026-352"
   type: "IA" | "VA" | "DG" | "RFI" | "TAP";
   version: number;
+  revision?: number;
+  updatedAt?: string;
   title: string;
   tlp: Tlp;
   status:
@@ -241,12 +244,14 @@ export interface Investigation {
 export interface Turn {
   id: string;
   question: string;
+  attachmentIds?: string[];
   status: "streaming" | "complete" | "stopped" | "failed" | "superseded";
   answer?: Answer;
   supersededBy?: string;
 }
 
 export interface Answer {
+  runId?: string;
   title?: string; // only when the answer is document-shaped
   blocks: AnswerBlock[];
   entities: { id: string; name: string; type: string }[];
@@ -257,7 +262,7 @@ export interface Answer {
   tlp: Tlp;
   classificationSettled: boolean; // TLP renders only when true
   egress: boolean; // a query left the UAE region
-  producedArtefact?: { ref: string; type: "IA" | "VA" };
+  producedArtefact?: { ref: string; type: "IA" | "VA" | "TAP" };
 }
 
 export type AnswerBlock =

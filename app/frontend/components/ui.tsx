@@ -163,7 +163,7 @@ export function Dialog({
       aria-labelledby={id}
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className={`m-auto w-full max-w-md border border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-pop ${className}`}
+      className={`m-auto w-full ${className.includes("max-w-") ? "" : "max-w-md"} border border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-pop ${className}`}
     >
       <div className="p-5">
         <div className="mb-4 flex items-start justify-between gap-4">

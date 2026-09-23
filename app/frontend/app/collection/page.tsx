@@ -8,12 +8,11 @@ import { useSearchParams } from "next/navigation";
 import { useConsoleUser } from "@/lib/role-context";
 import { canSee } from "@/lib/access";
 import { REQUESTS, WATCHES } from "@/lib/fixtures";
-import { SOURCES } from "@/lib/fixtures-sources";
-import { getConnectors, getHealth, getRequests, getSources, getWatches, isUnreachable } from "@/lib/api";
-import type { Connector, KeywordWatch, Source, SourceRequest } from "@/lib/types";
+import { getConnectors, getHealth, getRequests, getWatches, isUnreachable } from "@/lib/api";
+import type { Connector, KeywordWatch, SourceRequest } from "@/lib/types";
 import { PageHeader, Tabs, OfflineNote, tabPanelProps } from "@/components/ui";
 import { ConnectorsTab } from "@/components/collection/ConnectorsTab";
-import { SourcesTab } from "@/components/collection/SourcesTab";
+import { IntelligenceSourcesTab } from "@/components/collection/IntelligenceSourcesTab";
 import { WatchesTab } from "@/components/collection/WatchesTab";
 import { RequestsTab } from "@/components/collection/RequestsTab";
 
@@ -28,7 +27,6 @@ function CollectionInner() {
       ? initial
       : "connectors",
   );
-  const [sources, setSources] = useState<Source[]>(SOURCES);
   const [requests, setRequests] = useState<SourceRequest[]>(REQUESTS);
   const [watches, setWatches] = useState<KeywordWatch[]>(WATCHES);
   const [connectors, setConnectors] = useState<Connector[]>([]);
@@ -41,13 +39,6 @@ function CollectionInner() {
     // Five reads in flight at once; `live` drops any that land after a role
     // switch, so a stale payload never overwrites the new role's rows.
     let live = true;
-    getSources(user.id)
-      .then((rows) => {
-        if (!live) return;
-        setSources(rows);
-        setOffline(false);
-      })
-      .catch((e) => live && setOffline(isUnreachable(e)));
     getRequests(user.id).then((r) => live && setRequests(r)).catch((e) => live && setOffline(isUnreachable(e)));
     getWatches(user.id).then((w) => live && setWatches(w)).catch((e) => live && setOffline(isUnreachable(e)));
     getConnectors(user.id).then((c) => live && setConnectors(c)).catch((e) => live && setOffline(isUnreachable(e)));
@@ -74,7 +65,7 @@ function CollectionInner() {
       <Tabs<TabKey>
         tabs={[
           { key: "connectors", label: "Connectors" },
-          { key: "sources", label: "Sources", count: sources.length },
+          { key: "sources", label: "Sources" },
           { key: "watches", label: "Watches", count: watches.length },
           { key: "requests", label: "Requests", count: requests.length },
         ]}
@@ -86,8 +77,7 @@ function CollectionInner() {
       <div {...tabPanelProps("collection", tab)}>
         {tab === "connectors" && <ConnectorsTab initialRows={connectors} />}
         {tab === "sources" && (
-          <SourcesTab
-            initialRows={sources}
+          <IntelligenceSourcesTab
             schedulerOn={schedulerOn}
             connectors={connectors}
             onRequestSource={() => setTab("requests")}

@@ -11,6 +11,7 @@ import {
   IconDashboard,
   IconIntelligence,
   IconReports,
+  IconSearch,
 } from "@/components/icons";
 import type { ReactNode } from "react";
 
@@ -22,6 +23,7 @@ const NAV: {
 }[] = [
   { key: "dashboard", label: "Dashboard", href: "/", icon: <IconDashboard /> },
   { key: "intelligence", label: "Intelligence", href: "/intelligence", icon: <IconIntelligence /> },
+  { key: "investigations", label: "Investigation", href: "/investigations", icon: <IconSearch /> },
   { key: "reports", label: "Reports", href: "/reports", icon: <IconReports /> },
   { key: "clients", label: "Clients", href: "/clients", icon: <IconClients /> },
   { key: "collection", label: "Collection", href: "/collection", icon: <IconCollection /> },

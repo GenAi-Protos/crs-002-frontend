@@ -21,7 +21,7 @@ import {
   T_TH,
 } from "@/components/table";
 import { gstDate } from "@/lib/format";
-import { archiveReport, createReport, createRfi, getDashboardData, getReports, isUnreachable } from "@/lib/api";
+import { archiveReport, createReport, getDashboardData, getReports, isUnreachable } from "@/lib/api";
 import { NewReportDialog } from "@/components/reports/NewReportDialog";
 import { RowActions } from "@/components/reports/RowActions";
 import { ReportPreview } from "@/components/reports/ReportPreview";
@@ -301,14 +301,14 @@ export default function ReportsPage() {
               <RowGroup key={a.ref}>
                 <tr
                   onClick={() =>
-                    a.type === "RFI"
+                    a.type === "RFI" && a.rfi
                       ? setOpenRfi(rfiOpen ? null : a.ref)
                       : router.push(`/reports/${encodeURIComponent(a.ref)}`)
                   }
                   className={`${T_ROW} cursor-pointer ${ghost ? "opacity-45" : ""}`}
                 >
                   <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
-                    {a.type === "RFI" ? (
+                    {a.type === "RFI" && a.rfi ? (
                       <button
                         onClick={() => setOpenRfi(rfiOpen ? null : a.ref)}
                         className="flex items-center gap-1"
@@ -385,7 +385,7 @@ export default function ReportsPage() {
                         {a.rfi.requester} · due {gstDate(a.rfi.dueAt)} ·{" "}
                         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
                       </p>
-                      <p className="mt-1 text-sm">{a.rfi.question}</p>
+                      <p className="mt-1 text-sm">{a.rfi.question}</p>{a.caseId && <Link href={`/investigations/${a.caseId}`} className="mt-2 inline-block text-xs text-link underline">Open investigation</Link>}
                       <ul className="mt-2 space-y-1">
                         {a.rfi.steps.map((s) => (
                           <li key={s.label} className="flex items-center gap-2 text-xs">
@@ -429,14 +429,8 @@ export default function ReportsPage() {
 
       {showNew && (
         <NewReportDialog
-          clients={clients}
           onClose={() => setShowNew(false)}
-          onCreateRfi={async (draft) => {
-            // The server issues the ref, sets the status and attaches the gate.
-            const filed = await createRfi(user.id, draft);
-            setApiRows((r) => [filed, ...r]);
-            setShowNew(false);
-          }}
+          onStartInvestigation={() => { setShowNew(false); router.push("/investigations/new"); }}
           onCreateReport={async (type, title, choice) => {
             // The template was chosen and previewed a step earlier; the sections
             // come from whichever one it was, standard or uploaded.

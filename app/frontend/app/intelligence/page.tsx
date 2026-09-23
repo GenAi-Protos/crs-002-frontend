@@ -20,7 +20,7 @@ import type { Advisory, Client, Investigation, PirHit, Turn, Workflow } from "@/
 import { askIntelligence, getDashboardData, getInvestigations, getReports, isUnreachable } from "@/lib/api";
 import { TurnView, type TurnRequest } from "@/components/intelligence/AnswerCard";
 import { EntityDrawer } from "@/components/intelligence/EntityDrawer";
-import { INVESTIGATIONS as FALLBACK_INVESTIGATIONS, WORKFLOWS } from "@/lib/fixtures";
+import { WORKFLOWS } from "@/lib/fixtures";
 import { DEFAULT_ASK_OPTIONS, optionsAreDefault, type AskOptions } from "@/lib/ask-options";
 import { AskOptionsBar } from "@/components/intelligence/AskOptionsBar";
 import { LookupPanel } from "@/components/intelligence/LookupPanel";
@@ -28,6 +28,10 @@ import { gstDate } from "@/lib/format";
 import { IconChevronDown, IconPlus, IconSend } from "@/components/icons";
 import Link from "next/link";
 import { PageHeader, buttonClass, useDismiss, OfflineNote } from "@/components/ui";
+import { EvidenceUploader, evidencePending } from "@/components/evidence/EvidenceUploader";
+import { AddToCase } from "@/components/investigations/AddToCase";
+import { getEvidence, workspaceRequest } from "@/lib/workspace-api";
+import type { EvidenceFile } from "@/lib/workspace-types";
 
 interface StoredSession {
   id: string;
@@ -37,16 +41,16 @@ interface StoredSession {
 
 const SESSIONS_KEY = "nestor-intel-sessions";
 
-function readSessions(): StoredSession[] {
+function readSessions(userId: string): StoredSession[] {
   try {
-    return JSON.parse(sessionStorage.getItem(SESSIONS_KEY) ?? "[]");
+    return JSON.parse(sessionStorage.getItem(`${SESSIONS_KEY}:${userId}`) ?? "[]");
   } catch {
     return [];
   }
 }
 
-function writeSessions(s: StoredSession[]) {
-  sessionStorage.setItem(SESSIONS_KEY, JSON.stringify(s));
+function writeSessions(userId: string, s: StoredSession[]) {
+  sessionStorage.setItem(`${SESSIONS_KEY}:${userId}`, JSON.stringify(s));
 }
 
 function IntelligenceInner() {
@@ -57,6 +61,11 @@ function IntelligenceInner() {
   const [sessions, setSessions] = useState<StoredSession[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [draft, setDraft] = useState("");
+  const [attachments, setAttachments] = useState<EvidenceFile[]>([]);
+  const [uploadBusy, setUploadBusy] = useState(false);
+  const [allowPartial, setAllowPartial] = useState(false);
+  const [askError, setAskError] = useState<string | null>(null);
+  const [turnFiles, setTurnFiles] = useState<Record<string, EvidenceFile[]>>({});
   const [entity, setEntity] = useState<{ id: string; name: string; type: string } | null>(null);
   const [investigations, setInvestigations] = useState<Investigation[]>([]);
   const [hits, setHits] = useState<PirHit[]>([]);
@@ -67,6 +76,12 @@ function IntelligenceInner() {
   const [options, setOptions] = useState<AskOptions>(DEFAULT_ASK_OPTIONS);
   const [clients, setClients] = useState<Client[]>([]);
   const [workflows] = useState<Workflow[]>(WORKFLOWS);
+  const [workflowAvailability, setWorkflowAvailability] = useState<{ ref: string; available: boolean; mode: string; reason?: string | null }[]>([]);
+  useEffect(() => {
+    let active = true;
+    workspaceRequest<{ items: typeof workflowAvailability }>(user.id, "/intelligence/workflows").then((result) => { if (active) setWorkflowAvailability(result.items); }).catch(() => { if (active) setWorkflowAvailability([]); });
+    return () => { active = false; };
+  }, [user.id]);
   const endRef = useRef<HTMLDivElement>(null);
   const seededRef = useRef<string | null>(null);
   // What each turn asked for, keyed by turn id (the local id and, once the
@@ -83,16 +98,26 @@ function IntelligenceInner() {
   useDismiss(headerRef, closeHistory, historyOpen);
 
   useEffect(() => {
-    setSessions(readSessions());
+    let active = true;
+    const missing = turns.filter((turn) => turn.attachmentIds?.length && turnFiles[turn.id]?.length !== turn.attachmentIds.length);
+    missing.forEach((turn) => Promise.all((turn.attachmentIds ?? []).map((id) => getEvidence(user.id, id))).then((files) => active && setTurnFiles((previous) => ({ ...previous, [turn.id]: files }))).catch(() => undefined));
+    return () => { active = false; };
+  }, [turns, turnFiles, user.id]);
+
+  useEffect(() => {
+    let active = true;
+    controllers.current.forEach((controller) => controller.abort());
+    setSessions(readSessions(user.id)); setTurns([]); setSessionId(null); setAttachments([]); setTurnFiles({}); setDraft(""); setAskError(null); setInvestigations([]); setRequests({});
     Promise.all([getInvestigations(user.id), getDashboardData(user.id), getReports(user.id)])
-      .then(([items, data, reports]) => { setInvestigations(items); setHits(data.hits); setAdvisories(reports); setClients(data.clients); setOffline(false); })
-      .catch((e) => { setInvestigations(FALLBACK_INVESTIGATIONS); setOffline(isUnreachable(e)); });
+      .then(([items, data, reports]) => { if (active) { setInvestigations(items); setHits(data.hits); setAdvisories(reports); setClients(data.clients); setOffline(false); } })
+      .catch((e) => { if (active) { setInvestigations([]); setOffline(isUnreachable(e)); } });
+    return () => { active = false; };
   }, [user.id]);
 
   // The dashboard's Draft advisory action and the top bar search land here.
   // Keyed by the param value so a second navigation seeds again.
   useEffect(() => {
-    const q = params.get("q");
+    const q = params.get("q") ?? params.get("prompt");
     const hitId = params.get("draft");
     // ?lookup= opens the IOC Lookup instead of seeding the composer.
     if (params.get("lookup")) return;
@@ -120,7 +145,7 @@ function IntelligenceInner() {
   // always current without a save control.
   const persist = useCallback(
     (id: string, title: string, nextTurns: Turn[]) => {
-      const all = readSessions();
+      const all = readSessions(user.id);
       const existing = all.find((s) => s.id === id);
       let next: StoredSession[];
       if (existing) {
@@ -128,10 +153,10 @@ function IntelligenceInner() {
       } else {
         next = [{ id, title, turns: nextTurns }, ...all];
       }
-      writeSessions(next);
+      writeSessions(user.id, next);
       setSessions(next);
     },
-    [],
+    [user.id],
   );
 
   if (!canSee(user.role, "intelligence")) {
@@ -145,8 +170,15 @@ function IntelligenceInner() {
     );
   }
 
-  const ask = (question: string) => {
+  const ask = (question: string, files = attachments) => {
+    if (uploadBusy || evidencePending(files) || files.some((f) => f.status === "failed") || (files.some((f) => f.status === "partial") && !allowPartial)) {
+      setAskError("Wait for processing, remove failed files, or accept partial extraction.");
+      return;
+    }
+    setAskError(null);
     const turn = makeTurn(question);
+    turn.attachmentIds = files.map((f) => f.id);
+    setTurnFiles((previous) => ({ ...previous, [turn.id]: files }));
     const id = sessionId ?? `s-${Date.now().toString(36)}`;
     const title =
       sessions.find((s) => s.id === id)?.title ??
@@ -154,6 +186,7 @@ function IntelligenceInner() {
       question.replace(/[?.]+$/, "").slice(0, 64);
     if (!sessionId) setSessionId(id);
     const request: TurnRequest = {
+      clientId: options.clientId,
       workflow: options.workflow
         ? (workflows.find((w) => w.ref === options.workflow)?.name ?? options.workflow)
         : null,
@@ -163,8 +196,10 @@ function IntelligenceInner() {
     controllers.current.set(turn.id, controller);
     setTurns((t) => [...t, turn]);
     setDraft("");
-    askIntelligence(user.id, question, sessionId ?? undefined, options, controller.signal)
+    setAttachments([]);
+    askIntelligence(user.id, question, sessionId ?? undefined, options, controller.signal, files.map((f) => f.id), allowPartial)
       .then(({ investigationId, turn: backendTurn }) => {
+        setTurnFiles((previous) => ({ ...previous, [backendTurn.id]: files }));
         setRequests((r) => ({ ...r, [backendTurn.id]: request }));
         setTurns((t) => {
           // The user may have switched sessions while the answer was pending;
@@ -180,15 +215,16 @@ function IntelligenceInner() {
           return next;
         });
       })
-      .catch(() =>
+      .catch((error: Error) => {
+        if (!controller.signal.aborted) setAskError(error.message);
         setTurns((t) =>
           t.map((x) =>
             x.id === turn.id
               ? { ...x, status: controller.signal.aborted ? "stopped" : "failed" }
               : x,
           ),
-        ),
-      )
+        );
+      })
       .finally(() => controllers.current.delete(turn.id));
   };
 
@@ -198,13 +234,15 @@ function IntelligenceInner() {
   // failure is replaced by the new attempt, not stacked under it.
   const retry = (t: Turn) => {
     setTurns((ts) => ts.filter((x) => x.id !== t.id));
-    ask(t.question);
+    ask(t.question, turnFiles[t.id] ?? []);
   };
 
   const newSession = () => {
     setTurns([]);
     setSessionId(null);
     setDraft("");
+    setAttachments([]);
+    setAskError(null);
     setHistoryOpen(false);
   };
 
@@ -345,8 +383,8 @@ function IntelligenceInner() {
           </div>
         )}
         {turns.map((t) => (
+          <div key={t.id} className="space-y-3">
           <TurnView
-            key={t.id}
             turn={t}
             request={requests[t.id]}
             onStop={t.status === "streaming" ? () => stop(t.id) : undefined}
@@ -357,6 +395,9 @@ function IntelligenceInner() {
               setEntity(entities.find((e) => e.id === id) ?? null)
             }
           />
+          {!!turnFiles[t.id]?.length && <p className="text-xs text-cpx-grey-500">Attached: {turnFiles[t.id].map((f) => f.fileName).join(", ")}</p>}
+          {t.status === "complete" && sessionId && <AddToCase title={t.question} conversationId={sessionId} turnId={t.id} runId={t.answer?.runId} files={turnFiles[t.id] ?? []} clientId={requests[t.id]?.clientId} />}
+          </div>
         ))}
         <div ref={endRef} />
       </div>
@@ -376,25 +417,32 @@ function IntelligenceInner() {
             onChange={setOptions}
             clients={clients}
             workflows={workflows}
+            availability={workflowAvailability}
           />
+          <div className="border-b border-cpx-grey-100 px-4 py-3">
+            <EvidenceUploader value={attachments} onChange={setAttachments} tlp={options.tlpCeiling ?? "AMBER"} clientId={options.clientId} onBusy={setUploadBusy} />
+            {attachments.some((f) => f.status === "partial") && <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={allowPartial} onChange={(e) => setAllowPartial(e.target.checked)} />Use extracted portions and show coverage gaps</label>}
+          </div>
           <div className="flex items-center gap-2 pl-4 pr-2">
             <input
               autoFocus
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Ask a question"
+              aria-label="Question"
               className="h-12 flex-1 bg-transparent text-base focus:outline-none"
             />
             <button
               type="submit"
               aria-label="Send"
-              disabled={!draft.trim()}
+              disabled={!draft.trim() || uploadBusy || evidencePending(attachments) || attachments.some((f) => f.status === "failed") || (attachments.some((f) => f.status === "partial") && !allowPartial)}
               className="flex h-9 w-9 items-center justify-center bg-cpx-green text-cpx-black disabled:bg-cpx-grey-50 disabled:text-cpx-grey-400"
             >
               <IconSend />
             </button>
           </div>
         </form>
+        {askError && <p role="alert" className="mt-2 text-xs text-cpx-red-700">{askError}</p>}
         {!optionsAreDefault(options) && (
           <p className="mt-1.5 text-2xs text-cpx-grey-500">
             These settings are sent with the question and change the answer. They

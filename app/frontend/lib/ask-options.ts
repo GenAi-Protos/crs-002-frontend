@@ -16,6 +16,7 @@ export type AskOutput = "narrative" | "bullets" | "table";
 
 export interface AskOptions {
   clientId: string | null;
+  globalOnly?: boolean;
   tlpCeiling: Tlp | null;
   depth: AskDepth;
   workflow: string | null;
@@ -24,6 +25,7 @@ export interface AskOptions {
 
 export const DEFAULT_ASK_OPTIONS: AskOptions = {
   clientId: null,
+  globalOnly: false,
   tlpCeiling: null,
   depth: "analyst",
   workflow: null,
@@ -65,6 +67,7 @@ export const TLP_CEILINGS: Tlp[] = ["CLEAR", "GREEN", "AMBER", "AMBER+STRICT", "
 export function optionsAreDefault(o: AskOptions): boolean {
   return (
     o.clientId === null &&
+    !o.globalOnly &&
     o.tlpCeiling === null &&
     o.depth === "analyst" &&
     o.workflow === null &&
