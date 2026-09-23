@@ -195,14 +195,17 @@ export const getPirs = (userId: string) => listApi<Pir>(userId, "/pirs", "items"
 
 // `signal` is the analyst's Stop: aborting it ends the request and the turn
 // records itself as stopped, which is a state the model already carries.
-export async function askIntelligence(userId: string, question: string, investigationId?: string, options?: AskOptions, signal?: AbortSignal): Promise<{ investigationId: string; turn: Turn }> {
+export async function askIntelligence(userId: string, question: string, investigationId?: string, options?: AskOptions, signal?: AbortSignal, attachmentIds: string[] = [], allowPartialEvidence = false): Promise<{ investigationId: string; turn: Turn }> {
   const response = await request(`${apiBase()}/intelligence/ask`, {
     method: "POST",
     headers: { "X-Nestor-User": userId, "Content-Type": "application/json" },
-    body: JSON.stringify({ question, investigationId, options }),
+    body: JSON.stringify({ question, investigationId, options, attachmentIds, allowPartialEvidence }),
     signal,
   });
-  if (!response.ok) throw new Error(`Backend returned ${response.status}`);
+  if (!response.ok) {
+    const detail = await response.json().catch(() => null);
+    throw new Error(typeof detail?.detail === "string" ? detail.detail : `Backend returned ${response.status}`);
+  }
   return response.json() as Promise<{ investigationId: string; turn: Turn }>;
 }
 

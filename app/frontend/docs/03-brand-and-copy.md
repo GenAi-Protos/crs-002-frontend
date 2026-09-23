@@ -1,5 +1,7 @@
 # Brand and copy
 
+For the September 2026 requested feature slice, concise operational notices are allowed when they explain a user decision: private evidence promotion, partial extraction, unavailable sources, revision conflicts, approval gates and retry. These notices must name the state and next action. All existing brand tokens and accessible status treatments remain in force.
+
 ---
 
 ## 1 · Writing rules

@@ -45,6 +45,7 @@ import {
 export interface TurnRequest {
   /** The workflow chosen by name, or null when the system selected it. */
   workflow: string | null;
+  clientId?: string | null;
 }
 
 function linkEntities(

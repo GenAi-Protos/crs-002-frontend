@@ -15,8 +15,7 @@
 // structure has not made a mistake. Only a file no structure could be read
 // from is refused.
 
-import { useEffect, useState } from "react";
-import type { Client } from "@/lib/types";
+import { useState } from "react";
 import {
   REPORT_TYPES,
   TEMPLATES,
@@ -35,19 +34,12 @@ export interface TemplateChoice {
 type Step = "type" | "template" | "details";
 
 export function NewReportDialog({
-  clients,
   onClose,
-  onCreateRfi,
+  onStartInvestigation,
   onCreateReport,
 }: {
-  clients: Client[];
   onClose: () => void;
-  onCreateRfi: (draft: {
-    requester: string;
-    question: string;
-    clientId: string;
-    dueAt: string;
-  }) => Promise<void>;
+  onStartInvestigation: () => void;
   onCreateReport: (
     type: ReportType,
     title: string,
@@ -59,9 +51,9 @@ export function NewReportDialog({
   const [choice, setChoice] = useState<TemplateChoice | null>(null);
 
   const pickType = (t: ReportType) => {
+    if (t === "RFI") { onStartInvestigation(); return; }
     setType(t);
-    // An RFI is a work order, not a document, so it has no template step.
-    setStep(t === "RFI" ? "details" : "template");
+    setStep("template");
   };
 
   return (
@@ -81,13 +73,6 @@ export function NewReportDialog({
           />
         )}
 
-        {step === "details" && type === "RFI" && (
-          <RfiForm
-            clients={clients}
-            onBack={() => setStep("type")}
-            onCreate={onCreateRfi}
-          />
-        )}
 
         {step === "details" && type && type !== "RFI" && choice && (
           <TitleForm
@@ -147,7 +132,7 @@ function TypePicker({
                   <span className="text-sm font-medium">{template.name}</span>
                   <span className="ml-auto bg-cpx-grey-50 px-1.5 text-2xs">
                     {template.workOrder
-                      ? "Work order"
+                      ? "Open investigation"
                       : `${template.sections.length} ${template.sections.length === 1 ? "section" : "sections"}`}
                   </span>
                 </span>
@@ -268,117 +253,6 @@ function TitleForm({
           className={buttonClass("primary")}
         >
           {busy ? "Creating" : "Create report"}
-        </button>
-      </div>
-    </>
-  );
-}
-
-// --- RFI, unchanged ----------------------------------------------------------
-
-function RfiForm({
-  clients,
-  onBack,
-  onCreate,
-}: {
-  clients: Client[];
-  onBack: () => void;
-  onCreate: (draft: {
-    requester: string;
-    question: string;
-    clientId: string;
-    dueAt: string;
-  }) => Promise<void>;
-}) {
-  const [requester, setRequester] = useState("");
-  const [question, setQuestion] = useState("");
-  const [clientId, setClientId] = useState("");
-  const [due, setDue] = useState("2026-08-09");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!clientId && clients.length) setClientId(clients[0].id);
-  }, [clients, clientId]);
-
-  return (
-    <>
-      <p className="mt-3 flex items-baseline gap-2 text-xs text-cpx-grey-500">
-        <span className="bg-cpx-grey-50 px-1.5 text-2xs text-cpx-black">RFI</span>
-        Request for Information
-      </p>
-      <div className="mt-4 space-y-3">
-        <label className="block">
-          <span className="text-xs text-cpx-grey-500">Requester</span>
-          <input
-            value={requester}
-            onChange={(e) => setRequester(e.target.value)}
-            className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:border-cpx-green focus:outline-none"
-          />
-        </label>
-        <label className="block">
-          <span className="text-xs text-cpx-grey-500">Question</span>
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            rows={3}
-            className="mt-1 w-full border border-cpx-grey-100 px-3 py-2 text-sm focus:border-cpx-green focus:outline-none"
-          />
-        </label>
-        <label className="block">
-          <span className="text-xs text-cpx-grey-500">Client</span>
-          <select
-            value={clientId}
-            onChange={(e) => setClientId(e.target.value)}
-            className="mt-1 h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
-          >
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.id} · {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="text-xs text-cpx-grey-500">Due date</span>
-          <input
-            type="date"
-            value={due}
-            onChange={(e) => setDue(e.target.value)}
-            className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:outline-none"
-          />
-        </label>
-      </div>
-      {error && (
-        <p className="mt-3 text-xs text-status-warn-ink">{error}</p>
-      )}
-      <div className="mt-5 flex justify-end gap-2">
-        <button
-          onClick={onBack}
-          className={buttonClass("secondary", "md", "mr-auto")}
-        >
-          Back
-        </button>
-        <button
-          disabled={!requester.trim() || !question.trim() || !clientId || busy}
-          onClick={async () => {
-            setBusy(true);
-            setError(null);
-            try {
-              await onCreate({
-                requester: requester.trim(),
-                question: question.trim(),
-                clientId,
-                dueAt: `${due}T12:00:00Z`,
-              });
-            } catch (e) {
-              setError((e as Error).message);
-              setBusy(false);
-            }
-          }}
-          className={buttonClass("primary")}
-        >
-          {busy ? "Filing" : "Create"}
         </button>
       </div>
     </>

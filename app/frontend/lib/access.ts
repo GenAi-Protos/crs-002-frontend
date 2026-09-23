@@ -5,15 +5,16 @@ import type { Advisory, ConsoleUser, RoleKey } from "./types";
 export type Destination =
   | "dashboard"
   | "intelligence"
+  | "investigations"
   | "reports"
   | "clients"
   | "collection"
   | "manage";
 
 const DESTINATIONS: Record<RoleKey, Destination[]> = {
-  analyst: ["dashboard", "intelligence", "reports", "collection", "manage"],
-  "lead-analyst": ["dashboard", "intelligence", "reports", "clients", "collection", "manage"],
-  "incident-responder": ["dashboard", "intelligence", "reports", "manage"],
+  analyst: ["dashboard", "intelligence", "investigations", "reports", "collection", "manage"],
+  "lead-analyst": ["dashboard", "intelligence", "investigations", "reports", "clients", "collection", "manage"],
+  "incident-responder": ["dashboard", "intelligence", "investigations", "reports", "manage"],
   leadership: ["dashboard", "reports"],
   executive: ["dashboard"],
   sales: ["dashboard", "reports"],

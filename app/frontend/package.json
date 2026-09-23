@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "fixtures": "node scripts/generate-fixtures.mjs",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:workspace": "node scripts/verify-workspace.mjs"
   },
   "dependencies": {
     "next": "^15.5.25",
@@ -23,6 +24,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.25",
+    "playwright": "^1.61.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5"
   },

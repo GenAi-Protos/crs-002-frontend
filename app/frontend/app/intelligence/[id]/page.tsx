@@ -5,7 +5,6 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { investigationById } from "@/lib/fixtures";
 import { getDashboardData, getInvestigation, getReports, isUnreachable } from "@/lib/api";
 import type { Advisory, PirHit, Turn } from "@/lib/types";
 import { useConsoleUser } from "@/lib/role-context";
@@ -22,22 +21,23 @@ export default function InvestigationPage({
   const { id } = use(params);
   const { user } = useConsoleUser();
   const [entity, setEntity] = useState<{ id: string; name: string; type: string } | null>(null);
-  const fallback = investigationById(id);
-  const [turns, setTurns] = useState<Turn[]>(fallback?.turns ?? []);
-  const [found, setFound] = useState(!!fallback);
-  const [loading, setLoading] = useState(!fallback);
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [found, setFound] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [offline, setOffline] = useState(false);
   // The entity drawer resolves a clicked entity against real hits and advisories:
   // it was reading fixtures here, so a linked conversation showed demo context.
   const [hits, setHits] = useState<PirHit[]>([]);
   const [advisories, setAdvisories] = useState<Advisory[]>([]);
   useEffect(() => {
+    let active = true; setTurns([]); setFound(false); setLoading(true);
     getInvestigation(user.id, id)
-      .then((next) => { setTurns(next); setFound(true); setOffline(false); })
-      .catch((e) => setOffline(isUnreachable(e)))
-      .finally(() => setLoading(false));
+      .then((next) => { if (active) { setTurns(next); setFound(true); setOffline(false); } })
+      .catch((e) => { if (active) setOffline(isUnreachable(e)); })
+      .finally(() => { if (active) setLoading(false); });
     getDashboardData(user.id).then((d) => setHits(d.hits)).catch(() => setHits([]));
     getReports(user.id).then(setAdvisories).catch(() => setAdvisories([]));
+    return () => { active = false; };
   }, [user.id, id]);
 
   if (!canSee(user.role, "intelligence")) {

@@ -1,6 +1,47 @@
 # Screens
 
-Five destinations. Two detail routes. Read the layouts, not the prose.
+## Current implementation: September 2026
+
+The following behaviors supersede the historical layout notes below where they
+conflict. The agreed first delivery focuses on the requested features; editable
+generated charts and diagrams remain follow-on work.
+
+- **Investigations** is the seventh destination, at `/investigations` and
+  `/investigations/[id]`. Shared cases have a title, objective, entities, global or
+  single-client scope, priority, assignee, selected specialists and selected
+  sources. The four detail areas are Overview, Agents and evidence, Findings and
+  pivots, and Report. Evidence excerpts, provenance, negative results, errors,
+  contradictions and coverage remain inspectable. Exclusion and rerun require a
+  reason. Review and completion states follow report actions.
+- **Intelligence** retains Ask and IOC Lookup as quick tools. Its uploads support
+  PDF, DOC/DOCX, XLS/XLSX, CSV, JPG/JPEG and PNG: at most 10 files, 25 MiB per file
+  and 100 MiB combined. Processing, partial extraction and failure are visible.
+  Conversation memory and files remain owner-private. Add to investigation
+  explicitly promotes a selected answer/lookup and selected files. Unavailable
+  workflows cannot be selected; deep investigation belongs in the case section.
+- **Dashboard** uses six distinct server payloads at `/dashboard/views/{role}`.
+  Analyst: own cases/drafts and PIR triage. Lead: approval/change queues, team
+  workload and failures. IR: observable cases, detection guidance and source
+  limitations. Leadership: releases and delivery coverage. Executive: published
+  themes and sector/region exposure. Sales: own clients and published briefings.
+  Period and client filters preserve server scope. Missing measurements show
+  Not recorded. Executive/Sales drilldowns fetch reduced published summaries.
+- **Collection / Sources** combines connectors and analyst submissions. Add
+  Source collects Intelligence Title, Description, Source Name, editable Source
+  Category (Analyst Provided by default), Collection/Observation Date, TLP,
+  Confidence, Client Scope, Tags and Evidence File. Description or a file is
+  required. Submission is idempotent; indexing, partial and failed states expose
+  retry. Request connector stays separate.
+- **Reports** persist edits with revision-checked Save before workflow actions.
+  Section-based case RFI drafts use the editor too. Submit, approve, send back
+  and issue update use server endpoints and timestamps. Updated evidence requires
+  report regeneration before approval. Conflicts preserve local edits until the
+  analyst explicitly reloads. Checks are recalculated from saved content.
+
+New operational flows never silently substitute fixture results. Browser
+acceptance instructions are in [06-workspace-verification.md](06-workspace-verification.md).
+
+Seven destinations: Dashboard, Intelligence, Investigations, Reports, Clients, Collection and Manage. Read the layouts, not the prose.
 
 **Shell:** white 60px top bar and white 176px left rail, both with a hairline (64px icons below 1100px); the active destination sits on a green wash with a 3px green bar. The CSD-007 style guide is the visual reference.
 
@@ -52,7 +93,7 @@ Every view carries an `as of HH:MM GST` stamp so it is an addressable, refreshab
 | CEO | Posture in one sentence · Regional versus global · Sector exposure |
 | Sales | Delivered to my clients · Cadence by month · Sector benchmark · Export |
 
-**Charts on the leadership, CEO and sales views are deferred.** Ship the number tiles and the as-at stamp. See `CLAUDE.md` build order.
+The current dashboard uses `/dashboard/views/{role}`. Each role has a distinct payload. The period selector supports 7/30/90 days; client filtering preserves backend scope. Absent measurements are labelled Not recorded. Summary drilldowns fetch published, reduced content; raw analyst payloads are not supplied to Sales or Executive.
 
 **Row action on Relevant today:** `Draft advisory` pre-fills the Intelligence composer. Without it the analyst reads a hit then retypes its subject, which is the dead end that made the last design unusable.
 
