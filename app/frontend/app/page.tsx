@@ -257,8 +257,8 @@ function DashboardInner() {
       <PageHeader
         title="Dashboard"
         meta={
-          <span className="flex min-w-0 items-center gap-2 border-l border-cpx-grey-200 pl-2.5 text-xs text-cpx-grey-500">
-            <span className="whitespace-nowrap font-medium text-cpx-grey-700">{AUDIENCE[user.role]}</span>
+          <span className="flex min-w-0 items-center gap-2 border-l border-rule-strong pl-2.5 text-xs text-mute">
+            <span className="whitespace-nowrap font-medium text-ink-2">{AUDIENCE[user.role]}</span>
             {view && (
               <span className="hidden truncate @2xl/page:inline">as of {gstDateTime(view.generatedAt)}</span>
             )}
@@ -468,12 +468,12 @@ function DashboardInner() {
             <article>
               <div className="mb-3 flex items-center gap-3">
                 <TlpBadge tlp={summary.tlp} />
-                <span className="text-2xs text-cpx-grey-500">
+                <span className="text-2xs text-mute">
                   {summary.ref} · {gstDateTime(summary.publishedAt)}
                 </span>
               </div>
               <h3 className="text-md font-semibold">{summary.title}</h3>
-              <p className="mt-1 text-xs text-cpx-grey-500">
+              <p className="mt-1 text-xs text-mute">
                 {summary.scope.clientNames.join(", ") || "Global"}
               </p>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">

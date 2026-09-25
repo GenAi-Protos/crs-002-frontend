@@ -16,10 +16,10 @@ export function BarListH({
     <ul className="chart-marks space-y-1.5">
       {items.map((i, n) => (
         <li key={i.label} className="group relative flex items-center gap-2.5">
-          <span title={i.label} className={`shrink-0 truncate text-xs text-cpx-grey-700 ${labelClass}`}>
+          <span title={i.label} className={`shrink-0 truncate text-xs text-ink-2 ${labelClass}`}>
             {i.label}
           </span>
-          <span className="relative h-2.5 flex-1 bg-cpx-grey-50">
+          <span className="relative h-2.5 flex-1 bg-inset">
             <span
               className="bar-grow absolute inset-y-0 left-0"
               style={{
@@ -35,7 +35,7 @@ export function BarListH({
           {i.detail && (
             <span
               role="tooltip"
-              className="tip absolute bottom-full right-0 z-40 mb-1 w-max origin-bottom-right rounded-sm bg-cpx-purple px-2 py-1 text-2xs font-medium text-white shadow-pop"
+              className="tip absolute bottom-full right-0 z-40 mb-1 w-max origin-bottom-right rounded-sm bg-brand px-2 py-1 text-2xs font-medium text-white shadow-pop"
             >
               {i.label}: {i.detail}
             </span>

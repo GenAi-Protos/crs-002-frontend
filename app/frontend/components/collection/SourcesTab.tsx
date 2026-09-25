@@ -102,7 +102,7 @@ export function SourcesTab({
       <button
         onClick={() => setHeatOpen(!heatOpen)}
         aria-expanded={heatOpen}
-        className="mt-4 flex items-center gap-2 text-xs text-cpx-grey-500"
+        className="mt-4 flex items-center gap-2 text-xs text-mute"
       >
         <IconChevronDown className={heatOpen ? "rotate-180" : ""} />
         30 days by category
@@ -117,7 +117,7 @@ export function SourcesTab({
           value={sheet}
           onChange={(e) => setSheet(e.target.value)}
           aria-label="Sheet"
-          className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+          className="h-8 border border-rule bg-surface px-2 text-sm focus:outline-none"
         >
           {sheets.map((s) => (
             <option key={s}>{s}</option>
@@ -127,7 +127,7 @@ export function SourcesTab({
           value={state}
           onChange={(e) => setState(e.target.value)}
           aria-label="State"
-          className="h-8 border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+          className="h-8 border border-rule bg-surface px-2 text-sm focus:outline-none"
         >
           {STATE_OPTIONS.map((s) => (
             <option key={s} value={s}>
@@ -170,7 +170,7 @@ export function SourcesTab({
       </div>
 
       <div className="mt-3 overflow-x-auto xl:overflow-x-visible">
-      <table className={`${T_TABLE} min-w-[56rem] bg-white text-sm`}>
+      <table className={`${T_TABLE} min-w-[56rem] bg-surface text-sm`}>
         <colgroup>
           <col className="w-[22rem]" />
           <col />
@@ -231,7 +231,7 @@ export function SourcesTab({
                     });
                   }}
                   aria-label="Expected rhythm"
-                  className="h-7 border border-cpx-grey-100 bg-white px-1 text-xs focus:outline-none"
+                  className="h-7 border border-rule bg-surface px-1 text-xs focus:outline-none"
                 >
                   {RHYTHMS.map((r) => (
                     <option key={r}>{r}</option>

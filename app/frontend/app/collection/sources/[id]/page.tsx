@@ -43,7 +43,7 @@ function Back() {
   return (
     <Link
       href="/collection?tab=sources"
-      className="group/b mb-2 inline-flex items-center gap-0.5 text-xs text-cpx-grey-500 transition-colors duration-150 hover:text-cpx-purple"
+      className="group/b mb-2 inline-flex items-center gap-0.5 text-xs text-mute transition-colors duration-150 hover:text-accent"
     >
       <IconChevronLeft className="transition-transform duration-150 group-hover/b:-translate-x-0.5" />
       Sources
@@ -115,7 +115,7 @@ export default function SourcePage({
     return (
       <Page band>
         <Back />
-        <div className="mb-3 h-7 w-72 bg-cpx-grey-100" />
+        <div className="mb-3 h-7 w-72 bg-fill" />
         <div className="grid gap-3 @4xl/page:grid-cols-12">
           <SkeletonPanel rows={6} className="@4xl/page:col-span-4" />
           <SkeletonPanel rows={5} className="@4xl/page:col-span-8" />
@@ -260,8 +260,8 @@ export default function SourcePage({
                       }
                       className={`inline-flex h-6 min-w-8 items-center justify-center gap-0.5 rounded-sm border px-1.5 text-2xs tabular-nums transition-colors duration-150 ${
                         on
-                          ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-                          : "border-cpx-grey-100 text-cpx-grey-500 hover:border-cpx-grey-200 hover:text-cpx-black"
+                          ? "border-cpx-green bg-select font-medium text-ink"
+                          : "border-rule text-mute hover:border-rule-strong hover:text-ink"
                       }`}
                     >
                       {on && <IconCheck className="text-green-contrast" />}
@@ -289,13 +289,13 @@ export default function SourcePage({
             <div className="flex items-baseline gap-5 text-sm">
               <span>
                 <span className="font-medium tabular-nums">{s.itemsLast30d}</span>{" "}
-                <span className="text-cpx-grey-500">items, 30 days</span>
+                <span className="text-mute">items, 30 days</span>
               </span>
               <span>
-                <span className={`font-medium tabular-nums ${s.consecutiveFailures > 0 ? "text-cpx-red-700" : ""}`}>
+                <span className={`font-medium tabular-nums ${s.consecutiveFailures > 0 ? "text-danger" : ""}`}>
                   {s.consecutiveFailures}
                 </span>{" "}
-                <span className="text-cpx-grey-500">consecutive failures</span>
+                <span className="text-mute">consecutive failures</span>
               </span>
             </div>
             <div className="mt-3">
@@ -306,7 +306,7 @@ export default function SourcePage({
       </div>
 
       <Panel title="Poll log" count={log.length} enter={2} flush className="mt-3">
-        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
           <SearchBox value={logQuery} onChange={setLogQuery} className="w-full max-w-64" />
           <div className="flex-1" />
           <ListMeta
@@ -340,7 +340,7 @@ export default function SourcePage({
           <tbody>
             {filteredLog.length === 0 && (
               <EmptyRow colSpan={4}>
-                <span className="font-medium text-cpx-black">0 entries</span> matched
+                <span className="font-medium text-ink">0 entries</span> matched
               </EmptyRow>
             )}
             {filteredLog.map((r) => (
@@ -362,8 +362,8 @@ export default function SourcePage({
 
 function FactRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3 border-b border-cpx-grey-100 pb-2 last:border-b-0 last:pb-0">
-      <dt className="w-24 shrink-0 pt-0.5 text-xs font-medium text-cpx-grey-600">
+    <div className="flex items-start gap-3 border-b border-rule pb-2 last:border-b-0 last:pb-0">
+      <dt className="w-24 shrink-0 pt-0.5 text-xs font-medium text-ink-3">
         {label}
       </dt>
       <dd className="min-w-0 flex-1">{children}</dd>

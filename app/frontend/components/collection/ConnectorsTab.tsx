@@ -29,7 +29,7 @@ function Group({ label, rows, enter }: { label: string; rows: Connector[]; enter
   return (
     <Panel title={label} count={rows.length} enter={enter} flush bodyClassName="overflow-hidden">
       {rows.length === 0 ? (
-        <p className="px-3 py-3 text-sm text-cpx-grey-500">0 connectors.</p>
+        <p className="px-3 py-3 text-sm text-mute">0 connectors.</p>
       ) : (
         // Each card draws its own right and bottom hairline; the grid is pulled
         // 1px past the clipped body so the outer ones disappear under the frame.
@@ -45,13 +45,13 @@ function Group({ label, rows, enter }: { label: string; rows: Connector[]; enter
 
 function ConnectorCard({ c }: { c: Connector }) {
   return (
-    <div className="flex min-w-0 flex-col gap-1.5 border-b border-r border-cpx-grey-100 bg-white px-3 py-2.5 transition-colors duration-150 hover:bg-cpx-grey-50">
+    <div className="flex min-w-0 flex-col gap-1.5 border-b border-r border-rule bg-surface px-3 py-2.5 transition-colors duration-150 hover:bg-inset">
       <div className="flex items-center justify-between gap-2">
         <h3 className="min-w-0 truncate text-sm font-semibold tracking-tightish" title={c.name}>
           {c.name}
         </h3>
         {!c.verified && (
-          <span className="shrink-0 rounded-sm border border-cpx-bright-200 bg-cpx-bright-50 px-1.5 text-2xs font-medium text-cpx-bright-700">
+          <span className="shrink-0 rounded-sm border border-status-warn-edge bg-status-warn-fill px-1.5 text-2xs font-medium text-status-warn-ink">
             Unverified
           </span>
         )}
@@ -67,8 +67,8 @@ function ConnectorCard({ c }: { c: Connector }) {
         ) : (
           <StatusPill tone="idle" label="Not connected" />
         )}
-        <span className="text-2xs text-cpx-grey-500">{captureModeLabel[c.captureMode]}</span>
-        <span className="flex items-center gap-1 text-2xs text-cpx-grey-500">
+        <span className="text-2xs text-mute">{captureModeLabel[c.captureMode]}</span>
+        <span className="flex items-center gap-1 text-2xs text-mute">
           {c.residency === "egress" ? (
             <>
               <IconEgress />

@@ -13,9 +13,9 @@ export function SplitBar({
   const share = (v: number) => (total === 0 ? 0 : Math.round((v / total) * 100));
   return (
     <div>
-      <div className="chart-marks flex h-3 w-full gap-0.5 bg-white">
+      <div className="chart-marks flex h-3 w-full gap-0.5 bg-surface">
         {total === 0 ? (
-          <span className="h-full w-full bg-cpx-grey-100" title={`0 ${unit}`} />
+          <span className="h-full w-full bg-fill" title={`0 ${unit}`} />
         ) : (
           segments
             .filter((s) => s.value > 0)
@@ -31,7 +31,7 @@ export function SplitBar({
                 />
                 <span
                   role="tooltip"
-                  className={`tip absolute bottom-full z-40 mb-1.5 w-max rounded-sm bg-cpx-purple px-2 py-1 text-2xs font-medium text-white shadow-pop ${
+                  className={`tip absolute bottom-full z-40 mb-1.5 w-max rounded-sm bg-brand px-2 py-1 text-2xs font-medium text-white shadow-pop ${
                     i === 0
                       ? "left-0 origin-bottom-left"
                       : i === shown.length - 1
@@ -49,9 +49,9 @@ export function SplitBar({
         {segments.map((s) => (
           <li key={s.label} className="flex min-w-0 items-center gap-1.5 text-xs">
             <span aria-hidden className="inline-block h-2 w-2 shrink-0" style={{ background: s.color }} />
-            <span className="truncate text-cpx-grey-500">{s.label}</span>
+            <span className="truncate text-mute">{s.label}</span>
             <span className="ml-auto font-medium tabular-nums">{s.value.toLocaleString("en-GB")}</span>
-            <span className="w-8 text-right text-2xs tabular-nums text-cpx-grey-500">{share(s.value)}%</span>
+            <span className="w-8 text-right text-2xs tabular-nums text-mute">{share(s.value)}%</span>
           </li>
         ))}
       </ul>

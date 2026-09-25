@@ -60,7 +60,7 @@ export function DailyBars({
                 textAnchor="middle"
                 fontSize="9"
                 fontWeight="400"
-                fill="var(--color-cpx-grey)"
+                fill="var(--color-ink-2)"
               >
                 {d.date.slice(8)}
               </text>

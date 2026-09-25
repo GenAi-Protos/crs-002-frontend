@@ -183,7 +183,7 @@ export function PirsTab({
         enter={0}
         flush
       >
-      <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
         <SearchBox
           value={q}
           onChange={setQ}
@@ -218,7 +218,7 @@ export function PirsTab({
       </div>
 
       {adding && (
-        <div className="reveal border-b border-cpx-grey-100 bg-cpx-grey-50 p-4">
+        <div className="reveal border-b border-rule bg-inset p-4">
           <PirForm
             heading="Add PIR"
             initial={blankDraft()}
@@ -229,7 +229,7 @@ export function PirsTab({
       )}
 
       <div className={T_SCROLL}>
-        <table className={`${T_TABLE} table-fixed bg-white text-sm`}>
+        <table className={`${T_TABLE} table-fixed bg-surface text-sm`}>
           <colgroup>
             <col className="w-44" />
             <col className="w-16" />
@@ -253,15 +253,15 @@ export function PirsTab({
           <tbody>
             {rows.length === 0 && (
               <EmptyRow colSpan={editable ? 5 : 4}>
-                <span className="font-medium text-cpx-black">0 PIRs</span> matched
+                <span className="font-medium text-ink">0 PIRs</span> matched
               </EmptyRow>
             )}
             {rows.map((p) => {
               const editing = editingRef === p.ref;
               return (
                 <RowGroup key={p.ref}>
-                  <tr className={`${T_ROW} ${editing ? "bg-cpx-green-50/60" : ""}`}>
-                    <td className={`${T_TD} text-cpx-grey-700`}>{p.category}</td>
+                  <tr className={`${T_ROW} ${editing ? "bg-wash" : ""}`}>
+                    <td className={`${T_TD} text-ink-2`}>{p.category}</td>
                     <td className={`${T_TD} whitespace-nowrap font-mono text-xs`}>
                       {p.ref}
                     </td>
@@ -284,7 +284,9 @@ export function PirsTab({
                             setAdding(false);
                           }}
                           aria-expanded={editing}
-                          className={buttonClass("ghost", "sm", "text-link hover:text-cpx-purple")}
+                          // Link ink over the ghost button's own text-mute, which
+                          // sorts after text-link, hence the important marks.
+                          className={buttonClass("ghost", "sm", "text-link! hover:text-accent!")}
                         >
                           {editing ? "Close" : "Edit"}
                         </button>
@@ -292,7 +294,7 @@ export function PirsTab({
                     )}
                   </tr>
                   {editing && (
-                    <tr className="border-b border-cpx-grey-100 bg-cpx-grey-50">
+                    <tr className="border-b border-rule bg-inset">
                       <td colSpan={5} className="px-3 py-4">
                         <PirForm
                           heading={`Edit ${p.ref}`}
@@ -331,7 +333,7 @@ function Filter({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="flex items-center gap-1.5 text-xs text-cpx-grey-500">
+    <label className="flex items-center gap-1.5 text-xs text-mute">
       {label}
       <Select
         value={value}
@@ -386,13 +388,13 @@ function PirForm({
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className="block">
-          <span className="text-2xs text-cpx-grey-500">Category</span>
+          <span className="text-2xs text-mute">Category</span>
           <select
             value={draft.category}
             onChange={(e) =>
               setDraft({ ...draft, category: e.target.value as PirCategory })
             }
-            className="mt-1 h-8 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:border-cpx-green focus:outline-none"
+            className="mt-1 h-8 w-full border border-rule bg-surface px-2 text-sm focus:border-cpx-green focus:outline-none"
           >
             {CATEGORIES.map((c) => (
               <option key={c}>{c}</option>
@@ -401,13 +403,13 @@ function PirForm({
         </label>
 
         <label className="block">
-          <span className="text-2xs text-cpx-grey-500">Coverage</span>
+          <span className="text-2xs text-mute">Coverage</span>
           <input
             value={draft.coverage}
             onChange={(e) => setDraft({ ...draft, coverage: e.target.value })}
             list="pir-coverage-values"
             placeholder="Threat Actors"
-            className="mt-1 h-8 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:border-cpx-green focus:outline-none"
+            className="mt-1 h-8 w-full border border-rule bg-surface px-2 text-sm focus:border-cpx-green focus:outline-none"
           />
           <datalist id="pir-coverage-values">
             {[
@@ -429,13 +431,13 @@ function PirForm({
       </div>
 
       <label className="mt-3 block">
-        <span className="text-2xs text-cpx-grey-500">PIR</span>
+        <span className="text-2xs text-mute">PIR</span>
         <textarea
           value={draft.question}
           onChange={(e) => setDraft({ ...draft, question: e.target.value })}
           rows={3}
           placeholder="What threat actors are actively targeting [Client]'s industry?"
-          className="mt-1 w-full border border-cpx-grey-100 bg-white px-2 py-1.5 text-sm leading-relaxed focus:border-cpx-green focus:outline-none"
+          className="mt-1 w-full border border-rule bg-surface px-2 py-1.5 text-sm leading-relaxed focus:border-cpx-green focus:outline-none"
         />
       </label>
 
@@ -451,13 +453,13 @@ function PirForm({
         </label>
         {/* Derived from the text, never typed: the parameters and the question
             cannot disagree. Per-client lists sit at open item B2. */}
-        <span className="text-2xs text-cpx-grey-500">
+        <span className="text-2xs text-mute">
           Parameters{" "}
           {parameters.length === 0 ? (
-            <span className="text-cpx-black">none</span>
+            <span className="text-ink">none</span>
           ) : (
             parameters.map((p) => (
-              <span key={p} className="ml-1 bg-cpx-grey-50 px-1.5 text-cpx-black">
+              <span key={p} className="ml-1 bg-inset px-1.5 text-ink">
                 {PARAMETER_LABEL[p]}
               </span>
             ))

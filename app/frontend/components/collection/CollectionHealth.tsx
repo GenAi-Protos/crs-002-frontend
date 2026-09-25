@@ -30,7 +30,7 @@ import { IconChevronDown } from "@/components/icons";
 import { StatusPill, buttonClass, type StatusTone } from "@/components/ui";
 
 const HATCH =
-  "repeating-linear-gradient(45deg,var(--color-rule) 0,var(--color-rule) 2px,white 2px,white 4px)";
+  "repeating-linear-gradient(45deg,var(--color-rule) 0,var(--color-rule) 2px,var(--color-surface) 2px,var(--color-surface) 4px)";
 
 // Four steps of the sequential ramp, spaced apart so four buckets stay
 // separable, ending on Dark Purple as docs/03 defines the ramp. The lightest
@@ -67,10 +67,10 @@ const STATE_META: Record<Source["state"], { tone: StatusTone; label: string }> =
 export function NeedsAttention({ sources }: { sources: Source[] }) {
   const list = useMemo(() => needsAttention(sources), [sources]);
   return (
-    <section className="border border-cpx-grey-100 bg-white">
-      <div className="flex items-center gap-2 border-b border-cpx-grey-100 px-4 py-2.5">
+    <section className="border border-rule bg-surface">
+      <div className="flex items-center gap-2 border-b border-rule px-4 py-2.5">
         <h2 className="font-sans text-xs font-medium">Needs attention</h2>
-        <span className="bg-cpx-grey-50 px-1 text-2xs">{list.length}</span>
+        <span className="bg-inset px-1 text-2xs">{list.length}</span>
       </div>
       {list.length === 0 ? (
         <p className="px-4 py-3 text-base">No source is failing or blocked.</p>
@@ -79,7 +79,7 @@ export function NeedsAttention({ sources }: { sources: Source[] }) {
           {list.map((s) => (
             <div
               key={s.id}
-              className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-cpx-grey-100 px-4 py-2 first:border-t-0"
+              className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-rule px-4 py-2 first:border-t-0"
             >
               <StatusPill {...STATE_META[s.state]} />
               {/* The internal detail route only. An inventory URL is never an
@@ -90,7 +90,7 @@ export function NeedsAttention({ sources }: { sources: Source[] }) {
               >
                 {s.name}
               </Link>
-              <span className="text-xs text-cpx-grey-500">
+              <span className="text-xs text-mute">
                 {attentionReason(s)}
               </span>
             </div>
@@ -117,9 +117,9 @@ export function CategoryDays({ sources }: { sources: Source[] }) {
   const dates = withRecord[0]?.days ?? [];
 
   return (
-    <div className="reveal mt-2 overflow-x-auto border border-cpx-grey-100 bg-white p-4">
+    <div className="reveal mt-2 overflow-x-auto border border-rule bg-surface p-4">
       <div className="min-w-[52rem]">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-2xs text-cpx-grey-500">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-2xs text-mute">
           <span>Share of a category&apos;s sources returning items, by day</span>
           {(Object.keys(DAY_LEVEL_LABEL) as DayLevel[]).map((k) => (
             <span key={k} className="flex items-center gap-1.5">
@@ -145,7 +145,7 @@ export function CategoryDays({ sources }: { sources: Source[] }) {
         </div>
 
         {dates.length > 0 && (
-          <div className="mt-2 flex justify-between text-2xs text-cpx-grey-500">
+          <div className="mt-2 flex justify-between text-2xs text-mute">
             <span>{gstDate(`${dates[0].date}T12:00:00Z`)}</span>
             <span>
               {gstDate(`${dates[dates.length - 1].date}T12:00:00Z`)}
@@ -170,21 +170,21 @@ function CategoryRow({
 }) {
   const empty = strip.units === 0;
   return (
-    <div className="border-t border-cpx-grey-100 py-1.5 first:border-t-0">
+    <div className="border-t border-rule py-1.5 first:border-t-0">
       <div className="flex items-center gap-3">
         <button
           onClick={onToggle}
           aria-expanded={open}
           disabled={empty}
-          className="flex w-56 shrink-0 items-center gap-1.5 text-left text-xs disabled:text-cpx-grey-400"
+          className="flex w-56 shrink-0 items-center gap-1.5 text-left text-xs disabled:text-faint"
         >
           {!empty && <IconChevronDown className={open ? "rotate-180" : ""} />}
           <span className="truncate">{strip.label}</span>
-          <span className="bg-cpx-grey-50 px-1 text-2xs">{strip.units}</span>
+          <span className="bg-inset px-1 text-2xs">{strip.units}</span>
         </button>
 
         {empty ? (
-          <span className="text-2xs text-cpx-grey-500">No sources</span>
+          <span className="text-2xs text-mute">No sources</span>
         ) : (
           <>
             <div className="flex gap-[2px]">
@@ -198,7 +198,7 @@ function CategoryRow({
               ))}
             </div>
             {/* The row still reads with colour removed. */}
-            <span className="text-2xs text-cpx-grey-500">
+            <span className="text-2xs text-mute">
               {daysSummary(strip.days)}
             </span>
           </>
@@ -229,7 +229,7 @@ function SourceDayGrid({ sources }: { sources: Source[] }) {
 
   return (
     <div className="pb-2 pl-7 pt-1">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 py-1 text-2xs text-cpx-grey-500">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 py-1 text-2xs text-mute">
         <span>
           {Math.min(shown, list.length)} of {list.length} sources, quietest first
         </span>
@@ -257,7 +257,7 @@ function SourceDayGrid({ sources }: { sources: Source[] }) {
           <Link
             href={`/collection/sources/${s.id}`}
             title={s.name}
-            className="w-48 shrink-0 truncate text-2xs text-cpx-grey-500 hover:text-link"
+            className="w-48 shrink-0 truncate text-2xs text-mute hover:text-link"
           >
             {s.name}
           </Link>

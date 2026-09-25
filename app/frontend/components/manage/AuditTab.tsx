@@ -107,7 +107,7 @@ export function AuditTab() {
           The audit trail could not be loaded. {error}
         </Banner>
       )}
-      <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
         <SearchBox value={q} onChange={setQ} placeholder="Search actor, action or reference" className="w-full max-w-72" />
         <Select aria-label="Action" value={action} onChange={(e) => setAction(e.target.value)} fieldSize="sm">
           <option value={ALL}>All actions</option>
@@ -165,7 +165,7 @@ export function AuditTab() {
           <tbody>
             {rows.length === 0 && (
               <EmptyRow colSpan={5}>
-                <span className="font-medium text-cpx-black">0 audit events</span>{" "}
+                <span className="font-medium text-ink">0 audit events</span>{" "}
                 {items.length ? "match these filters." : "recorded."}
               </EmptyRow>
             )}
@@ -173,7 +173,7 @@ export function AuditTab() {
               const detail = detailText(i.detail);
               return (
                 <tr key={i.id} className={T_ROW}>
-                  <td className={`${T_TD} whitespace-nowrap text-xs tabular-nums text-cpx-grey-500`} title={i.at ? gstDateTime(i.at) : undefined}>
+                  <td className={`${T_TD} whitespace-nowrap text-xs tabular-nums text-mute`} title={i.at ? gstDateTime(i.at) : undefined}>
                     {i.at ? agoFromNow(i.at, now) : "-"}
                   </td>
                   <td className={T_TD}>
@@ -182,15 +182,15 @@ export function AuditTab() {
                     </span>
                   </td>
                   <td className={T_TD}>
-                    <span className="block truncate text-cpx-grey-700">{statusLabel(i.action)}</span>
+                    <span className="block truncate text-ink-2">{statusLabel(i.action)}</span>
                   </td>
                   <td className={T_TD}>
-                    <span className="block truncate font-mono text-xs text-cpx-grey-600" title={i.ref ?? undefined}>
+                    <span className="block truncate font-mono text-xs text-ink-3" title={i.ref ?? undefined}>
                       {i.ref ?? "-"}
                     </span>
                   </td>
                   <td className={`${T_TD} hidden @3xl:table-cell`}>
-                    <span className="block truncate text-xs text-cpx-grey-500" title={detail}>
+                    <span className="block truncate text-xs text-mute" title={detail}>
                       {detail || "-"}
                     </span>
                   </td>

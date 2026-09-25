@@ -114,7 +114,7 @@ function Summary({ rows, sources }: { rows: Row[]; sources: Source[] }) {
   const emptyCategories = rows.filter((r) => r.status.units === 0).length;
 
   return (
-    <div className="grid grid-cols-2 gap-px border border-cpx-grey-100 bg-cpx-grey-100 sm:grid-cols-3 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-px border border-rule bg-fill sm:grid-cols-3 lg:grid-cols-5">
       <Tile label="Total sources" value={units.toLocaleString("en-GB")} />
       <Tile
         label="Enabled"
@@ -149,8 +149,8 @@ function Tile({
   warn?: boolean;
 }) {
   return (
-    <div className="bg-white px-4 py-3">
-      <span className="text-2xs text-cpx-grey-500">{label}</span>
+    <div className="bg-surface px-4 py-3">
+      <span className="text-2xs text-mute">{label}</span>
       <span
         className={`mt-1 block text-xl font-display font-medium leading-none tracking-tightish ${
           warn ? "text-status-warn-ink" : ""
@@ -158,7 +158,7 @@ function Tile({
       >
         {value}
       </span>
-      {hint && <span className="mt-1.5 block text-2xs text-cpx-grey-500">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-2xs text-mute">{hint}</span>}
     </div>
   );
 }

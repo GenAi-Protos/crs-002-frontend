@@ -306,13 +306,13 @@ function IntelligenceInner() {
         </button>
         {historyOpen && (
           <>
-            <div className="pop absolute right-0 top-9 z-40 w-96 max-w-[calc(100vw-2rem)] origin-top-right rounded-sm border border-cpx-grey-100 bg-white py-1 shadow-pop">
+            <div className="pop absolute right-0 top-9 z-40 w-96 max-w-[calc(100vw-2rem)] origin-top-right rounded-sm border border-rule bg-overlay py-1 shadow-pop">
               <ul className="max-h-80 overflow-y-auto">
                 {localOnly.map((s) => (
                   <li key={s.id}>
                     <button
                       onClick={() => openStored(s)}
-                      className={`flex w-full items-baseline gap-2 px-3 py-1.5 text-left transition-colors duration-100 hover:bg-cpx-grey-50 ${s.id === sessionId ? "bg-cpx-green-50/60" : ""}`}
+                      className={`flex w-full items-baseline gap-2 px-3 py-1.5 text-left transition-colors duration-100 hover:bg-inset ${s.id === sessionId ? "bg-wash" : ""}`}
                     >
                       <span
                         className="min-w-0 flex-1 truncate text-xs"
@@ -320,7 +320,7 @@ function IntelligenceInner() {
                       >
                         {s.title}
                       </span>
-                      <span className="shrink-0 text-2xs text-cpx-grey-500">
+                      <span className="shrink-0 text-2xs text-mute">
                         This session
                       </span>
                     </button>
@@ -330,7 +330,7 @@ function IntelligenceInner() {
                   <li key={inv.id}>
                     <button
                       onClick={() => openInvestigation(inv.id)}
-                      className={`flex w-full items-baseline gap-2 px-3 py-1.5 text-left transition-colors duration-100 hover:bg-cpx-grey-50 ${sessionId === `fx-${inv.id}` ? "bg-cpx-green-50/60" : ""}`}
+                      className={`flex w-full items-baseline gap-2 px-3 py-1.5 text-left transition-colors duration-100 hover:bg-inset ${sessionId === `fx-${inv.id}` ? "bg-wash" : ""}`}
                     >
                       <span
                         className="min-w-0 flex-1 truncate text-xs"
@@ -338,7 +338,7 @@ function IntelligenceInner() {
                       >
                         {inv.title}
                       </span>
-                      <span className="shrink-0 text-2xs text-cpx-grey-500">
+                      <span className="shrink-0 text-2xs text-mute">
                         {forked.has(`fx-${inv.id}`)
                           ? "Continued"
                           : gstDate(inv.createdAt)}
@@ -365,15 +365,15 @@ function IntelligenceInner() {
           // Centred in the space above the composer: an empty console that
           // stacks its openers against the bottom edge reads as a broken feed.
           <div className="flex flex-1 flex-col justify-end pb-1">
-            <ul className="overflow-hidden rounded-sm border border-cpx-grey-100 bg-white">
+            <ul className="overflow-hidden rounded-sm border border-rule bg-surface">
               {STARTER_PROMPTS.map((p, i) => (
-                <li key={p} className="enter border-b border-cpx-grey-100 last:border-b-0" style={{ "--i": i } as React.CSSProperties}>
+                <li key={p} className="enter border-b border-rule last:border-b-0" style={{ "--i": i } as React.CSSProperties}>
                   <button
                     onClick={() => ask(p)}
                     className="row-link flex w-full items-center gap-3 px-3 py-2 text-left text-sm"
                   >
                     <span className="min-w-0 flex-1">{p}</span>
-                    <IconArrowRight className="lean shrink-0 text-cpx-grey-300" />
+                    <IconArrowRight className="lean shrink-0 text-ghost" />
                   </button>
                 </li>
               ))}
@@ -393,7 +393,7 @@ function IntelligenceInner() {
               setEntity(entities.find((e) => e.id === id) ?? null)
             }
           />
-          {!!turnFiles[t.id]?.length && <p className="text-xs text-cpx-grey-500">Attached: {turnFiles[t.id].map((f) => f.fileName).join(", ")}</p>}
+          {!!turnFiles[t.id]?.length && <p className="text-xs text-mute">Attached: {turnFiles[t.id].map((f) => f.fileName).join(", ")}</p>}
           {t.status === "complete" && sessionId && <AddToCase title={t.question} conversationId={sessionId} turnId={t.id} runId={t.answer?.runId} files={turnFiles[t.id] ?? []} clientId={requests[t.id]?.clientId} />}
           </div>
         ))}
@@ -402,7 +402,7 @@ function IntelligenceInner() {
 
       <div className="sticky bottom-0 bg-canvas pb-4 pt-2">
         <form
-          className="rounded-sm border border-cpx-grey-200 bg-white transition-colors duration-150 focus-within:border-cpx-grey-300 has-[.ring-on-frame:focus-visible]:outline-2 has-[.ring-on-frame:focus-visible]:outline-offset-2 has-[.ring-on-frame:focus-visible]:outline-cpx-bright has-[.ring-on-frame:focus-visible]:outline-solid"
+          className="rounded-sm border border-rule-strong bg-surface transition-colors duration-150 focus-within:border-ghost has-[.ring-on-frame:focus-visible]:outline-2 has-[.ring-on-frame:focus-visible]:outline-offset-2 has-[.ring-on-frame:focus-visible]:outline-focus has-[.ring-on-frame:focus-visible]:outline-solid"
           onSubmit={(e) => {
             e.preventDefault();
             if (draft.trim()) ask(draft.trim());
@@ -417,7 +417,7 @@ function IntelligenceInner() {
             workflows={workflows}
             availability={workflowAvailability}
           />
-          <div className="border-b border-cpx-grey-100 px-3 py-2">
+          <div className="border-b border-rule px-3 py-2">
             <EvidenceUploader value={attachments} onChange={setAttachments} tlp={options.tlpCeiling ?? "AMBER"} clientId={options.clientId} onBusy={setUploadBusy} />
             {attachments.some((f) => f.status === "partial") && <label className="mt-2 flex items-center gap-2 text-xs"><input type="checkbox" checked={allowPartial} onChange={(e) => setAllowPartial(e.target.checked)} />Use extracted portions and show coverage gaps</label>}
           </div>
@@ -428,13 +428,13 @@ function IntelligenceInner() {
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Ask a question"
               aria-label="Question"
-              className="ring-on-frame h-11 flex-1 bg-transparent text-base placeholder:text-cpx-grey-400"
+              className="ring-on-frame h-11 flex-1 bg-transparent text-base placeholder:text-mute"
             />
             <button
               type="submit"
               aria-label="Send"
               disabled={!draft.trim() || uploadBusy || evidencePending(attachments) || attachments.some((f) => f.status === "failed") || (attachments.some((f) => f.status === "partial") && !allowPartial)}
-              className="flex h-8 w-8 items-center justify-center rounded-sm bg-cpx-green text-cpx-purple transition duration-150 ease-out-quart hover:bg-cpx-green-600 enabled:active:scale-[0.94] disabled:bg-cpx-grey-100 disabled:text-cpx-grey-400"
+              className="flex h-8 w-8 items-center justify-center rounded-sm bg-cpx-green text-cpx-purple transition duration-150 ease-out-quart hover:bg-cpx-green-600 enabled:active:scale-[0.94] disabled:bg-fill disabled:text-faint"
             >
               <IconSend />
             </button>
@@ -442,7 +442,7 @@ function IntelligenceInner() {
         </form>
         {askError && <Banner className="mt-2">{askError}</Banner>}
         {!optionsAreDefault(options) && (
-          <p className="mt-1.5 text-2xs text-cpx-grey-500">
+          <p className="mt-1.5 text-2xs text-mute">
             Settings apply to the next question, not to answers on screen.
           </p>
         )}

@@ -101,7 +101,7 @@ export function CaseList({ creating = false }: { creating?: boolean }) {
         </Banner>
       )}
       <Panel flush enter={0} bodyClassName="@container">
-        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
           <SearchBox value={query} onChange={setQuery} className="w-full max-w-80" />
           <Select aria-label="Case status" value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="all">All statuses</option>
@@ -147,11 +147,11 @@ export function CaseList({ creating = false }: { creating?: boolean }) {
                 <EmptyRow colSpan={7}>
                   {query || status !== "all" ? (
                     <>
-                      <span className="font-medium text-cpx-black">0 investigations</span> match these filters.
+                      <span className="font-medium text-ink">0 investigations</span> match these filters.
                     </>
                   ) : (
                     <>
-                      <span className="font-medium text-cpx-black">0 investigations.</span> Create one to begin.
+                      <span className="font-medium text-ink">0 investigations.</span> Create one to begin.
                     </>
                   )}
                 </EmptyRow>
@@ -173,18 +173,18 @@ export function CaseList({ creating = false }: { creating?: boolean }) {
                   <td className={T_TD}>
                     <PriorityBadge level={item.priority} />
                   </td>
-                  <td className={`${T_TD} hidden font-mono text-xs text-cpx-grey-700 @2xl:table-cell`}>
+                  <td className={`${T_TD} hidden font-mono text-xs text-ink-2 @2xl:table-cell`}>
                     {item.clientId ?? "Global"}
                   </td>
                   <td className={`${T_TD} ${T_NUM} hidden @3xl:table-cell`}>{item.evidenceIds.length}</td>
                   <td
-                    className={`${T_TD} whitespace-nowrap text-xs text-cpx-grey-500`}
+                    className={`${T_TD} whitespace-nowrap text-xs text-mute`}
                     title={gstDateTime(item.updatedAt)}
                   >
                     {agoFromNow(item.updatedAt, now)}
                   </td>
                   <td className={T_TD}>
-                    <IconChevronRight className="lean text-cpx-grey-300" />
+                    <IconChevronRight className="lean text-ghost" />
                   </td>
                 </tr>
               ))}
@@ -192,8 +192,8 @@ export function CaseList({ creating = false }: { creating?: boolean }) {
           </table>
         )}
         {total > items.length && (
-          <div className="flex items-center justify-center gap-3 border-t border-cpx-grey-100 px-3 py-2">
-            <span className="text-xs text-cpx-grey-500">Filters apply to loaded investigations.</span>
+          <div className="flex items-center justify-center gap-3 border-t border-rule px-3 py-2">
+            <span className="text-xs text-mute">Filters apply to loaded investigations.</span>
             <Button
               size="sm"
               disabled={moreBusy}

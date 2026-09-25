@@ -48,20 +48,20 @@ export function RequestsTab({ initialRows = [] }: { requestedBy?: string; initia
         enter={0}
         flush
       >
-        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
           <SearchBox value={q} onChange={setQ} placeholder="Search requests" className="w-full max-w-72" />
           <div className="flex-1" />
           <ListMeta shown={shown.length} total={rows.length} sort="Newest first" />
         </div>
         {shown.length === 0 && (
-          <p className="px-3 py-6 text-center text-sm text-cpx-grey-500">
-            <span className="font-medium text-cpx-black">0 requests</span>
+          <p className="px-3 py-6 text-center text-sm text-mute">
+            <span className="font-medium text-ink">0 requests</span>
             {q ? " match." : "."}
           </p>
         )}
         <ul>
           {shown.map((r) => (
-            <li key={r.id} className="row-link border-b border-cpx-grey-100 px-3 py-2 last:border-b-0">
+            <li key={r.id} className="row-link border-b border-rule px-3 py-2 last:border-b-0">
               {/* The reason names the request; the URL is the evidence under it.
                   Leading with the URL made every row read as an address. */}
               <div className="flex items-center gap-2">
@@ -73,7 +73,7 @@ export function RequestsTab({ initialRows = [] }: { requestedBy?: string; initia
               </div>
               {/* The tooltip carries the defanged form too: an inventory URL
                   is never shown, copied or logged in its live form. */}
-              <p className="mt-0.5 flex items-center gap-2 text-2xs text-cpx-grey-500">
+              <p className="mt-0.5 flex items-center gap-2 text-2xs text-mute">
                 <span className="min-w-0 flex-1 truncate font-mono" title={defang(r.url)}>
                   {defang(r.url)}
                 </span>
@@ -81,7 +81,7 @@ export function RequestsTab({ initialRows = [] }: { requestedBy?: string; initia
                   {r.requestedBy} · {gstDate(r.requestedAt)}
                 </span>
               </p>
-              {r.note && <p className="mt-0.5 text-2xs text-cpx-grey-500">{r.note}</p>}
+              {r.note && <p className="mt-0.5 text-2xs text-mute">{r.note}</p>}
             </li>
           ))}
         </ul>
@@ -127,28 +127,28 @@ function RequestDialog({
     <Dialog title="Request a source" onClose={onClose}>
         <div className="space-y-3">
           <label className="block">
-            <span className="text-xs text-cpx-grey-500">URL</span>
+            <span className="text-xs text-mute">URL</span>
             <input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="mt-1 h-9 w-full border border-cpx-grey-100 px-3 font-mono text-xs focus:border-cpx-green focus:outline-none"
+              className="mt-1 h-9 w-full border border-rule px-3 font-mono text-xs focus:border-cpx-green focus:outline-none"
             />
           </label>
           <label className="block">
-            <span className="text-xs text-cpx-grey-500">Why</span>
+            <span className="text-xs text-mute">Why</span>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={2}
-              className="mt-1 w-full border border-cpx-grey-100 px-3 py-2 text-sm focus:border-cpx-green focus:outline-none"
+              className="mt-1 w-full border border-rule px-3 py-2 text-sm focus:border-cpx-green focus:outline-none"
             />
           </label>
           <label className="block">
-            <span className="text-xs text-cpx-grey-500">PIR served</span>
+            <span className="text-xs text-mute">PIR served</span>
             <select
               value={pirRef}
               onChange={(e) => setPirRef(e.target.value)}
-              className="mt-1 h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+              className="mt-1 h-9 w-full border border-rule bg-surface px-2 text-sm focus:outline-none"
             >
               {pirs.map((p) => (
                 <option key={p.ref} value={p.ref}>

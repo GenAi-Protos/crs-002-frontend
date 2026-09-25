@@ -66,7 +66,7 @@ function linkEntities(
       <button
         key={`${ent.id}-${i}`}
         onClick={() => onEntity(ent.id)}
-        className="text-link underline underline-offset-2 hover:text-cpx-blue-800"
+        className="text-link underline underline-offset-2 hover:text-info"
       >
         {part}
       </button>
@@ -107,11 +107,11 @@ function answerExportJson(a: Answer): string {
 export function AnswerSkeleton() {
   return (
     <div aria-hidden className="space-y-2">
-      <div className="h-4 w-2/3 bg-cpx-grey-100" />
-      <div className="h-3 w-full bg-cpx-grey-50" />
-      <div className="h-3 w-11/12 bg-cpx-grey-50" />
-      <div className="h-3 w-4/5 bg-cpx-grey-50" />
-      <div className="mt-4 h-3 w-40 bg-cpx-grey-50" />
+      <div className="h-4 w-2/3 bg-fill" />
+      <div className="h-3 w-full bg-inset" />
+      <div className="h-3 w-11/12 bg-inset" />
+      <div className="h-3 w-4/5 bg-inset" />
+      <div className="mt-4 h-3 w-40 bg-inset" />
     </div>
   );
 }
@@ -136,7 +136,7 @@ export function TurnView({
   return (
     <div className={`space-y-3 ${superseded ? "opacity-60" : ""}`}>
       <div className="flex items-start gap-2.5">
-        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-cpx-grey-100 text-2xs font-medium">
+        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-fill text-2xs font-medium">
           Q
         </span>
         <p className="pt-0.5 text-base font-medium">{turn.question}</p>
@@ -168,11 +168,11 @@ export function TurnView({
 function PendingCard({ onStop, steps }: { onStop?: () => void; steps: string[] }) {
   const current = steps.at(-1);
   return (
-    <div className="border border-cpx-grey-100 bg-white p-5" aria-busy="true">
+    <div className="border border-rule bg-surface p-5" aria-busy="true">
       <div className="flex items-center justify-between gap-3">
         <span
           role="status"
-          className="inline-flex h-5 items-center gap-1.5 rounded-sm border border-cpx-bright-200 bg-cpx-bright-50 px-1.5 text-2xs font-medium text-cpx-bright-700"
+          className="inline-flex h-5 items-center gap-1.5 rounded-sm border border-status-warn-edge bg-status-warn-fill px-1.5 text-2xs font-medium text-status-warn-ink"
         >
           <span aria-hidden className="h-2 w-2 rounded-full bg-cpx-bright-100 ring-1 ring-cpx-bright" />
           Running
@@ -183,7 +183,7 @@ function PendingCard({ onStop, steps }: { onStop?: () => void; steps: string[] }
           </Button>
         )}
       </div>
-      <p aria-live="polite" className="mt-3 min-h-5 truncate text-sm text-cpx-grey-500">
+      <p aria-live="polite" className="mt-3 min-h-5 truncate text-sm text-mute">
         {current ?? ""}
       </p>
       <div className="mt-4">
@@ -197,7 +197,7 @@ function PendingCard({ onStop, steps }: { onStop?: () => void; steps: string[] }
 // scrollback stays an honest record of what happened.
 function Outcome({ text, onRetry }: { text: string; onRetry?: () => void }) {
   return (
-    <div role="status" className="reveal border border-cpx-grey-100 bg-white p-5">
+    <div role="status" className="reveal border border-rule bg-surface p-5">
       <p className="text-sm">{text}</p>
       {onRetry && (
         <Button size="sm" className="mt-3" onClick={onRetry}>
@@ -225,11 +225,11 @@ function AnswerBody({
   const superseded = status === "superseded";
 
   return (
-    <div className="reveal-up border border-cpx-grey-100 bg-white">
+    <div className="reveal-up border border-rule bg-surface">
       <div className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-2.5">
-            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-cpx-purple">
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center bg-brand">
               <NestorMarkReverse size={16} />
             </span>
             {a.title && (
@@ -247,7 +247,7 @@ function AnswerBody({
                 setCopied(true);
                 setTimeout(() => setCopied(false), 1200);
               }}
-              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 transition-colors duration-150 hover:bg-cpx-grey-50 hover:text-cpx-black"
+              className="flex h-7 w-7 items-center justify-center text-faint transition-colors duration-150 hover:bg-inset hover:text-ink"
             >
               <IconCopy />
             </button>
@@ -264,12 +264,12 @@ function AnswerBody({
                 el.click();
                 URL.revokeObjectURL(el.href);
               }}
-              className="flex h-7 w-7 items-center justify-center text-cpx-grey-400 transition-colors duration-150 hover:bg-cpx-grey-50 hover:text-cpx-black"
+              className="flex h-7 w-7 items-center justify-center text-faint transition-colors duration-150 hover:bg-inset hover:text-ink"
             >
               <IconExport />
             </button>
             {copied && (
-              <span role="status" className="reveal text-2xs text-cpx-grey-500">
+              <span role="status" className="reveal text-2xs text-mute">
                 Copied
               </span>
             )}
@@ -355,7 +355,7 @@ function AnswerBody({
             {a.classificationSettled ? (
               <TlpBadge tlp={a.tlp} />
             ) : (
-              <span className="inline-flex h-5 items-center bg-cpx-grey-50 px-1.5 text-2xs text-cpx-grey-500">
+              <span className="inline-flex h-5 items-center bg-inset px-1.5 text-2xs text-mute">
                 Classification pending
               </span>
             )}
@@ -375,12 +375,12 @@ function AnswerBody({
       <button
         onClick={() => setSourcesOpen(!sourcesOpen)}
         aria-expanded={sourcesOpen}
-        className="flex w-full items-center justify-between border-t border-cpx-grey-100 px-5 py-2 text-xs text-cpx-grey-500 transition-colors duration-150 hover:bg-cpx-grey-50"
+        className="flex w-full items-center justify-between border-t border-rule px-5 py-2 text-xs text-mute transition-colors duration-150 hover:bg-inset"
       >
         <span className="flex flex-wrap items-center gap-2">
           Sources
-          <span className="bg-cpx-grey-50 px-1 text-2xs">{a.citations.length}</span>
-          <span className="text-cpx-grey-400">·</span>
+          <span className="bg-inset px-1 text-2xs">{a.citations.length}</span>
+          <span className="text-faint">·</span>
           {superseded ? (
             <span>Superseded</span>
           ) : (
@@ -399,26 +399,26 @@ function AnswerBody({
         <IconChevronDown className={sourcesOpen ? "rotate-180" : ""} />
       </button>
       {sourcesOpen && (
-        <div className="reveal border-t border-cpx-grey-100 px-5 py-3">
+        <div className="reveal border-t border-rule px-5 py-3">
           <dl className="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-1 text-xs">
             {request && (
               <>
-                <dt className="text-cpx-grey-500">Workflow</dt>
+                <dt className="text-mute">Workflow</dt>
                 <dd>{request.workflow ?? "Auto-selected"}</dd>
               </>
             )}
-            <dt className="text-cpx-grey-500">Evidence</dt>
+            <dt className="text-mute">Evidence</dt>
             <dd>
               <span className="font-medium">{a.citations.length}</span>{" "}
               {a.citations.length === 1 ? "citation" : "citations"} ·{" "}
               <span className="font-medium">{recordCount(records)}</span>
             </dd>
-            <dt className="text-cpx-grey-500">Empty searches</dt>
+            <dt className="text-mute">Empty searches</dt>
             <dd>
               <span className="font-medium">{a.negativeResults.length}</span> returned 0
               records
             </dd>
-            <dt className="text-cpx-grey-500">Coverage</dt>
+            <dt className="text-mute">Coverage</dt>
             <dd>
               <span className="font-medium">
                 {a.sourcesUnavailable.length}
@@ -427,13 +427,13 @@ function AnswerBody({
               {a.sourcesUnavailable.length === 1 && !a.sourcesTotal ? "source" : "sources"} unavailable
               {a.sourcesUnavailable.length > 0 && <>: {a.sourcesUnavailable.join(", ")}</>}
             </dd>
-            <dt className="text-cpx-grey-500">Region</dt>
+            <dt className="text-mute">Region</dt>
             <dd>{a.egress ? "Left region" : "In region"}</dd>
-            <dt className="text-cpx-grey-500">Classification</dt>
+            <dt className="text-mute">Classification</dt>
             <dd>{a.classificationSettled ? `TLP:${a.tlp}` : "Pending"}</dd>
             {a.producedArtefact && (
               <>
-                <dt className="text-cpx-grey-500">Output</dt>
+                <dt className="text-mute">Output</dt>
                 <dd>
                   <Link
                     href={`/reports/${encodeURIComponent(a.producedArtefact.ref)}`}
@@ -445,13 +445,13 @@ function AnswerBody({
               </>
             )}
           </dl>
-          <ul className="mt-3 space-y-1.5 border-t border-cpx-grey-100 pt-3">
+          <ul className="mt-3 space-y-1.5 border-t border-rule pt-3">
             {a.citations.map((c) => (
               <li key={c.id} className="flex items-baseline gap-2 text-xs">
-                <span className="font-mono text-cpx-grey-400">[{c.ref}]</span>
+                <span className="font-mono text-faint">[{c.ref}]</span>
                 <span className="">{c.label}</span>
                 <span className="font-medium">{recordCount(c.recordCount)}</span>
-                {c.url && <span className="font-mono text-2xs text-cpx-grey-400 break-all">{defang(c.url)}</span>}
+                {c.url && <span className="font-mono text-2xs text-faint break-all">{defang(c.url)}</span>}
               </li>
             ))}
           </ul>

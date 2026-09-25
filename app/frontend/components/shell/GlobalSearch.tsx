@@ -162,7 +162,7 @@ export function GlobalSearch() {
 
   return (
     <div ref={boxRef} className="relative hidden md:block">
-      <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-cpx-grey-500" />
+      <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-mute" />
       <input
         ref={inputRef}
         value={q}
@@ -179,12 +179,12 @@ export function GlobalSearch() {
         aria-controls="global-search-results"
         aria-autocomplete="list"
         aria-activedescendant={open && flat.length > 0 ? optionId(cursor) : undefined}
-        className="h-7 w-52 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 pl-8 pr-14 text-sm text-cpx-black transition-colors duration-150 placeholder:text-cpx-grey-500 hover:border-cpx-grey-200 focus:border-cpx-green focus:bg-white focus:outline-none lg:w-64 xl:w-80"
+        className="h-7 w-52 rounded-sm border border-rule bg-inset pl-8 pr-14 text-sm text-ink transition-colors duration-150 placeholder:text-mute hover:border-rule-strong focus:border-cpx-green focus:bg-surface focus:outline-none lg:w-64 xl:w-80"
       />
       {/* The shortcut, where the eye lands when it looks for the box. */}
       <kbd
         aria-hidden
-        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 px-1 font-sans text-2xs text-cpx-grey-500"
+        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-sm border border-rule bg-inset px-1 font-sans text-2xs text-mute"
       >
         {shortcut}
       </kbd>
@@ -194,11 +194,11 @@ export function GlobalSearch() {
           id="global-search-results"
           role="listbox"
           aria-label="Search results"
-          className="pop absolute right-0 top-9 z-50 max-h-[70vh] w-[38rem] max-w-[calc(100vw-5rem)] origin-top-right overflow-y-auto border border-cpx-grey-100 bg-white text-cpx-black shadow-pop"
+          className="pop absolute right-0 top-9 z-50 max-h-[70vh] w-[38rem] max-w-[calc(100vw-5rem)] origin-top-right overflow-y-auto border border-rule bg-overlay text-ink shadow-pop"
         >
           {/* Filters stay visible while typing: the counts are the fastest way
               to see where a match actually lives. */}
-          <div className="sticky top-0 flex flex-wrap items-center gap-1 border-b border-cpx-grey-100 bg-white px-3 py-2">
+          <div className="sticky top-0 flex flex-wrap items-center gap-1 border-b border-rule bg-surface px-3 py-2">
             {FILTERS.map((f) => {
               const n = counts?.[f];
               return (
@@ -207,13 +207,13 @@ export function GlobalSearch() {
                   onClick={() => setFilter(f)}
                   className={`flex items-center gap-1 rounded-sm border px-2 py-0.5 text-xs font-medium ${
                     filter === f
-                      ? "border-cpx-green bg-cpx-green-50 text-cpx-black"
-                      : "border-cpx-grey-100 text-cpx-grey-700 hover:bg-cpx-grey-50"
+                      ? "border-cpx-green bg-select text-ink"
+                      : "border-rule text-ink-2 hover:bg-inset"
                   }`}
                 >
                   {FILTER_LABEL[f]}
                   {n !== undefined && n > 0 && (
-                    <span className="text-cpx-grey-500">{n}</span>
+                    <span className="text-mute">{n}</span>
                   )}
                 </button>
               );
@@ -230,14 +230,14 @@ export function GlobalSearch() {
               onClear={() => setRecent(clearRecent())}
             />
           ) : !corpus ? (
-            <p className="px-3 py-6 text-center text-xs text-cpx-grey-500">
+            <p className="px-3 py-6 text-center text-xs text-mute">
               Loading records
             </p>
           ) : result && result.total > 0 ? (
             <>
               {result.groups.map((group) => (
                 <section key={group.category} role="group" aria-label={group.label}>
-                  <h3 className="border-b border-cpx-grey-100 bg-band px-3 py-1.5 text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
+                  <h3 className="border-b border-rule bg-band px-3 py-1.5 text-2xs font-medium uppercase tracking-wide text-mute">
                     {group.label}
                   </h3>
                   <ul role="presentation">
@@ -252,8 +252,8 @@ export function GlobalSearch() {
                             tabIndex={-1}
                             onMouseEnter={() => setCursor(index)}
                             onClick={() => go(hit.href, q)}
-                            className={`flex w-full items-start gap-2 border-b border-cpx-grey-100 px-3 py-2 text-left transition-colors duration-150 ${
-                              index === cursor ? "bg-cpx-grey-50" : "hover:bg-cpx-grey-50"
+                            className={`flex w-full items-start gap-2 border-b border-rule px-3 py-2 text-left transition-colors duration-150 ${
+                              index === cursor ? "bg-inset" : "hover:bg-inset"
                             }`}
                           >
                             <span className="min-w-0 flex-1">
@@ -264,19 +264,19 @@ export function GlobalSearch() {
                                   {hit.title}
                                 </span>
                                 {hit.badge && (
-                                  <span className="rounded-sm bg-cpx-grey-100 px-1.5 text-2xs text-cpx-grey-500">
+                                  <span className="rounded-sm bg-fill px-1.5 text-2xs text-mute">
                                     {hit.badge}
                                   </span>
                                 )}
                                 {hit.related && (
-                                  <span className="rounded-sm bg-cpx-grey-100 px-1.5 text-2xs text-cpx-grey-500">
+                                  <span className="rounded-sm bg-fill px-1.5 text-2xs text-mute">
                                     related
                                   </span>
                                 )}
                               </span>
                               {/* Why it matched. Without this a result list is
                                   a guess the reader has to check. */}
-                              <span className="mt-0.5 block text-2xs leading-snug text-cpx-grey-500">
+                              <span className="mt-0.5 block text-2xs leading-snug text-mute">
                                 {hit.context}
                               </span>
                             </span>
@@ -286,7 +286,7 @@ export function GlobalSearch() {
                     })}
                   </ul>
                   {group.more > 0 && (
-                    <p className="border-b border-cpx-grey-100 px-3 py-1.5 text-2xs text-cpx-grey-500">
+                    <p className="border-b border-rule px-3 py-1.5 text-2xs text-mute">
                       {group.more} more in {group.label}. Narrow the search or open
                       the destination.
                     </p>
@@ -306,12 +306,12 @@ export function GlobalSearch() {
               </p>
               {/* A zero here means we hold nothing that matches, never that the
                   observable is clean. */}
-              <p className="mt-1 text-2xs text-cpx-grey-500">
+              <p className="mt-1 text-2xs text-mute">
                 Nothing held matches. This is a statement about our records, not
                 about the value.
               </p>
               {result && result.withheld > 0 && (
-                <p className="mt-1 text-2xs text-cpx-grey-500">
+                <p className="mt-1 text-2xs text-mute">
                   {result.withheld} withheld at this access level.
                 </p>
               )}
@@ -344,7 +344,7 @@ function Recent({
 }) {
   if (items.length === 0) {
     return (
-      <p className="px-3 py-5 text-xs text-cpx-grey-500">
+      <p className="px-3 py-5 text-xs text-mute">
         Search an address, domain, hash, malware family, threat actor, campaign,
         report reference or PIR.
       </p>
@@ -352,13 +352,13 @@ function Recent({
   }
   return (
     <div>
-      <div className="flex items-center justify-between border-b border-cpx-grey-100 bg-band px-3 py-1.5">
-        <h3 className="text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
+      <div className="flex items-center justify-between border-b border-rule bg-band px-3 py-1.5">
+        <h3 className="text-2xs font-medium uppercase tracking-wide text-mute">
           Recent searches
         </h3>
         <button
           onClick={onClear}
-          className="text-2xs text-cpx-grey-500 hover:text-cpx-black"
+          className="text-2xs text-mute hover:text-ink"
         >
           Clear
         </button>
@@ -368,7 +368,7 @@ function Recent({
           <li key={r}>
             <button
               onClick={() => onPick(r)}
-              className="block w-full border-b border-cpx-grey-100 px-3 py-2 text-left text-xs hover:bg-cpx-grey-50"
+              className="block w-full border-b border-rule px-3 py-2 text-left text-xs hover:bg-inset"
             >
               {r}
             </button>
@@ -389,7 +389,7 @@ function Footer({
   onAsk: () => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-2xs text-cpx-grey-500">
+    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-2xs text-mute">
       <span role="status">
         {result.total} {result.total === 1 ? "record" : "records"} held
         {result.withheld > 0 && (
@@ -397,7 +397,7 @@ function Footer({
         )}
       </span>
       {askInstead && (
-        <button onClick={onAsk} className="underline underline-offset-2 hover:text-cpx-black">
+        <button onClick={onAsk} className="underline underline-offset-2 hover:text-ink">
           Ask Nestor instead
         </button>
       )}

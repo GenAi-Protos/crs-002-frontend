@@ -45,11 +45,37 @@ The last build was rejected partly for text volume. These are limits, not guidan
 | Accent Red | `#FF3666` | Critical only |
 | Accent Blue | `#3AC2FF` | Base is 1.9:1 on white: chrome and chart use only, never text. |
 | Link | `#0276B0` | Links in content (`text-link`). Accent Blue 700, 5:1 on white. Never a chart slot. |
-| Canvas, Band, Rule, Inset | `#FFFFFF` `#F7F7F8` `#ECECEF` `#F7F7F8` | Page (white), table header band, hairlines, empty heatmap cells. No screen carries a grey hex of its own. |
+| Canvas, Band, Rule, Inset | `#FFFFFF` `#F7F7F8` `#ECECEF` `#F7F7F8` | Page (white), table header band, hairlines, empty heatmap cells. No screen carries a grey hex of its own. These and every other neutral are theme tokens (below). |
 
 ### Tint scales
 
-Every brand colour carries the 50 to 900 scale the other CPX consoles use (CSD-007 style guide 2.2), as `cpx-green-*`, `cpx-blue-*`, `cpx-red-*`, `cpx-bright-*` and `cpx-grey-*` in `app/globals.css`. The rule of thumb: 50 and 100 are fills and borders, 700 and 800 are text on those fills. Secondary text is `text-cpx-grey-500` (`#6E6E78`), body text in cells is `text-cpx-grey-700`, the hairline is `border-cpx-grey-100`, hover fills are `bg-cpx-grey-50`. Nothing uses `black/N` opacity greys any more.
+Every brand colour carries the 50 to 900 scale the other CPX consoles use (CSD-007 style guide 2.2), as `cpx-green-*`, `cpx-blue-*`, `cpx-red-*`, `cpx-bright-*` and `cpx-grey-*` in `app/globals.css`. The rule of thumb: 50 and 100 are fills and borders, 700 and 800 are text on those fills. Screens no longer use the grey, white or tint steps directly: they go through the theme tokens below, which carry those same light values. Nothing uses `black/N` opacity greys.
+
+### Themes
+
+The console has a light and a dark theme. The light theme is the CPX look above, unchanged. Each theme token in `app/globals.css` is declared once as `light-dark(light, dark)`. The dark value is its own step, checked for AA against the dark surfaces, not an inversion.
+
+| Role | Tokens | Light | Dark |
+|---|---|---|---|
+| Surfaces | `band` `canvas` `surface` `overlay` | `#F7F7F8` `#FFF` `#FFF` `#FFF` | `#0C0C11` `#111117` `#16161E` `#1E1E28` |
+| Fills | `inset` (table head, hover, disabled), `fill` (counts, skeletons, tracks) | `#F7F7F8` `#ECECEF` | `#20202A` `#282833` |
+| Lines | `rule` (hairline), `rule-strong` (hover edge, control edge), `ghost` (separators) | grey 100, 200, 300 | `#292933` `#3B3B48` `#5A5A66` |
+| Ink | `ink` `ink-2` `ink-3` `mute` `faint` | near black, grey 700, 600, 500, 400 | `#ECECF1` `#D2D2DA` `#B6B6C0` `#9E9EAA` `#74747F` |
+| Brand | `accent` (hover and selected ink), `brand` (tooltip, segmented selection, avatar fill), `focus` | Dark Purple, Dark Purple, Bright Purple | bright 100, bright 600, bright 300 |
+| Selection | `select` (active nav, chip), `wash` (row hover and selected row), `select-2`, `flash` (`changed`) | green 50, green 50 at 60%, green 100 | CPX Green at 12%, 7%, 22%, 24% |
+| Status | `status-warn-*`, `green-contrast`, `good-*`, `danger*`, `info*`, `link` | the tint ladder in the table below | translucent tints of the same hue, 300 or 400 ink |
+
+Rules:
+
+- **Neutrals and tints only through these tokens.** Never `bg-white`, a `cpx-grey-*` step or a tint step in a component; the completeness grep in the theme work returns only the exceptions below.
+- **Brand scale classes remain only for fills that read the same on both grounds.** These are the green primary button (always Dark Purple text), TLP labels, `bg-cpx-green-800` done squares, confidence bars, severity pips and the running marker.
+- **Paper stays paper.** The report preview carries `.paper` (`color-scheme: light`), because it is the document as the client receives it. Print forces the light theme, so a PDF never comes out dark.
+- **Name clash.** A colour token must not share a name with a static style utility: `solid` would also colour `outline-solid` and `border-solid`, which is why the purple fill is `brand`.
+- **Class order.** Tailwind orders same-property utilities alphabetically. A colour override on a primitive that already sets that colour needs the important mark (`text-link!`), not luck.
+
+The theme is chosen once, before first paint, by the inline script in `lib/theme.ts`: the stored choice (`localStorage["nestor:theme"]`), else the OS preference. The toggle is the sun or moon button in the top bar (`components/shell/ThemeToggle.tsx`). It is a toggle button named "Dark theme" with `aria-pressed`. It follows the OS as it changes until the analyst picks. The top bar swaps to the reverse CPX logo on dark, and the Nestor mark takes the reverse mark's colours (section 5). Teams' own theme is not read, because the console ships no `@microsoft/teams-js`; the OS preference stands in for it.
+
+Chart colours have dark steps too. Categorical slot 1 moves to bright 400 and slot 4 to bright 200, because Dark Purple vanishes on a dark ground. The sequential ramp runs the other way in dark. Critical and high severity take red 600 and red 300. All were validated with the dataviz palette check against `#16161E`, which they pass on CVD, normal vision and 3:1 contrast.
 
 **Banned outright: `#FDB913`, `#EA661F`, `#FFC72C`, `#F59E0B`.** The first three are the retired CPX yellow identity. The fourth is the Tailwind default amber, which sits **under 5 degrees of hue from `#FDB913` at effectively the same saturation and value**. It reads as the old identity, and status colour ships in persistent chrome on every screen.
 
@@ -189,6 +215,7 @@ Motion is CSS only, from the tokens in `app/globals.css`. No animation library, 
 | Tabs, segmented controls, rail | one indicator slides to the selection (180 to 200ms) instead of each option drawing its own |
 | Changed figures (`changed`) | a dashboard figure that moved since the last refresh washes green once over 900ms; under reduced motion it keeps a still 2px green rule instead |
 | Refresh | the icon turns half a revolution per click; it never spins while waiting |
+| Theme switch | the whole console crossfades once over 200ms (a view transition), and the toggle's sun and moon swap with a quarter turn; reduced motion switches at once |
 
 Deliberately not animated: number count-ups (the in-between values are counts nobody sent, rule 8), skeleton shimmer (a loop), anything on typing or filtering, the rail's width, focus rings. Reduced motion also zeroes every animation and transition delay, so a staggered item is never stranded invisible.
 

@@ -31,6 +31,7 @@ export function ReportPreview({
   onPrint?: () => void;
 }) {
   // Native modal: Escape, focus trap and focus return come from the platform.
+  // `paper` keeps it the white document the client receives in either theme.
   const { ref, handleClose } = useModal(onClose);
 
   const template = templateFor(a.type);
@@ -43,20 +44,20 @@ export function ReportPreview({
       aria-label="Preview"
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className="m-auto w-full max-w-[860px] border-0 bg-white p-0 text-cpx-black"
+      className="paper m-auto w-full max-w-[860px] border-0 bg-surface p-0 text-ink"
     >
       <div>
-        <div className="no-print sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-cpx-grey-100 bg-white px-6 py-3">
+        <div className="no-print sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-rule bg-surface px-6 py-3">
           <span className="text-sm font-medium tracking-tightish">Preview</span>
-          <span className="bg-cpx-grey-50 px-1.5 text-2xs">
+          <span className="bg-inset px-1.5 text-2xs">
             {template?.name ?? a.type}
           </span>
           {a.template?.kind === "custom" && (
-            <span className="bg-cpx-grey-50 px-1.5 text-2xs text-cpx-grey-500">
+            <span className="bg-inset px-1.5 text-2xs text-mute">
               Custom template
             </span>
           )}
-          <span className="text-xs text-cpx-grey-500">
+          <span className="text-xs text-mute">
             As the client receives it
           </span>
           <div className="flex-1" />
@@ -71,14 +72,14 @@ export function ReportPreview({
           <button
             onClick={onClose}
             aria-label="Close preview"
-            className="flex h-7 w-7 items-center justify-center hover:bg-cpx-grey-50"
+            className="flex h-7 w-7 items-center justify-center hover:bg-inset"
           >
             <IconClose />
           </button>
         </div>
 
         {unwritten > 0 && (
-          <p className="no-print border-b border-cpx-grey-100 bg-status-warn-fill px-6 py-2 text-xs text-status-warn-ink">
+          <p className="no-print border-b border-rule bg-status-warn-fill px-6 py-2 text-xs text-status-warn-ink">
             {unwritten} of {a.sections.length}{" "}
             {unwritten === 1 ? "section still holds" : "sections still hold"} only
             the template guidance. It renders below as it would be sent.
@@ -86,11 +87,11 @@ export function ReportPreview({
         )}
 
         <article className="print-root px-6 py-8">
-          <header className="border-b border-cpx-grey-100 pb-4">
+          <header className="border-b border-rule pb-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-xs">{a.ref}</span>
               <TlpBadge tlp={a.tlp} />
-              <span className="text-2xs text-cpx-grey-500">
+              <span className="text-2xs text-mute">
                 v{a.version} ·{" "}
               {a.template?.kind === "custom"
                 ? a.template.name
@@ -100,7 +101,7 @@ export function ReportPreview({
             <h1 className="mt-2 text-xl font-semibold leading-snug tracking-tightish">
               {a.title}
             </h1>
-            <p className="mt-2 text-2xs text-cpx-grey-500">
+            <p className="mt-2 text-2xs text-mute">
               {a.owner ?? "Unassigned"} ·{" "}
               {a.publishedAt
                 ? `Published ${gstDateTime(a.publishedAt)}`
@@ -111,7 +112,7 @@ export function ReportPreview({
           <div className="mt-6 space-y-7">
             {a.sections.map((s) => (
               <section key={s.id}>
-                <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
+                <h2 className="border-b border-rule pb-1 text-md font-semibold tracking-tightish">
                   {s.heading}
                 </h2>
                 {s.heading === "Diamond Model Analysis" ? (
@@ -138,7 +139,7 @@ export function ReportPreview({
                   <p
                     className={`mt-2 whitespace-pre-line text-sm leading-relaxed ${
                       isPlaceholder(s, template)
-                        ? "italic text-cpx-grey-500"
+                        ? "italic text-mute"
                         : ""
                     }`}
                   >
@@ -146,7 +147,7 @@ export function ReportPreview({
                   </p>
                 )}
                 {s.citations.length > 0 && (
-                  <p className="mt-1.5 text-2xs text-cpx-grey-500">
+                  <p className="mt-1.5 text-2xs text-mute">
                     {s.citations
                       .map(
                         (c) =>
@@ -163,12 +164,12 @@ export function ReportPreview({
 
           {a.techniques.length > 0 && (
             <section className="mt-8">
-              <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
+              <h2 className="border-b border-rule pb-1 text-md font-semibold tracking-tightish">
                 Techniques
               </h2>
               <table className="mt-2 w-full border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-cpx-grey-100 text-left text-cpx-grey-500">
+                  <tr className="border-b border-rule text-left text-mute">
                     <th className="py-1.5 pr-4">Technique</th>
                     <th className="py-1.5 pr-4">Tactic</th>
                     <th className="py-1.5">Observed</th>
@@ -180,7 +181,7 @@ export function ReportPreview({
                     return (
                       <tr
                         key={t.techniqueId}
-                        className="border-b border-cpx-grey-100 align-top"
+                        className="border-b border-rule align-top"
                       >
                         <td className="py-1.5 pr-4">
                           <span className="font-mono text-2xs">
@@ -206,12 +207,12 @@ export function ReportPreview({
 
           {a.cvss.length > 0 && (
             <section className="mt-8">
-              <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
+              <h2 className="border-b border-rule pb-1 text-md font-semibold tracking-tightish">
                 CVSS
               </h2>
               <table className="mt-2 w-full border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-cpx-grey-100 text-left text-cpx-grey-500">
+                  <tr className="border-b border-rule text-left text-mute">
                     <th className="py-1.5 pr-4">CVE</th>
                     <th className="py-1.5 pr-4">Score</th>
                     <th className="py-1.5">Authority</th>
@@ -219,7 +220,7 @@ export function ReportPreview({
                 </thead>
                 <tbody>
                   {a.cvss.map((c, i) => (
-                    <tr key={`${c.cveId}-${i}`} className="border-b border-cpx-grey-100">
+                    <tr key={`${c.cveId}-${i}`} className="border-b border-rule">
                       <td className="py-1.5 pr-4 font-mono text-2xs">
                         {c.cveId}
                       </td>
@@ -234,7 +235,7 @@ export function ReportPreview({
             </section>
           )}
 
-          <footer className="mt-10 border-t border-cpx-grey-100 pt-3 text-2xs text-cpx-grey-500">
+          <footer className="mt-10 border-t border-rule pt-3 text-2xs text-mute">
             {a.ref} · v{a.version} · TLP:{a.tlp} · CPX Threat Intelligence Center
             {tables.length > 0 && (
               <> · {tables.length} structured {tables.length === 1 ? "table" : "tables"}</>

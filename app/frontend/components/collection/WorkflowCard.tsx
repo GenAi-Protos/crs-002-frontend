@@ -48,11 +48,11 @@ export function WorkflowCard({
   const stages = stageStates(status, definition.stages);
 
   return (
-    <section className="border border-cpx-grey-100 bg-white">
+    <section className="border border-rule bg-surface">
       <button
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-cpx-grey-50"
+        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-inset"
       >
         <IconChevronDown className={`mt-1 shrink-0 ${open ? "rotate-180" : ""}`} />
         <span className="min-w-0 flex-1">
@@ -61,7 +61,7 @@ export function WorkflowCard({
               {definition.label}
             </span>
             <StatusPill tone={TONE[status.state]} label={RUN_STATE_LABEL[status.state]} />
-            <span className="bg-cpx-grey-50 px-1.5 text-2xs">
+            <span className="bg-inset px-1.5 text-2xs">
               {definition.origin === "inventory"
                 ? "Inventory"
                 : definition.origin === "connector"
@@ -91,9 +91,9 @@ export function WorkflowCard({
       </button>
 
       {open && (
-        <div className="reveal border-t border-cpx-grey-100 px-4 py-4">
+        <div className="reveal border-t border-rule px-4 py-4">
           {definition.gap && (
-            <p className="mb-4 border border-cpx-grey-100 bg-cpx-grey-50 px-3 py-2 text-xs">
+            <p className="mb-4 border border-rule bg-inset px-3 py-2 text-xs">
               {definition.gap}
             </p>
           )}
@@ -132,7 +132,7 @@ function Fact({
 }) {
   return (
     <span className="flex flex-col" title={title}>
-      <span className="text-cpx-grey-500">{label}</span>
+      <span className="text-mute">{label}</span>
       <span className="font-medium">{value}</span>
     </span>
   );
@@ -151,7 +151,7 @@ function Actions({
 }) {
   const nothingToRun = status.enabled === 0;
   return (
-    <div className="mt-5 border-t border-cpx-grey-100 pt-4">
+    <div className="mt-5 border-t border-rule pt-4">
       <div className="flex flex-wrap gap-2">
         <Action label="Start collection" disabled={nothingToRun} primary />
         <Action label="Stop collection" disabled={status.state !== "running"} />
@@ -161,7 +161,7 @@ function Actions({
         <Action label="View errors" disabled={status.failing + status.blocked === 0} />
         <Action label="Send to repository" disabled={status.state !== "awaiting-review"} />
       </div>
-      <p className="mt-2 text-2xs text-cpx-grey-500">
+      <p className="mt-2 text-2xs text-mute">
         {/* The one thing that must never be misread on this screen. */}
         Collection runs on the server. No console action fetches a source URL.
       </p>

@@ -61,7 +61,7 @@ export function IntelligenceSourcesTab({ connectors, schedulerOn, onRequestSourc
         flush
         bodyClassName="@container"
       >
-        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
           <SearchBox value={query} onChange={setQuery} className="w-full max-w-80" />
           <Select aria-label="Source kind" value={kind} onChange={(e) => setKind(e.target.value)}>
             <option value="all">All sources</option>
@@ -84,7 +84,7 @@ export function IntelligenceSourcesTab({ connectors, schedulerOn, onRequestSourc
         {loading ? (
           <SkeletonRows rows={6} className="p-3" />
         ) : error && items.length === 0 ? (
-          <p className="px-3 py-6 text-center text-sm text-cpx-grey-500">Not loaded.</p>
+          <p className="px-3 py-6 text-center text-sm text-mute">Not loaded.</p>
         ) : (
           <table className={`${T_TABLE} table-fixed text-sm`}>
             <colgroup>
@@ -121,12 +121,12 @@ export function IntelligenceSourcesTab({ connectors, schedulerOn, onRequestSourc
                     <td className={T_TD}>
                       <TypeBadge label="Connector" />
                     </td>
-                    <td className={`${T_TD} hidden truncate text-cpx-grey-700 @2xl:table-cell`}>{item.source.category}</td>
-                    <td className={`${T_TD} hidden text-cpx-grey-700 @3xl:table-cell`}>Global</td>
+                    <td className={`${T_TD} hidden truncate text-ink-2 @2xl:table-cell`}>{item.source.category}</td>
+                    <td className={`${T_TD} hidden text-ink-2 @3xl:table-cell`}>Global</td>
                     <td className={T_TD}>
                       <StatusPill {...SOURCE_STATE[item.source.state]} />
                     </td>
-                    <td className={`${T_TD} hidden whitespace-nowrap text-xs text-cpx-grey-500 @xl:table-cell`}>
+                    <td className={`${T_TD} hidden whitespace-nowrap text-xs text-mute @xl:table-cell`}>
                       {item.source.lastNewItemAt ? gstDateTime(item.source.lastNewItemAt) : "No observations"}
                     </td>
                   </tr>
@@ -134,7 +134,7 @@ export function IntelligenceSourcesTab({ connectors, schedulerOn, onRequestSourc
                   <tr key={item.submission.id} className={T_ROW}>
                     <td className={T_TD}>
                       <button
-                        className="block max-w-full truncate text-left font-medium text-link transition-colors duration-150 hover:text-cpx-purple"
+                        className="block max-w-full truncate text-left font-medium text-link transition-colors duration-150 hover:text-accent"
                         onClick={() => setSelected(item.submission)}
                       >
                         {item.submission.title}
@@ -143,25 +143,25 @@ export function IntelligenceSourcesTab({ connectors, schedulerOn, onRequestSourc
                     <td className={T_TD}>
                       <TypeBadge label="Analyst" title={item.submission.sourceName} />
                     </td>
-                    <td className={`${T_TD} hidden truncate text-cpx-grey-700 @2xl:table-cell`}>{item.submission.sourceCategory}</td>
-                    <td className={`${T_TD} hidden font-mono text-xs text-cpx-grey-700 @3xl:table-cell`}>{item.submission.clientId ?? "Global"}</td>
+                    <td className={`${T_TD} hidden truncate text-ink-2 @2xl:table-cell`}>{item.submission.sourceCategory}</td>
+                    <td className={`${T_TD} hidden font-mono text-xs text-ink-2 @3xl:table-cell`}>{item.submission.clientId ?? "Global"}</td>
                     <td className={T_TD}>
                       <StatusPill {...(FILE_STATE[item.submission.status] ?? { tone: statusTone(item.submission.status), label: statusLabel(item.submission.status) })} />
                     </td>
-                    <td className={`${T_TD} hidden whitespace-nowrap text-xs text-cpx-grey-500 @xl:table-cell`}>{item.submission.observedOn}</td>
+                    <td className={`${T_TD} hidden whitespace-nowrap text-xs text-mute @xl:table-cell`}>{item.submission.observedOn}</td>
                   </tr>
                 ),
               )}
               {!rows.length && (
                 <EmptyRow colSpan={6}>
-                  <span className="font-medium text-cpx-black">0 sources</span> match.
+                  <span className="font-medium text-ink">0 sources</span> match.
                 </EmptyRow>
               )}
             </tbody>
           </table>
         )}
         {rows.length > limit && (
-          <div className="flex justify-center border-t border-cpx-grey-100 px-3 py-2">
+          <div className="flex justify-center border-t border-rule px-3 py-2">
             <Button size="sm" onClick={() => setLimit((n) => n + 50)}>
               Show 50 more
             </Button>
@@ -209,5 +209,5 @@ function SubmissionDetails({ initial, onClose }: { initial: AnalystSubmission; o
     const timer = setInterval(() => { workspaceRequest<AnalystSubmission>(user.id, `/collection/submissions/${item.id}`).then((row) => { if (active) setItem(row); }).catch((cause: Error) => { if (active) setError(cause.message); }); }, 2000);
     return () => { active = false; clearInterval(timer); };
   }, [item.id, item.status, user.id]);
-  return <Drawer title={item.title} onClose={onClose}><div className="space-y-5"><div className="flex items-center gap-2"><TlpBadge tlp={item.tlp} /><StatusPill {...(FILE_STATE[item.status] ?? { tone: statusTone(item.status), label: statusLabel(item.status) })} /></div><p className="whitespace-pre-wrap text-sm">{item.description}</p><dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-xs [&>dt]:text-cpx-grey-500"><dt>Source</dt><dd>{item.sourceName}</dd><dt>Category</dt><dd>{item.sourceCategory}</dd><dt>Observed</dt><dd>{item.observedOn}</dd><dt>Confidence</dt><dd>{item.confidence}</dd><dt>Scope</dt><dd>{item.clientId ?? "Global"}</dd><dt>Evidence files</dt><dd>{item.attachmentIds.length}</dd><dt>Tags</dt><dd>{item.tags.join(", ") || "0 tags"}</dd></dl><ul className="space-y-3">{files.map((file) => <li key={file.id} className="flex items-center gap-2 border-t border-cpx-grey-100 pt-3"><span className="min-w-0 flex-1 break-words text-xs">{file.fileName}</span><Button size="sm" onClick={() => downloadEvidence(user.id, file).catch((cause: Error) => setError(cause.message))}>Download</Button></li>)}</ul>{item.warnings?.map((warning) => <p key={warning} className="text-xs text-status-warn-ink">{warning}</p>)}{(item.error || error) && <Banner>{error ?? item.error}</Banner>}{["failed", "partial"].includes(item.status) && <Button disabled={busy} onClick={async () => { setBusy(true); setError(null); try { setItem(await workspaceWrite<AnalystSubmission>(user.id, `/collection/submissions/${item.id}/retry`, {})); } catch (cause) { setError((cause as Error).message); } finally { setBusy(false); } }}>Retry processing</Button>}</div></Drawer>;
+  return <Drawer title={item.title} onClose={onClose}><div className="space-y-5"><div className="flex items-center gap-2"><TlpBadge tlp={item.tlp} /><StatusPill {...(FILE_STATE[item.status] ?? { tone: statusTone(item.status), label: statusLabel(item.status) })} /></div><p className="whitespace-pre-wrap text-sm">{item.description}</p><dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-xs [&>dt]:text-mute"><dt>Source</dt><dd>{item.sourceName}</dd><dt>Category</dt><dd>{item.sourceCategory}</dd><dt>Observed</dt><dd>{item.observedOn}</dd><dt>Confidence</dt><dd>{item.confidence}</dd><dt>Scope</dt><dd>{item.clientId ?? "Global"}</dd><dt>Evidence files</dt><dd>{item.attachmentIds.length}</dd><dt>Tags</dt><dd>{item.tags.join(", ") || "0 tags"}</dd></dl><ul className="space-y-3">{files.map((file) => <li key={file.id} className="flex items-center gap-2 border-t border-rule pt-3"><span className="min-w-0 flex-1 break-words text-xs">{file.fileName}</span><Button size="sm" onClick={() => downloadEvidence(user.id, file).catch((cause: Error) => setError(cause.message))}>Download</Button></li>)}</ul>{item.warnings?.map((warning) => <p key={warning} className="text-xs text-status-warn-ink">{warning}</p>)}{(item.error || error) && <Banner>{error ?? item.error}</Banner>}{["failed", "partial"].includes(item.status) && <Button disabled={busy} onClick={async () => { setBusy(true); setError(null); try { setItem(await workspaceWrite<AnalystSubmission>(user.id, `/collection/submissions/${item.id}/retry`, {})); } catch (cause) { setError((cause as Error).message); } finally { setBusy(false); } }}>Retry processing</Button>}</div></Drawer>;
 }

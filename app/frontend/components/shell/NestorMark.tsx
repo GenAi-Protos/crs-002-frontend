@@ -48,10 +48,12 @@ export function NestorMarkReverse({ size = 24 }: { size?: number }) {
 }
 
 /**
- * For white and light surfaces. The chevron carries green-800, the contrast
- * green the brand defines for exactly this case: `#4CEE76` is 1.5:1 on white,
- * which is why the light mark used to need a Dark Purple tile behind it.
+ * For the console's own surfaces, in either theme. On light the chevron carries
+ * green-800, the contrast green the brand defines for exactly this case
+ * (`#4CEE76` is 1.5:1 on white, which is why the light mark used to need a Dark
+ * Purple tile behind it); on dark it is the reverse mark's colours. The pair
+ * lives in app/globals.css as --mark-chevron and --mark-blocks.
  */
 export function NestorMarkPrimary({ size = 24 }: { size?: number }) {
-  return <Cairn size={size} chevron="#0F7E33" blocks="#1E1847" />;
+  return <Cairn size={size} chevron="var(--mark-chevron)" blocks="var(--mark-blocks)" />;
 }

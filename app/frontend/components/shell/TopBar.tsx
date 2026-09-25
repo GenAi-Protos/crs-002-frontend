@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { ROLE_LABELS, useConsoleUser } from "@/lib/role-context";
 import type { RoleKey } from "@/lib/types";
 import { GlobalSearch } from "./GlobalSearch";
+import { NestorMarkPrimary } from "./NestorMark";
+import { ThemeToggle } from "./ThemeToggle";
 import { publicEnv } from "@/lib/runtime-env";
 import { getHealth } from "@/lib/api";
 
@@ -50,8 +52,9 @@ const BACKEND_LABEL: Record<Backend, string> = {
   unreachable: "Unreachable",
 };
 
-// Light chrome, the CPX white header at Teams-tab height: 48px, because the
-// Teams app bar and tab strip already sit above it (docs/03, Shell). The CPX
+// The CPX header at Teams-tab height: 48px, because the Teams app bar and tab
+// strip already sit above it (docs/03, Shell). White on the light theme, the
+// surface on the dark one, where the reverse CPX logo takes over. The CPX
 // wordmark reads as the parent, the Nestor mark as the tool.
 export function TopBar() {
   const { user, setRole } = useConsoleUser();
@@ -64,19 +67,29 @@ export function TopBar() {
     .join("");
 
   return (
-    <header className="z-40 flex h-12 shrink-0 items-center gap-2 border-b border-cpx-grey-100 bg-white px-3 text-cpx-black sm:gap-2.5 sm:px-4">
+    <header className="z-40 flex h-12 shrink-0 items-center gap-2 border-b border-rule bg-surface px-3 text-ink sm:gap-2.5 sm:px-4">
       <Image
         src="/cpx-logo-primary.svg"
         alt="CPX"
         width={172}
         height={80}
-        className="h-6 w-auto"
+        className="h-6 w-auto dark:hidden"
         priority
       />
-      <span className="h-4 w-px bg-cpx-grey-200" aria-hidden />
+      <Image
+        src="/cpx-logo-reverse.svg"
+        alt="CPX"
+        width={172}
+        height={80}
+        className="hidden h-6 w-auto dark:block"
+        priority
+      />
+      <span className="h-4 w-px shrink-0 bg-rule-strong" aria-hidden />
       <span className="flex items-center gap-1.5">
-        <Image src="/nestor-mark.svg" alt="" width={20} height={20} aria-hidden />
-        <span className="hidden font-display text-sm font-bold uppercase tracking-tightish text-cpx-purple sm:inline">
+        <span aria-hidden className="flex">
+          <NestorMarkPrimary size={20} />
+        </span>
+        <span className="hidden font-display text-sm font-bold uppercase tracking-tightish text-accent sm:inline">
           Nestor
         </span>
       </span>
@@ -86,8 +99,8 @@ export function TopBar() {
         title={backend === "live" ? "Backend reachable" : "Backend not reachable"}
         className={`ml-1 inline-flex h-6 items-center gap-1.5 rounded-sm border px-2 text-2xs font-medium transition-colors duration-200 ${
           backend === "unreachable"
-            ? "border-cpx-red-200 bg-cpx-red-50 text-cpx-red-700"
-            : "border-cpx-grey-100 bg-white text-cpx-grey-500"
+            ? "border-danger-edge bg-danger-tint text-danger"
+            : "border-rule bg-surface text-mute"
         }`}
       >
         <span
@@ -96,7 +109,7 @@ export function TopBar() {
               ? "bg-cpx-green"
               : backend === "unreachable"
                 ? "bg-cpx-red"
-                : "bg-cpx-grey-400"
+                : "bg-faint"
           }`}
           aria-hidden
         />
@@ -114,7 +127,7 @@ export function TopBar() {
           value={user.role}
           onChange={(e) => setRole(e.target.value as RoleKey)}
           aria-label="Role"
-          className="h-7 rounded-sm border border-cpx-grey-100 bg-white px-1.5 text-xs text-cpx-grey-700 transition-colors duration-150 hover:border-cpx-grey-200 focus:border-cpx-green focus:outline-none"
+          className="h-7 min-w-0 rounded-sm border border-rule bg-surface px-1.5 text-xs text-ink-2 transition-colors duration-150 hover:border-rule-strong focus:border-cpx-green focus:outline-none"
         >
           {ROLES.map((r) => (
             <option key={r} value={r}>
@@ -124,13 +137,15 @@ export function TopBar() {
         </select>
       )}
 
+      <ThemeToggle />
+
       <span
         title={`${user.name} · ${ROLE_LABELS[user.role]}`}
-        className="inline-flex h-7 items-center gap-2 rounded-sm px-1 text-xs font-medium xl:border xl:border-cpx-grey-100 xl:px-2"
+        className="inline-flex h-7 items-center gap-2 rounded-sm px-1 text-xs font-medium xl:border xl:border-rule xl:px-2"
       >
         <span
           aria-hidden
-          className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-cpx-purple text-2xs font-medium text-white"
+          className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand text-2xs font-medium text-white"
         >
           {initials}
         </span>
