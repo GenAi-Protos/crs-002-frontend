@@ -200,7 +200,7 @@ export default function ReportsPage() {
       />
 
       <div {...tabPanelProps("reports", effectiveTab)}>
-      <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
         <SearchBox value={q} onChange={setQ} className="w-full max-w-72" />
         <Select value={year} onChange={(e) => setYear(e.target.value)} aria-label="Year">
           {years.map((y) => (
@@ -249,7 +249,7 @@ export default function ReportsPage() {
         <SkeletonRows className="p-3" />
       ) : (
       <div>
-      <table className={`${T_TABLE} table-fixed bg-white text-sm`}>
+      <table className={`${T_TABLE} table-fixed bg-surface text-sm`}>
         <colgroup>
           <col className="w-48" />
           <col className="w-16" />
@@ -273,7 +273,7 @@ export default function ReportsPage() {
         <tbody>
           {visible.length === 0 && (
             <EmptyRow colSpan={6}>
-              <span className="font-medium text-cpx-black">0 reports</span> matched
+              <span className="font-medium text-ink">0 reports</span> matched
             </EmptyRow>
           )}
           {visible.map((a) => {
@@ -288,7 +288,7 @@ export default function ReportsPage() {
                       ? setOpenRfi(rfiOpen ? null : a.ref)
                       : router.push(`/reports/${encodeURIComponent(a.ref)}`)
                   }
-                  className={`${T_ROW} cursor-pointer ${ghost ? "opacity-50" : ""} ${rfiOpen ? "bg-cpx-green-50/60" : ""}`}
+                  className={`${T_ROW} cursor-pointer ${ghost ? "opacity-50" : ""} ${rfiOpen ? "bg-wash" : ""}`}
                 >
                   <td className={`${T_TD} truncate whitespace-nowrap font-mono text-xs`}>
                     {a.type === "RFI" && a.rfi ? (
@@ -322,12 +322,12 @@ export default function ReportsPage() {
                       }
                     />
                   </td>
-                  <td className={`${T_TD} hidden text-cpx-grey-700 @3xl:table-cell`}>
+                  <td className={`${T_TD} hidden text-ink-2 @3xl:table-cell`}>
                     <Clipped text={a.owner ?? "-"} />
                   </td>
                   <td className={T_TD}>
                     {a.type === "RFI" && a.rfi && a.status !== "published" ? (
-                      <span className="text-xs text-cpx-grey-700">
+                      <span className="text-xs text-ink-2">
                         In progress, {a.rfi.steps.filter((s) => s.done).length} of{" "}
                         {a.rfi.steps.length} done
                       </span>
@@ -362,10 +362,10 @@ export default function ReportsPage() {
                   </td>
                 </tr>
                 {a.type === "RFI" && rfiOpen && a.rfi && (
-                  <tr className="border-b border-cpx-grey-100 bg-cpx-grey-50">
+                  <tr className="border-b border-rule bg-inset">
                     <td colSpan={6} className="px-4 py-3">
                      <div className="reveal">
-                      <p className="text-xs text-cpx-grey-500">
+                      <p className="text-xs text-mute">
                         {a.rfi.requester} · due {gstDate(a.rfi.dueAt)} ·{" "}
                         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
                       </p>
@@ -374,7 +374,7 @@ export default function ReportsPage() {
                         {a.rfi.steps.map((s) => (
                           <li key={s.label} className="flex items-center gap-2 text-xs">
                             <span
-                              className={`flex h-4 w-4 items-center justify-center ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-200 bg-white"}`}
+                              className={`flex h-4 w-4 items-center justify-center ${s.done ? "bg-cpx-green-800 text-white" : "border border-rule-strong bg-surface"}`}
                             >
                               {s.done && <IconCheck />}
                             </span>
@@ -402,7 +402,7 @@ export default function ReportsPage() {
       </div>
       )}
       {filtered.length > shown && (
-        <div className="flex justify-center border-t border-cpx-grey-100 px-3 py-2">
+        <div className="flex justify-center border-t border-rule px-3 py-2">
           <Button size="sm" onClick={() => setShown(shown + 50)}>
             Show 50 more
           </Button>
@@ -442,7 +442,7 @@ export default function ReportsPage() {
       {notice && (
         <div
           role="status"
-          className="pop fixed bottom-4 left-1/2 z-50 flex origin-bottom -translate-x-1/2 items-center gap-3 rounded-sm border border-cpx-grey-100 bg-white px-3 py-2 text-sm shadow-pop"
+          className="pop fixed bottom-4 left-1/2 z-50 flex origin-bottom -translate-x-1/2 items-center gap-3 rounded-sm border border-rule bg-overlay px-3 py-2 text-sm shadow-pop"
         >
           {notice}
           <Button variant="ghost" size="sm" onClick={() => setNotice(null)}>

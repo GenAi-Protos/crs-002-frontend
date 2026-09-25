@@ -115,7 +115,7 @@ Everyone lands on `/`. The Dashboard resolves its content from the role.
 - No credential value is displayed or accepted anywhere on it
 - Text sizes from the eight-step scale only; buttons via `Button` or `buttonClass`; overlays via `Dialog` or `Drawer`
 - Built from the shared shell: `Page` (with `band` where the content is panels), `Panel`, `Banner` for errors and notices, `CenterMessage`/`NotPermitted` for whole-page states, `lib/status.ts` for every status word and tone; grids respond to `@container/page`, not the viewport
-- Colours from the `cpx-*` tokens and scales only: no `black/N` greys, no hex in a component
+- Colours from the theme tokens (`surface`, `ink`, `mute`, `rule`, `accent`, the status tints: docs/03 §2 Themes), so the screen works in light and dark; brand scale classes only for fills that read the same on both grounds; no `black/N` greys, no hex in a component
 - While a fetch is in flight `SkeletonRows` holds the geometry; when it fell back to fixtures `OfflineNote` is visible
 - Motion only through the tokens and utilities in `app/globals.css` (`reveal`, `ease-out-quart`, the chart draw-ins); nothing pulses or loops, and reduced motion is honoured (docs/03 §6)
 - Nothing on the screen assumes it owns the browser viewport: `<main>` is the only scroll region (docs/01, Shell)

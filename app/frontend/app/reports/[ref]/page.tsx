@@ -139,9 +139,9 @@ export default function ReportPage({
   if (loading && !base) {
     return (
       <div className="flex flex-1 flex-col bg-band">
-        <div className="h-12 border-b border-cpx-grey-100 bg-white" />
-        <div className="mx-auto my-4 w-full max-w-[760px] rounded-sm border border-cpx-grey-100 bg-white px-8 py-6">
-          <div className="mb-5 h-6 w-2/3 bg-cpx-grey-100" />
+        <div className="h-12 border-b border-rule bg-surface" />
+        <div className="mx-auto my-4 w-full max-w-[760px] rounded-sm border border-rule bg-surface px-8 py-6">
+          <div className="mb-5 h-6 w-2/3 bg-fill" />
           <SkeletonRows rows={8} height="h-5" />
         </div>
       </div>
@@ -237,7 +237,7 @@ export default function ReportPage({
           itself); the context between them drops out by the width the page
           actually has, and a Teams tab narrower than the row wraps the actions
           onto a second line rather than clipping them. */}
-      <div className="sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-cpx-grey-100 bg-white px-4 py-2">
+      <div className="sticky top-0 z-20 flex min-h-12 flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-rule bg-surface px-4 py-2">
         <span className="shrink-0 whitespace-nowrap font-mono text-sm font-medium">
           {a.ref}
         </span>
@@ -247,7 +247,7 @@ export default function ReportPage({
         {/* Report type, stated. Which format a document follows is the first
             thing a reviewer needs and it was only implicit in the reference. */}
         <TypeBadge label={a.type} title={template?.name} />
-        <span className="shrink-0 whitespace-nowrap text-xs text-cpx-grey-500">
+        <span className="shrink-0 whitespace-nowrap text-xs text-mute">
           v{a.version}
         </span>
         <span className="shrink-0" role="status">
@@ -267,20 +267,20 @@ export default function ReportPage({
           ))}
         </span>
         <span
-          className="hidden shrink-0 truncate whitespace-nowrap text-xs text-cpx-grey-500 @2xl/page:inline"
+          className="hidden shrink-0 truncate whitespace-nowrap text-xs text-mute @2xl/page:inline"
           title={`Owner: ${a.owner ?? "unassigned"}`}
         >
           {a.owner ?? "-"}
         </span>
         <span
-          className="hidden shrink-0 whitespace-nowrap text-xs text-cpx-grey-500 @3xl/page:inline"
+          className="hidden shrink-0 whitespace-nowrap text-xs text-mute @3xl/page:inline"
           title={`Last updated ${gstDateTime(lastUpdated)}`}
         >
           {gstDate(lastUpdated)}
         </span>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
-          {editable && <><span className={`hidden text-2xs @2xl/page:inline ${local ? "font-medium text-status-warn-ink" : "text-cpx-grey-500"}`} role="status">{local ? "Unsaved changes" : `Saved · revision ${a.revision ?? 0}`}</span><Button variant={local ? "primary" : "secondary"} disabled={!local || saving || offline} onClick={save}>{saving ? "Saving" : "Save"}</Button></>}
+          {editable && <><span className={`hidden text-2xs @2xl/page:inline ${local ? "font-medium text-status-warn-ink" : "text-mute"}`} role="status">{local ? "Unsaved changes" : `Saved · revision ${a.revision ?? 0}`}</span><Button variant={local ? "primary" : "secondary"} disabled={!local || saving || offline} onClick={save}>{saving ? "Saving" : "Save"}</Button></>}
           <Menu<ReportFormat>
             label="Export report"
             items={formatsFor(a).map((f) => ({
@@ -308,14 +308,14 @@ export default function ReportPage({
         />
       )}
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-cpx-grey-100 bg-white px-4 py-1.5 text-2xs text-cpx-grey-500">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-rule bg-surface px-4 py-1.5 text-2xs text-mute">
         <span>
-          Report type <span className="text-cpx-black">{a.type}</span>
+          Report type <span className="text-ink">{a.type}</span>
           {template && <> · {template.name}</>}
         </span>
         <span>
           Template{" "}
-          <span className="text-cpx-black">
+          <span className="text-ink">
             {a.template
               ? a.template.kind === "standard"
                 ? "Standard template"
@@ -325,7 +325,7 @@ export default function ReportPage({
           {a.template?.kind === "custom" && <> · custom</>}
         </span>
         <span>
-          Sections <span className="text-cpx-black">{a.sections.length}</span>
+          Sections <span className="text-ink">{a.sections.length}</span>
         </span>
       </div>
 
@@ -340,7 +340,7 @@ export default function ReportPage({
 
       {publishedState && (
         <div className="reveal mx-auto mt-4 w-full max-w-[760px] space-y-1">
-          <div className="flex items-center gap-2 rounded-sm bg-cpx-purple px-3 py-2 text-xs text-white">
+          <div className="flex items-center gap-2 rounded-sm bg-brand px-3 py-2 text-xs text-white">
             <span className="font-medium">Version {a.version}</span>
             <span className="text-cpx-bright-100">
               Published {a.publishedAt ? gstDateTime(a.publishedAt) : ""}
@@ -369,13 +369,13 @@ export default function ReportPage({
       )}
 
       {/* The document is the page: white paper on the grey canvas. */}
-      <article className="enter mx-auto my-4 w-full max-w-[760px] rounded-sm border border-cpx-grey-100 bg-white px-8 py-6">
-        {editable ? <input aria-label="Report title" value={a.title} onChange={(event) => update((draft) => ({ ...draft, title: event.target.value }))} className="-mx-1 w-full rounded-sm border border-transparent bg-transparent px-1 text-xl font-semibold leading-snug tracking-tightish transition-colors duration-150 hover:border-cpx-grey-100 focus:border-cpx-green focus:outline-none" /> : <h1 className="text-xl font-semibold leading-snug tracking-tightish">{a.title}</h1>}
+      <article className="enter mx-auto my-4 w-full max-w-[760px] rounded-sm border border-rule bg-surface px-8 py-6">
+        {editable ? <input aria-label="Report title" value={a.title} onChange={(event) => update((draft) => ({ ...draft, title: event.target.value }))} className="-mx-1 w-full rounded-sm border border-transparent bg-transparent px-1 text-xl font-semibold leading-snug tracking-tightish transition-colors duration-150 hover:border-rule focus:border-cpx-green focus:outline-none" /> : <h1 className="text-xl font-semibold leading-snug tracking-tightish">{a.title}</h1>}
 
         <div className="mt-6 space-y-7">
           {a.sections.map((s) => (
             <section key={s.id} id={s.id} className="scroll-mt-32">
-              <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
+              <h2 className="border-b border-rule pb-1 text-md font-semibold tracking-tightish">
                 {s.heading}
               </h2>
               {s.heading === "TTPs Mapping" || s.heading === "MITRE ATT&CK Mapping" ? (
@@ -416,7 +416,7 @@ export default function ReportPage({
                     }))
                   }
                   rows={Math.max(2, Math.ceil(s.body.length / 90))}
-                  className="-mx-1 mt-2 w-full resize-y rounded-sm border border-transparent bg-transparent px-1 text-sm leading-relaxed transition-colors duration-150 hover:border-cpx-grey-100 focus:border-cpx-green focus:bg-white focus:outline-none"
+                  className="-mx-1 mt-2 w-full resize-y rounded-sm border border-transparent bg-transparent px-1 text-sm leading-relaxed transition-colors duration-150 hover:border-rule focus:border-cpx-green focus:bg-surface focus:outline-none"
                 />
               ) : (
                 <p className="mt-2 whitespace-pre-line text-sm leading-relaxed">
@@ -424,7 +424,7 @@ export default function ReportPage({
                 </p>
               )}
               {s.citations.length > 0 && (
-                <p className="mt-1.5 text-2xs text-cpx-grey-500">
+                <p className="mt-1.5 text-2xs text-mute">
                   {s.citations
                     .map((c) => `[${c.ref}] ${c.label}, ${recordCount(c.recordCount)}`)
                     .join(" · ")}
@@ -438,7 +438,7 @@ export default function ReportPage({
 
         {publishedState && (
           <section className="mt-10">
-            <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
+            <h2 className="border-b border-rule pb-1 text-md font-semibold tracking-tightish">
               Delivery
             </h2>
             <p className="mt-2 text-xs">
@@ -458,7 +458,7 @@ export default function ReportPage({
       </article>
 
       {!isDigest && canWriteReports(user.role) && (
-        <footer className="sticky bottom-0 z-20 mt-auto flex h-12 items-center gap-2 border-t border-cpx-grey-100 bg-white px-4">
+        <footer className="sticky bottom-0 z-20 mt-auto flex h-12 items-center gap-2 border-t border-rule bg-surface px-4">
           {publishedState ? (
             <Button onClick={() => setShowUpdate(true)} disabled={saving || offline}>
               Issue an update
@@ -491,7 +491,7 @@ export default function ReportPage({
                   <button
                     disabled={saving}
                     onClick={() => transition("send-back", r.key)}
-                    className="w-full rounded-sm border border-cpx-grey-100 px-3 py-2 text-left text-sm transition-colors duration-150 hover:border-cpx-green hover:bg-cpx-green-50/60 disabled:opacity-50"
+                    className="w-full rounded-sm border border-rule px-3 py-2 text-left text-sm transition-colors duration-150 hover:border-cpx-green hover:bg-wash disabled:opacity-50"
                   >
                     {r.label}
                   </button>
@@ -503,7 +503,7 @@ export default function ReportPage({
             </Button>
         </Dialog>
       )}
-      {showUpdate && <Dialog title="Issue an update" onClose={() => setShowUpdate(false)} className="max-w-lg"><p className="text-sm text-cpx-grey-500">A new draft; the published version stays available.</p><label className="mt-4 block text-xs font-medium text-cpx-grey-700">Change note<textarea value={changeNote} onChange={(event) => setChangeNote(event.target.value)} required rows={3} className={fieldClass} /></label><div className="mt-4 flex justify-end gap-2"><Button disabled={saving} onClick={() => setShowUpdate(false)}>Cancel</Button><Button variant="primary" disabled={saving || !changeNote.trim()} onClick={issueUpdate}>{saving ? "Creating…" : "Create update draft"}</Button></div></Dialog>}
+      {showUpdate && <Dialog title="Issue an update" onClose={() => setShowUpdate(false)} className="max-w-lg"><p className="text-sm text-mute">A new draft; the published version stays available.</p><label className="mt-4 block text-xs font-medium text-ink-2">Change note<textarea value={changeNote} onChange={(event) => setChangeNote(event.target.value)} required rows={3} className={fieldClass} /></label><div className="mt-4 flex justify-end gap-2"><Button disabled={saving} onClick={() => setShowUpdate(false)}>Cancel</Button><Button variant="primary" disabled={saving || !changeNote.trim()} onClick={issueUpdate}>{saving ? "Creating…" : "Create update draft"}</Button></div></Dialog>}
     </div>
   );
 }
@@ -538,7 +538,7 @@ function SourcesSection({ a }: { a: Advisory }) {
 
   return (
     <section className="mt-10">
-      <h2 className="border-b border-cpx-grey-100 pb-1 text-md font-semibold tracking-tightish">
+      <h2 className="border-b border-rule pb-1 text-md font-semibold tracking-tightish">
         Sources
       </h2>
       <p className="mt-2 text-xs">
@@ -602,7 +602,7 @@ function SentBackLine({ sendBack }: { sendBack: Advisory["sendBacks"][number] })
   const reason =
     SEND_BACK_REASONS.find((r) => r.key === sendBack.reason)?.label ?? sendBack.reason;
   return (
-    <div className="reveal flex items-center gap-2 border-b border-cpx-grey-100 bg-cpx-bright-50 px-4 py-2 text-xs text-cpx-bright-700">
+    <div className="reveal flex items-center gap-2 border-b border-rule bg-status-warn-fill px-4 py-2 text-xs text-status-warn-ink">
       <IconWarn className="text-status-warn-ink" />
       <span>
         Sent back by {sendBack.by}, {gstDateTime(sendBack.at)}:{" "}
@@ -618,7 +618,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
   if (a.checks.length === 0) return null;
   if (failed.length === 0) {
     return (
-      <div className="flex items-center gap-2 border-b border-cpx-grey-100 bg-white px-4 py-1.5 text-xs">
+      <div className="flex items-center gap-2 border-b border-rule bg-surface px-4 py-1.5 text-xs">
         <IconCheck className="text-green-contrast" />
         All checks passed.
       </div>
@@ -629,7 +629,7 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
     // One line, not one line per check. Every check is unpassed on a new draft,
     // and three stacked red rows read as a fault rather than as the ordinary
     // starting state of a document nobody has written yet.
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-cpx-grey-100 bg-white px-4 py-1.5 text-xs">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-rule bg-surface px-4 py-1.5 text-xs">
       <IconWarn className={blocking > 0 ? "text-cpx-red" : "text-status-warn-ink"} />
       <span className="whitespace-nowrap">
         <span className="font-medium">
@@ -637,12 +637,12 @@ function ChecksLine({ advisory: a }: { advisory: Advisory }) {
         </span>{" "}
         checks not passed
         {blocking > 0 && (
-          <span className="text-cpx-grey-500">, {blocking} blocking</span>
+          <span className="text-mute">, {blocking} blocking</span>
         )}
       </span>
-      <span className="text-cpx-grey-500">·</span>
+      <span className="text-mute">·</span>
       {failed.map((c, i) => (
-        <span key={c.id} className="text-cpx-grey-500">
+        <span key={c.id} className="text-mute">
           {c.anchorSectionId ? (
             <a href={`#${c.anchorSectionId}`} className="link-quiet">
               {c.label}
@@ -708,7 +708,7 @@ function TechniquesTable({
             aria-label="Technique ID"
             className={`${inputClass} w-36 font-mono text-xs`}
           />
-          <span className="text-xs text-cpx-grey-500">
+          <span className="text-xs text-mute">
             {newId.trim() === ""
               ? ""
               : resolved
@@ -853,7 +853,7 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
   if (!a.rfi) return null;
   return (
     <div className="flex flex-1 flex-col bg-band">
-    <article className="enter mx-auto my-4 w-full max-w-[760px] rounded-sm border border-cpx-grey-100 bg-white px-8 py-6">
+    <article className="enter mx-auto my-4 w-full max-w-[760px] rounded-sm border border-rule bg-surface px-8 py-6">
       <div className="flex items-center gap-3">
         <span className="font-mono text-sm font-medium">{a.ref}</span>
         <TypeBadge label="RFI" />
@@ -861,7 +861,7 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
       <h1 className="mt-3 text-xl font-semibold leading-snug tracking-tightish">
         {a.rfi.question}
       </h1>
-      <p className="mt-2 text-xs text-cpx-grey-500">
+      <p className="mt-2 text-xs text-mute">
         {a.rfi.requester} · due {gstDateTime(a.rfi.dueAt)} ·{" "}
         {clients.find((c) => c.id === a.rfi?.clientId)?.name ?? a.rfi?.clientId}
       </p>
@@ -870,7 +870,7 @@ function RfiView({ a, clients }: { a: Advisory; clients: Client[] }) {
         {a.rfi.steps.map((s) => (
           <li key={s.label} className="flex items-center gap-2.5 text-sm">
             <span
-              className={`flex h-5 w-5 items-center justify-center ${s.done ? "bg-green-contrast text-white" : "border border-cpx-grey-200"}`}
+              className={`flex h-5 w-5 items-center justify-center ${s.done ? "bg-cpx-green-800 text-white" : "border border-rule-strong"}`}
             >
               {s.done && <IconCheck />}
             </span>

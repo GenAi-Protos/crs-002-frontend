@@ -135,10 +135,10 @@ export function Panel({
       aria-labelledby={title ? id : undefined}
       aria-label={title ? undefined : ariaLabel}
       style={style}
-      className={`flex min-w-0 flex-col border border-cpx-grey-100 bg-white ${enter === undefined ? "" : "enter"} ${className}`}
+      className={`flex min-w-0 flex-col border border-rule bg-surface ${enter === undefined ? "" : "enter"} ${className}`}
     >
       {(title || aside || action) && (
-        <header className="flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-cpx-grey-100 px-3 py-1.5">
+        <header className="flex min-h-9 flex-wrap items-center gap-x-2 gap-y-1.5 border-b border-rule px-3 py-1.5">
           {title && (
             <h2 id={id} className="min-w-0 truncate font-sans text-sm font-semibold tracking-tightish">
               {title}
@@ -146,7 +146,7 @@ export function Panel({
           )}
           {count !== undefined && <CountBadge n={count} />}
           <span className="ml-auto flex shrink-0 items-center gap-3">
-            {aside && <span className="whitespace-nowrap text-2xs text-cpx-grey-500">{aside}</span>}
+            {aside && <span className="whitespace-nowrap text-2xs text-mute">{aside}</span>}
             {action}
           </span>
         </header>
@@ -161,7 +161,7 @@ export function PanelLink({ href, children }: { href: string; children: ReactNod
   return (
     <Link
       href={href}
-      className="group/pl inline-flex items-center gap-0.5 text-xs font-medium text-link transition-colors duration-150 hover:text-cpx-purple"
+      className="group/pl inline-flex items-center gap-0.5 text-xs font-medium text-link transition-colors duration-150 hover:text-accent"
     >
       {children}
       <IconChevronRight className="transition-transform duration-150 ease-out-quart group-hover/pl:translate-x-0.5" />
@@ -187,12 +187,12 @@ const BUTTON_VARIANT: Record<ButtonVariant, string> = {
   primary:
     "bg-cpx-green font-medium text-cpx-purple hover:bg-cpx-green-600 disabled:opacity-50 disabled:hover:bg-cpx-green",
   secondary:
-    "border border-cpx-grey-100 bg-white font-medium hover:border-cpx-grey-200 hover:bg-cpx-grey-50 disabled:opacity-50 disabled:hover:border-cpx-grey-100 disabled:hover:bg-white",
+    "border border-rule bg-surface font-medium hover:border-rule-strong hover:bg-inset disabled:opacity-50 disabled:hover:border-rule disabled:hover:bg-surface",
   ghost:
-    "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple disabled:opacity-50 disabled:hover:bg-transparent",
+    "text-mute hover:bg-inset hover:text-accent disabled:opacity-50 disabled:hover:bg-transparent",
   // Accent Red text is 3.2:1 on white, so destructive actions carry red-700.
   danger:
-    "border border-cpx-red-200 bg-white font-medium text-cpx-red-700 hover:bg-cpx-red-50 disabled:opacity-50 disabled:hover:bg-white",
+    "border border-danger-edge bg-surface font-medium text-danger hover:bg-danger-tint disabled:opacity-50 disabled:hover:bg-surface",
 };
 
 const BUTTON_SIZE: Record<ButtonSize, string> = {
@@ -239,7 +239,7 @@ export function IconButton({
       type="button"
       aria-label={label}
       title={label}
-      className={`inline-flex ${size === "sm" ? "h-6 w-6" : "h-7 w-7"} shrink-0 items-center justify-center rounded-sm text-cpx-grey-500 transition duration-150 ease-out-quart hover:bg-cpx-grey-100 hover:text-cpx-black enabled:active:scale-[0.94] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex ${size === "sm" ? "h-6 w-6" : "h-7 w-7"} shrink-0 items-center justify-center rounded-sm text-mute transition duration-150 ease-out-quart hover:bg-fill hover:text-ink enabled:active:scale-[0.94] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       {...rest}
     >
       {children}
@@ -254,7 +254,7 @@ export function IconButton({
 // Height is set apart so a compact (28px) control in a toolbar or panel header
 // does not fight the default.
 const FIELD =
-  "rounded-sm border border-cpx-grey-100 bg-white px-2.5 text-sm text-cpx-black transition-colors duration-150 placeholder:text-cpx-grey-400 hover:border-cpx-grey-200 focus:border-cpx-green focus:outline-none disabled:cursor-not-allowed disabled:bg-cpx-grey-50 disabled:text-cpx-grey-500";
+  "rounded-sm border border-rule bg-surface px-2.5 text-sm text-ink transition-colors duration-150 placeholder:text-mute hover:border-rule-strong focus:border-cpx-green focus:outline-none disabled:cursor-not-allowed disabled:bg-inset disabled:text-mute";
 
 export const inputClass = `h-8 w-full ${FIELD}`;
 
@@ -304,9 +304,9 @@ export function Field({
 }) {
   return (
     <label className={`block min-w-0 ${className}`}>
-      <span className="mb-1 block text-xs font-medium text-cpx-grey-700">{label}</span>
+      <span className="mb-1 block text-xs font-medium text-ink-2">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-2xs text-cpx-grey-500">{hint}</span>}
+      {hint && <span className="mt-1 block text-2xs text-mute">{hint}</span>}
     </label>
   );
 }
@@ -372,7 +372,7 @@ export function Dialog({
       aria-labelledby={id}
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className={`m-auto w-full ${className.includes("max-w-") ? "" : "max-w-md"} border border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-pop ${className}`}
+      className={`m-auto w-full ${className.includes("max-w-") ? "" : "max-w-md"} border border-rule bg-overlay p-0 text-ink shadow-pop ${className}`}
     >
       <div className="p-4">
         <div className="mb-3 flex items-start justify-between gap-4">
@@ -409,9 +409,9 @@ export function Drawer({
       aria-labelledby={id}
       onClose={handleClose}
       onClick={closeOnBackdrop(onClose)}
-      className={`drawer fixed bottom-0 left-auto right-0 top-12 m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-cpx-grey-100 bg-white p-0 text-cpx-black shadow-xl ${className}`}
+      className={`drawer fixed bottom-0 left-auto right-0 top-12 m-0 h-auto max-h-none w-[480px] max-w-full overflow-y-auto border-l border-rule bg-overlay p-0 text-ink shadow-xl ${className}`}
     >
-      <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-cpx-grey-100 bg-white px-4 py-2.5">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-rule bg-overlay px-4 py-2.5">
         <div id={id} className="min-w-0">
           {title}
         </div>
@@ -458,19 +458,19 @@ export type StatusTone = "good" | "warn" | "critical" | "idle";
 export function StatusPill({ tone, label }: { tone: StatusTone; label: string }) {
   const map: Record<StatusTone, { box: string; icon: ReactNode }> = {
     good: {
-      box: "border-cpx-green-200 bg-cpx-green-50 text-cpx-green-800",
+      box: "border-good-edge bg-good-tint text-green-contrast",
       icon: <IconCheck />,
     },
     warn: {
-      box: "border-cpx-bright-200 bg-cpx-bright-50 text-cpx-bright-700",
+      box: "border-status-warn-edge bg-status-warn-fill text-status-warn-ink",
       icon: <IconWarn />,
     },
     critical: {
-      box: "border-cpx-red-200 bg-cpx-red-100 text-cpx-red-700",
+      box: "border-danger-edge bg-danger-tint-2 text-danger",
       icon: <IconCritical />,
     },
     idle: {
-      box: "border-cpx-grey-200 bg-cpx-grey-100 text-cpx-grey-700",
+      box: "border-rule-strong bg-fill text-ink-2",
       icon: <IconDash />,
     },
   };
@@ -486,10 +486,10 @@ export function StatusPill({ tone, label }: { tone: StatusTone; label: string })
 }
 
 const SEVERITY: Record<Severity, { box: string; label: string }> = {
-  critical: { box: "border-cpx-red-200 bg-cpx-red-100 text-cpx-red-700", label: "Critical" },
-  high: { box: "border-cpx-red-100 bg-cpx-red-50 text-cpx-red-700", label: "High" },
-  medium: { box: "border-cpx-blue-100 bg-cpx-blue-50 text-cpx-blue-700", label: "Medium" },
-  low: { box: "border-cpx-grey-200 bg-cpx-grey-100 text-cpx-grey-700", label: "Low" },
+  critical: { box: "border-danger-edge bg-danger-tint-2 text-danger", label: "Critical" },
+  high: { box: "border-danger-tint-2 bg-danger-tint text-danger", label: "High" },
+  medium: { box: "border-info-edge bg-info-tint text-info", label: "Medium" },
+  low: { box: "border-rule-strong bg-fill text-ink-2", label: "Low" },
 };
 
 /** The square pip is the CPX building block, in the severity scale's ink. */
@@ -520,7 +520,7 @@ export function SeverityBadge({ level }: { level: Severity }) {
  *  a priority (someone's call) never reads as a severity (the record's). */
 export function PriorityBadge({ level }: { level: Severity }) {
   return (
-    <span className="inline-flex h-5 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border border-cpx-grey-200 bg-white px-1.5 text-2xs font-medium text-cpx-grey-700">
+    <span className="inline-flex h-5 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border border-rule-strong bg-surface px-1.5 text-2xs font-medium text-ink-2">
       <SeverityPip level={level} />
       {SEVERITY[level].label}
     </span>
@@ -531,7 +531,7 @@ export function PriorityBadge({ level }: { level: Severity }) {
 export function CountBadge({ n, className = "" }: { n: number; className?: string }) {
   return (
     <span
-      className={`inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-sm bg-cpx-grey-100 px-1 text-2xs font-medium tabular-nums text-cpx-grey-700 ${className}`}
+      className={`inline-flex h-4 min-w-4 shrink-0 items-center justify-center rounded-sm bg-fill px-1 text-2xs font-medium tabular-nums text-ink-2 ${className}`}
     >
       {n.toLocaleString("en-GB")}
     </span>
@@ -546,7 +546,7 @@ export function OfflineNote() {
   return (
     <span
       role="status"
-      className="reveal inline-flex h-5 items-center gap-1 whitespace-nowrap rounded-sm border border-cpx-blue-100 bg-cpx-blue-50 px-1.5 text-2xs font-medium text-cpx-blue-700"
+      className="reveal inline-flex h-5 items-center gap-1 whitespace-nowrap rounded-sm border border-info-edge bg-info-tint px-1.5 text-2xs font-medium text-info"
     >
       <IconWarn />
       Demonstration data. Backend unreachable.
@@ -567,7 +567,7 @@ export function SkeletonRows({
   return (
     <div aria-busy="true" aria-label="Loading" className={`space-y-1.5 ${className}`}>
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className={`${height} bg-cpx-grey-100`} style={{ width: `${100 - (i % 3) * 8}%` }} />
+        <div key={i} className={`${height} bg-fill`} style={{ width: `${100 - (i % 3) * 8}%` }} />
       ))}
     </div>
   );
@@ -579,14 +579,14 @@ export function SkeletonPanel({ rows = 4, className = "" }: { rows?: number; cla
     <div
       aria-busy="true"
       aria-label="Loading"
-      className={`flex flex-col border border-cpx-grey-100 bg-white ${className}`}
+      className={`flex flex-col border border-rule bg-surface ${className}`}
     >
-      <div className="flex h-9 items-center border-b border-cpx-grey-100 px-3">
-        <div className="h-3 w-32 bg-cpx-grey-100" />
+      <div className="flex h-9 items-center border-b border-rule px-3">
+        <div className="h-3 w-32 bg-fill" />
       </div>
       <div className="space-y-2 p-3">
         {Array.from({ length: rows }, (_, i) => (
-          <div key={i} className="h-5 bg-cpx-grey-50" style={{ width: `${100 - (i % 3) * 12}%` }} />
+          <div key={i} className="h-5 bg-inset" style={{ width: `${100 - (i % 3) * 12}%` }} />
         ))}
       </div>
     </div>
@@ -600,10 +600,10 @@ export function SkeletonPanel({ rows = 4, className = "" }: { rows?: number; cla
 type BannerTone = "error" | "warn" | "note" | "info";
 
 const BANNER: Record<BannerTone, { box: string; icon: ReactNode }> = {
-  error: { box: "border-cpx-red-200 bg-cpx-red-50 text-cpx-red-700", icon: <IconCritical /> },
-  warn: { box: "border-cpx-bright-200 bg-cpx-bright-50 text-cpx-bright-700", icon: <IconWarn /> },
-  note: { box: "border-cpx-grey-100 bg-cpx-grey-50 text-cpx-grey-700", icon: <IconInfo /> },
-  info: { box: "border-cpx-blue-100 bg-cpx-blue-50 text-cpx-blue-700", icon: <IconInfo /> },
+  error: { box: "border-danger-edge bg-danger-tint text-danger", icon: <IconCritical /> },
+  warn: { box: "border-status-warn-edge bg-status-warn-fill text-status-warn-ink", icon: <IconWarn /> },
+  note: { box: "border-rule bg-inset text-ink-2", icon: <IconInfo /> },
+  info: { box: "border-info-edge bg-info-tint text-info", icon: <IconInfo /> },
 };
 
 export function Banner({
@@ -667,7 +667,7 @@ export function EmptyState({
 }) {
   return (
     <div className={`flex flex-col items-center gap-2 px-3 py-6 text-center ${className}`}>
-      <p className="text-sm text-cpx-grey-500">{children}</p>
+      <p className="text-sm text-mute">{children}</p>
       {action}
     </div>
   );
@@ -683,8 +683,8 @@ export function TlpBadge({ tlp }: { tlp: Tlp }) {
           : tlp === "AMBER"
             ? "bg-status-warn-fill text-status-warn-ink"
             : tlp === "GREEN"
-              ? "bg-green-contrast text-white"
-              : "bg-cpx-grey-100 text-cpx-grey-500"
+              ? "bg-cpx-green-800 text-white"
+              : "bg-fill text-mute"
       }`}
     >
       TLP:{tlp}
@@ -695,7 +695,7 @@ export function TlpBadge({ tlp }: { tlp: Tlp }) {
 // A defanged observable: inert, never an anchor, never prefetched.
 export function IndicatorChip({ value }: { value: string }) {
   return (
-    <span className="inline-flex max-w-full items-center rounded-sm bg-cpx-grey-50 px-1.5 py-0.5 font-mono text-xs text-cpx-grey-500 break-all">
+    <span className="inline-flex max-w-full items-center rounded-sm bg-inset px-1.5 py-0.5 font-mono text-xs text-mute break-all">
       {defang(value)}
     </span>
   );
@@ -704,7 +704,7 @@ export function IndicatorChip({ value }: { value: string }) {
 // Inert URL rendering for the source inventory. Plain text, always defanged.
 export function InertUrl({ url }: { url: string }) {
   return (
-    <span className="font-mono text-2xs text-cpx-grey-500 break-all">
+    <span className="font-mono text-2xs text-mute break-all">
       {defang(url)}
     </span>
   );
@@ -741,7 +741,7 @@ export function Tooltip({
         role="tooltip"
         className={`tip absolute z-40 ${pos} ${
           side === "top" ? "bottom-full mb-1.5 origin-bottom" : "top-full mt-1.5 origin-top"
-        } w-max max-w-64 rounded-sm bg-cpx-purple px-2 py-1 text-left font-sans text-2xs font-medium normal-case leading-4 tracking-normal whitespace-normal text-white shadow-pop`}
+        } w-max max-w-64 rounded-sm bg-brand px-2 py-1 text-left font-sans text-2xs font-medium normal-case leading-4 tracking-normal whitespace-normal text-white shadow-pop`}
       >
         {content}
       </span>
@@ -762,7 +762,7 @@ export function SearchBox({
 }) {
   return (
     <div className={`relative ${className}`}>
-      <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-cpx-grey-500" />
+      <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-mute" />
       <input
         type="search"
         value={value}
@@ -790,12 +790,12 @@ export function ListMeta({
   note?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 text-xs text-cpx-grey-500">
+    <div className="flex flex-wrap items-center gap-2 text-xs text-mute">
       <span className="whitespace-nowrap">
-        Showing <span className="font-medium text-cpx-black tabular-nums">{shown}</span> of{" "}
-        <span className="font-medium text-cpx-black tabular-nums">{total}</span>
+        Showing <span className="font-medium text-ink tabular-nums">{shown}</span> of{" "}
+        <span className="font-medium text-ink tabular-nums">{total}</span>
       </span>
-      <span className="text-cpx-grey-300" aria-hidden>
+      <span className="text-ghost" aria-hidden>
         ·
       </span>
       <span className="whitespace-nowrap">{sort}</span>
@@ -887,7 +887,7 @@ export function Tabs<T extends string>({
       role="tablist"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className={`relative flex items-end gap-0.5 overflow-x-auto shadow-[inset_0_-1px_0_var(--color-cpx-grey-100)] ${className}`}
+      className={`relative flex items-end gap-0.5 overflow-x-auto shadow-[inset_0_-1px_0_var(--color-rule)] ${className}`}
     >
       {tabs.map((t) => {
         const selected = value === t.key;
@@ -904,8 +904,8 @@ export function Tabs<T extends string>({
             onClick={() => onChange(t.key)}
             className={`flex h-8 shrink-0 items-center gap-1.5 rounded-t-sm px-2.5 text-sm font-medium transition-colors duration-150 ${
               selected
-                ? "text-cpx-purple"
-                : "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple"
+                ? "text-accent"
+                : "text-mute hover:bg-inset hover:text-accent"
             }`}
           >
             {t.label}
@@ -959,7 +959,7 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="relative inline-flex h-7 shrink-0 items-stretch rounded-sm border border-cpx-grey-100 bg-white p-0.5"
+      className="relative inline-flex h-7 shrink-0 items-stretch rounded-sm border border-rule bg-surface p-0.5"
     >
       {options.map((o) => {
         const selected = o.key === value;
@@ -972,7 +972,7 @@ export function SegmentedControl<T extends string>({
             data-selected={selected}
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(o.key)}
-            className={`${segment} rounded-sm text-cpx-grey-500 transition-colors duration-150 hover:text-cpx-purple`}
+            className={`${segment} rounded-sm text-mute transition-colors duration-150 hover:text-accent`}
           >
             {o.label}
           </button>
@@ -981,7 +981,7 @@ export function SegmentedControl<T extends string>({
       {box && (
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0.5 flex items-stretch overflow-hidden rounded-sm bg-cpx-purple transition-[clip-path] duration-200 ease-out-quart"
+          className="pointer-events-none absolute inset-0.5 flex items-stretch overflow-hidden rounded-sm bg-brand transition-[clip-path] duration-200 ease-out-quart"
           style={{
             clipPath: `inset(0 ${Math.max(0, box.cw - box.x - box.w - 2)}px 0 ${Math.max(0, box.x - 2)}px round 3px)`,
           }}
@@ -1008,10 +1008,10 @@ export function SegmentedControl<T extends string>({
 export type StatTone = "neutral" | "critical" | "high" | "warn" | "good";
 
 const STAT_INK: Record<StatTone, string> = {
-  neutral: "text-cpx-black",
-  critical: "text-cpx-red-700",
-  high: "text-cpx-red-700",
-  warn: "text-cpx-bright-700",
+  neutral: "text-ink",
+  critical: "text-danger",
+  high: "text-danger",
+  warn: "text-status-warn-ink",
   good: "text-green-contrast",
 };
 
@@ -1053,7 +1053,7 @@ export function Stat({
     value === null ? null : typeof value === "number" ? value.toLocaleString("en-GB") : value;
   const body = (
     <>
-      <span className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-cpx-grey-600">
+      <span className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-ink-3">
         {pip && <span aria-hidden className="inline-block h-2 w-2 shrink-0" style={{ background: pip }} />}
         <span className="truncate" title={label}>
           {label}
@@ -1061,7 +1061,7 @@ export function Stat({
       </span>
       {shown === null ? (
         <span
-          className={`mt-1 block text-sm font-medium text-cpx-grey-500 ${size === "sm" ? "leading-6" : "leading-7"}`}
+          className={`mt-1 block text-sm font-medium text-mute ${size === "sm" ? "leading-6" : "leading-7"}`}
         >
           Not recorded
         </span>
@@ -1072,14 +1072,14 @@ export function Stat({
           {shown}
         </span>
       )}
-      {caption && <span className="mt-0.5 block truncate text-2xs text-cpx-grey-500">{caption}</span>}
+      {caption && <span className="mt-0.5 block truncate text-2xs text-mute">{caption}</span>}
     </>
   );
-  const cell = `relative block min-w-0 bg-white px-3 ${size === "sm" ? "py-2" : "py-2.5"} ${flash ? "changed" : ""}`;
+  const cell = `relative block min-w-0 bg-surface px-3 ${size === "sm" ? "py-2" : "py-2.5"} ${flash ? "changed" : ""}`;
   return href ? (
     <Link key={flash} href={href} className={`${cell} row-link group/stat`}>
       {body}
-      <IconChevronRight className="lean absolute bottom-2.5 right-2 text-cpx-grey-300 opacity-0 transition-opacity duration-150 group-hover/stat:opacity-100 group-focus-visible/stat:opacity-100" />
+      <IconChevronRight className="lean absolute bottom-2.5 right-2 text-ghost opacity-0 transition-opacity duration-150 group-hover/stat:opacity-100 group-focus-visible/stat:opacity-100" />
     </Link>
   ) : (
     <div key={flash} className={cell}>
@@ -1103,7 +1103,7 @@ export function StatStrip({
   return (
     <section
       aria-label={label}
-      className={`grid gap-px overflow-hidden border border-cpx-grey-100 bg-cpx-grey-100 ${className}`}
+      className={`grid gap-px overflow-hidden border border-rule bg-fill ${className}`}
     >
       {children}
     </section>
@@ -1133,14 +1133,12 @@ export function FilterChip({
       aria-pressed={active}
       className={`inline-flex h-7 shrink-0 items-center gap-1.5 rounded-sm border px-2.5 text-xs transition-colors duration-150 enabled:active:scale-[0.97] ${
         active
-          ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-          : `border-cpx-grey-100 bg-white hover:border-cpx-grey-200 hover:bg-cpx-grey-50 ${count === 0 ? "text-cpx-grey-500" : ""}`
+          ? "border-cpx-green bg-select font-medium text-ink"
+          : `border-rule bg-surface hover:border-rule-strong hover:bg-inset ${count === 0 ? "text-mute" : ""}`
       }`}
     >
       {label}
-      {count !== undefined && (
-        <CountBadge n={count} className={active ? "bg-cpx-green-100 text-cpx-green-900" : ""} />
-      )}
+      {count !== undefined && <CountBadge n={count} />}
     </button>
   );
 }
@@ -1159,7 +1157,7 @@ export function Fact({
 }) {
   return (
     <div className="min-w-0" title={title}>
-      <dt className="text-2xs text-cpx-grey-500">{label}</dt>
+      <dt className="text-2xs text-mute">{label}</dt>
       <dd className={`text-sm font-medium ${truncate ? "truncate" : ""}`}>{value}</dd>
     </div>
   );
@@ -1176,8 +1174,8 @@ export function DetailRow({
   children: ReactNode;
 }) {
   return (
-    <div className="mt-4 border-t border-cpx-grey-100 pt-3">
-      <span className="flex items-center gap-2 text-2xs font-medium uppercase tracking-wide text-cpx-grey-500">
+    <div className="mt-4 border-t border-rule pt-3">
+      <span className="flex items-center gap-2 text-2xs font-medium uppercase tracking-wide text-mute">
         {label}
         {count !== undefined && <CountBadge n={count} />}
       </span>
@@ -1203,8 +1201,8 @@ export function MasterListItem({
       aria-current={selected || undefined}
       className={`block w-full border-l-2 px-3 py-2 text-left transition-colors duration-150 ${
         selected
-          ? "border-cpx-green bg-cpx-green-50/60"
-          : "border-transparent hover:border-cpx-grey-200 hover:bg-cpx-grey-50"
+          ? "border-cpx-green bg-wash"
+          : "border-transparent hover:border-rule-strong hover:bg-inset"
       }`}
     >
       {children}
@@ -1292,18 +1290,18 @@ export interface Step {
 }
 
 const MARKER: Record<StepState, string> = {
-  pending: "bg-white ring-cpx-grey-200",
+  pending: "bg-surface ring-rule-strong",
   // In progress is Bright Purple, the CPX "waiting" colour, and it is still,
   // not pulsing (hard rule 4).
   running: "bg-cpx-bright-100 ring-cpx-bright",
-  completed: "bg-cpx-green ring-cpx-purple",
+  completed: "bg-cpx-green ring-accent",
   partial: "bg-status-warn-fill ring-status-warn-ink",
   failed: "bg-cpx-red ring-cpx-red",
   "awaiting-review": "bg-status-warn-fill ring-status-warn-ink",
 };
 
 const STATE_INK: Record<StepState, string> = {
-  pending: "text-cpx-grey-500",
+  pending: "text-mute",
   running: "text-status-warn-ink",
   completed: "text-green-contrast",
   partial: "text-status-warn-ink",
@@ -1329,7 +1327,7 @@ export function StepRail({ steps }: { steps: Step[] }) {
           <li key={s.key} className="flex gap-3">
             <span className="flex flex-col items-center">
               <StepMarker state={s.state} />
-              {!last && <span className="w-px flex-1 bg-cpx-grey-100" />}
+              {!last && <span className="w-px flex-1 bg-fill" />}
             </span>
             <span className={`min-w-0 flex-1 ${last ? "" : "pb-3"}`}>
               <span className="flex flex-wrap items-baseline gap-2">
@@ -1342,7 +1340,7 @@ export function StepRail({ steps }: { steps: Step[] }) {
                 )}
               </span>
               {s.detail && (
-                <span className="mt-0.5 block text-xs text-cpx-grey-500">{s.detail}</span>
+                <span className="mt-0.5 block text-xs text-mute">{s.detail}</span>
               )}
             </span>
           </li>

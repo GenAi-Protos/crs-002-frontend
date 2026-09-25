@@ -47,14 +47,14 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
         enter={0}
         flush
       >
-        <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
           <SearchBox value={q} onChange={setQ} placeholder="Search watches" className="w-full max-w-72" />
           <div className="flex-1" />
           <ListMeta shown={rows.length} total={watches.length} sort="Name A to Z" />
         </div>
         {rows.length === 0 && (
-          <p className="px-3 py-6 text-center text-sm text-cpx-grey-500">
-            <span className="font-medium text-cpx-black">0 watches</span>
+          <p className="px-3 py-6 text-center text-sm text-mute">
+            <span className="font-medium text-ink">0 watches</span>
             {q ? " match." : "."}
           </p>
         )}
@@ -62,35 +62,35 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
           {rows.map((w) => {
             const isOpen = open === w.id;
             return (
-              <li key={w.id} className="border-b border-cpx-grey-100 last:border-b-0">
+              <li key={w.id} className="border-b border-rule last:border-b-0">
                 <button
                   onClick={() => setOpen(isOpen ? null : w.id)}
                   aria-expanded={isOpen}
-                  className={`row-link flex w-full items-center gap-3 px-3 py-2 text-left ${isOpen ? "bg-cpx-green-50/60" : ""}`}
+                  className={`row-link flex w-full items-center gap-3 px-3 py-2 text-left ${isOpen ? "bg-wash" : ""}`}
                 >
-                  <IconChevronDown className={`text-cpx-grey-400 ${isOpen ? "" : "-rotate-90"}`} />
+                  <IconChevronDown className={`text-faint ${isOpen ? "" : "-rotate-90"}`} />
                   <span className="min-w-0 flex-1 truncate text-sm font-medium">{w.name}</span>
                   <span className="hidden flex-wrap gap-1 @xl/page:flex">
                     {w.pirRefs.map((p) => (
                       <TypeBadge key={p} label={p} />
                     ))}
                   </span>
-                  <span className="w-20 shrink-0 text-right text-xs capitalize text-cpx-grey-500">{w.cadence}</span>
-                  <span className="w-20 shrink-0 text-right text-xs tabular-nums text-cpx-grey-500">
+                  <span className="w-20 shrink-0 text-right text-xs capitalize text-mute">{w.cadence}</span>
+                  <span className="w-20 shrink-0 text-right text-xs tabular-nums text-mute">
                     {w.terms.length} {w.terms.length === 1 ? "term" : "terms"}
                   </span>
                 </button>
                 {isOpen && (
-                  <div className="reveal grid gap-3 border-t border-cpx-grey-100 bg-cpx-grey-50/60 px-3 py-3 pl-9 @3xl/page:grid-cols-2">
+                  <div className="reveal grid gap-3 border-t border-rule bg-inset/60 px-3 py-3 pl-9 @3xl/page:grid-cols-2">
                     <div>
                       <div className="flex flex-wrap gap-1.5">
                         {w.terms.map((t) => (
-                          <span key={t} className="rounded-sm border border-cpx-grey-100 bg-white px-1.5 py-0.5 font-mono text-xs">
+                          <span key={t} className="rounded-sm border border-rule bg-surface px-1.5 py-0.5 font-mono text-xs">
                             {t}
                           </span>
                         ))}
                       </div>
-                      <p className="mt-2 text-xs text-cpx-grey-500">
+                      <p className="mt-2 text-xs text-mute">
                         {w.language} · {w.region}
                       </p>
                       <div className="mt-3 flex gap-2">
@@ -112,7 +112,8 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
                             }
                           }}
                           onBlur={() => setConfirming(null)}
-                          className={confirming === w.id ? "border-cpx-red-700 bg-cpx-red-50" : ""}
+                          // The darker edge marks the armed state over the danger button's own.
+                          className={confirming === w.id ? "border-danger!" : ""}
                         >
                           {confirming === w.id ? "Confirm delete" : "Delete"}
                         </Button>
@@ -120,8 +121,8 @@ export function WatchesTab({ initialRows = WATCHES }: { initialRows?: KeywordWat
                     </div>
                     {w.lastRun ? (
                       <div>
-                        <p className="text-xs text-cpx-grey-500">Last run {gstDateTime(w.lastRun.at)}</p>
-                        <ul className="mt-1 divide-y divide-cpx-grey-100 rounded-sm border border-cpx-grey-100 bg-white">
+                        <p className="text-xs text-mute">Last run {gstDateTime(w.lastRun.at)}</p>
+                        <ul className="mt-1 divide-y divide-rule rounded-sm border border-rule bg-surface">
                           {w.lastRun.results.map((r) => (
                             <li key={r.sourceName} className="flex justify-between px-2 py-1 text-xs">
                               <span>{r.sourceName}</span>
@@ -208,14 +209,14 @@ function WatchDialog({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="h-9 w-full border border-cpx-grey-100 px-3 text-sm focus:border-cpx-green focus:outline-none"
+              className="h-9 w-full border border-rule px-3 text-sm focus:border-cpx-green focus:outline-none"
             />
           </Field>
           <Field label="Terms, comma separated">
             <input
               value={terms}
               onChange={(e) => setTerms(e.target.value)}
-              className="h-9 w-full border border-cpx-grey-100 px-3 font-mono text-xs focus:border-cpx-green focus:outline-none"
+              className="h-9 w-full border border-rule px-3 font-mono text-xs focus:border-cpx-green focus:outline-none"
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">
@@ -223,7 +224,7 @@ function WatchDialog({
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+                className="h-9 w-full border border-rule bg-surface px-2 text-sm focus:outline-none"
               >
                 {["English", "Arabic", "English and Arabic"].map((l) => (
                   <option key={l}>{l}</option>
@@ -234,7 +235,7 @@ function WatchDialog({
               <select
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                className="h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+                className="h-9 w-full border border-rule bg-surface px-2 text-sm focus:outline-none"
               >
                 {["Global", "Middle East", "UAE"].map((r) => (
                   <option key={r}>{r}</option>
@@ -257,8 +258,8 @@ function WatchDialog({
                   title={p.question}
                   className={`px-2 py-1 text-xs ${
                     pirRefs.includes(p.ref)
-                      ? "border border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-                      : "border border-cpx-grey-100 text-cpx-grey-500"
+                      ? "border border-cpx-green bg-select font-medium text-ink"
+                      : "border border-rule text-mute"
                   }`}
                 >
                   {p.ref}
@@ -270,7 +271,7 @@ function WatchDialog({
             <select
               value={cadence}
               onChange={(e) => setCadence(e.target.value as Rhythm)}
-              className="h-9 w-full border border-cpx-grey-100 bg-white px-2 text-sm focus:outline-none"
+              className="h-9 w-full border border-rule bg-surface px-2 text-sm focus:outline-none"
             >
               {CADENCES.map((c) => (
                 <option key={c}>{c}</option>
@@ -317,7 +318,7 @@ function WatchDialog({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs text-cpx-grey-500">{label}</span>
+      <span className="text-xs text-mute">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
   );

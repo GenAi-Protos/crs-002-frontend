@@ -31,12 +31,12 @@ export function Sparkline({
                 className="bar-rise block w-full"
                 style={{
                   height: p.value > 0 ? `${Math.max(8, (p.value / max) * 100)}%` : "2px",
-                  background: p.value > 0 ? color : "var(--color-cpx-grey-200)",
+                  background: p.value > 0 ? color : "var(--color-rule-strong)",
                   animationDelay: `${Math.min(i, 30) * 8}ms`,
                 }}
               />
               <span
-                className={`tip absolute bottom-full z-40 mb-1.5 w-max origin-bottom rounded-sm bg-cpx-purple px-2 py-1 text-2xs font-medium text-white shadow-pop ${pos}`}
+                className={`tip absolute bottom-full z-40 mb-1.5 w-max origin-bottom rounded-sm bg-brand px-2 py-1 text-2xs font-medium text-white shadow-pop ${pos}`}
               >
                 {gstDate(p.date)} · {p.value.toLocaleString("en-GB")} {unit}
               </span>

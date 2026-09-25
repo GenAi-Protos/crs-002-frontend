@@ -31,14 +31,14 @@ export const T_SCROLL = "overflow-x-auto";
 export const T_TABLE = "w-full border-collapse";
 
 /** The header row: one rule under it. */
-export const T_HEAD = "border-b border-cpx-grey-100 text-left";
+export const T_HEAD = "border-b border-rule text-left";
 
 /**
  * The header band sits on the cell rather than the row, so a sticky header
  * stays opaque as rows scroll under it. CSD-007 head: grey-50 band, 12px
  * uppercase, semibold, secondary grey.
  */
-export const T_TH = `${PAD} bg-cpx-grey-50 py-1.5 text-2xs font-semibold uppercase tracking-wide whitespace-nowrap text-cpx-grey-500`;
+export const T_TH = `${PAD} bg-inset py-1.5 text-2xs font-semibold uppercase tracking-wide whitespace-nowrap text-mute`;
 
 /** Opt-in: a header that stays put while the page scrolls under it. */
 export const T_STICKY = "sticky top-0 z-10";
@@ -48,10 +48,10 @@ export const T_STICKY = "sticky top-0 z-10";
  * on the leading edge (`row-link`, an inset shadow: nothing reflows) and a
  * `.lean` chevron that leans in, where the row navigates.
  */
-export const T_ROW = "row-link border-b border-cpx-grey-100 align-middle last:border-b-0";
+export const T_ROW = "row-link border-b border-rule align-middle last:border-b-0";
 
 /** A row that is the current selection or the open one. */
-export const T_ROW_SELECTED = "bg-cpx-green-50/60 shadow-[inset_2px_0_0_var(--color-cpx-green)]";
+export const T_ROW_SELECTED = "bg-wash shadow-[inset_2px_0_0_var(--color-cpx-green)]";
 
 export const T_TD = `${PAD} py-1.5 text-sm`;
 
@@ -68,7 +68,7 @@ export const T_NUM = "text-right tabular-nums";
 export function EmptyRow({ colSpan, children }: { colSpan: number; children: React.ReactNode }) {
   return (
     <tr>
-      <td colSpan={colSpan} className="px-3 py-6 text-center text-sm text-cpx-grey-500">
+      <td colSpan={colSpan} className="px-3 py-6 text-center text-sm text-mute">
         {children}
       </td>
     </tr>
@@ -96,7 +96,7 @@ export function TypeBadge({
       className={`inline-flex h-[18px] max-w-full items-center overflow-hidden text-ellipsis whitespace-nowrap rounded-sm px-1.5 text-2xs font-medium ${
         tone === "warn"
           ? "bg-status-warn-fill text-status-warn-ink"
-          : "bg-cpx-grey-100 text-cpx-grey-700"
+          : "bg-fill text-ink-2"
       }`}
     >
       {label}
@@ -146,7 +146,7 @@ export function CopyButton({
       onClick={copy}
       title={copied ? "Copied" : `Copy ${what} as shown`}
       aria-label={copied ? "Copied" : `Copy ${what} as shown`}
-      className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center text-cpx-grey-500 opacity-45 transition-opacity hover:opacity-100 focus-visible:opacity-100 ${className}`}
+      className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center text-mute opacity-45 transition-opacity hover:opacity-100 focus-visible:opacity-100 ${className}`}
     >
       {copied ? (
         <IconCheck className="text-green-contrast" />
@@ -208,7 +208,7 @@ export function ConfidenceValue({ value }: { value: number }) {
       </span>
       <span
         aria-hidden
-        className="h-1.5 w-10 shrink-0 overflow-hidden rounded-sm bg-cpx-grey-100"
+        className="h-1.5 w-10 shrink-0 overflow-hidden rounded-sm bg-fill"
       >
         <span
           className={`block h-full rounded-sm ${fill}`}
@@ -267,7 +267,7 @@ export function ColumnInfo({
         aria-label={`What ${heading} means`}
         title={`What ${heading} means`}
         className={`ml-1 inline-flex h-[18px] w-[18px] items-center justify-center rounded-sm transition-opacity ${
-          open ? "bg-cpx-grey-100 opacity-100" : "opacity-50 hover:opacity-100"
+          open ? "bg-fill opacity-100" : "opacity-50 hover:opacity-100"
         }`}
       >
         <IconHistory />
@@ -277,16 +277,16 @@ export function ColumnInfo({
         <span
           role="dialog"
           aria-label={heading}
-          className="absolute left-0 top-6 z-30 block w-[22rem] border border-cpx-grey-100 bg-white p-3 text-left shadow-pop"
+          className="absolute left-0 top-6 z-30 block w-[22rem] border border-rule bg-overlay p-3 text-left shadow-pop"
         >
           <span className="block text-xs font-medium tracking-tightish">
             {heading}
           </span>
-          <span className="mt-1 block text-2xs leading-relaxed text-cpx-grey-500">
+          <span className="mt-1 block text-2xs leading-relaxed text-mute">
             {body}
           </span>
           {rows.length > 0 && (
-            <span className="mt-2 block border-t border-cpx-grey-100 pt-2">
+            <span className="mt-2 block border-t border-rule pt-2">
               {rows.map((r) => (
                 <span
                   key={r.label + r.value}

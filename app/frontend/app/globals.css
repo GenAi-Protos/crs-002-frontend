@@ -68,52 +68,118 @@
   --color-cpx-grey-800: #181820;
   --color-cpx-grey-900: #040405;
 
-  /* Links in content: Accent Blue 700, 5:1 on white. Never a chart slot. */
-  --color-link: #0276b0;
+  /* ---------------------------------------------------------------------------
+     Theme tokens (docs/03 section 2, Themes). Screens colour neutrals and tints
+     through these names only, never through a grey, white or tint step, so one
+     token carries both themes. Each is light-dark(light, dark): the light value
+     is the CPX console look unchanged; the dark value is its own step, checked
+     for AA against the dark surfaces, not an inversion. `color-scheme` on the
+     root (set from data-theme, below) picks the side. Brand scale classes stay
+     only for fills that read the same on both grounds: the green primary
+     button, TLP labels, the severity and confidence marks. */
 
-  /* Neutral surfaces. Named so no screen carries a grey hex of its own.
-     Page is white; band and inset are grey-50; the hairline is grey-100. */
-  --color-canvas: #ffffff;
-  --color-band: #f7f7f8;
-  --color-rule: #ececef;
-  --color-inset: #f7f7f8;
+  /* Surfaces, darkest to lightest in the dark theme: band under panels, the
+     page, panels and fields, raised overlays (menus, dialogs, the drawer). */
+  --color-band: light-dark(#f7f7f8, #0c0c11);
+  --color-canvas: light-dark(#ffffff, #111117);
+  --color-surface: light-dark(#ffffff, #16161e);
+  --color-overlay: light-dark(#ffffff, #1e1e28);
+  /* A quiet fill inside a surface: table head, hover, disabled field. */
+  --color-inset: light-dark(#f7f7f8, #20202a);
+  /* A stronger neutral fill: counts, skeletons, neutral chips, bar tracks. */
+  --color-fill: light-dark(#ececef, #282833);
+
+  /* Lines: the hairline, and the step a hover or a control edge takes. */
+  --color-rule: light-dark(#ececef, #292933);
+  --color-rule-strong: light-dark(#dcdce0, #3b3b48);
+  /* Separators and idle chevrons: decoration, never the only carrier. */
+  --color-ghost: light-dark(#bfbfc6, #5a5a66);
+
+  /* Ink. mute is secondary text (5.1:1 light, 6.4:1 on the dark surface);
+     faint is disabled text and idle marks, which WCAG exempts. */
+  --color-ink: light-dark(#040405, #ececf1);
+  --color-ink-2: light-dark(#2b2b34, #d2d2da);
+  --color-ink-3: light-dark(#4a4a53, #b6b6c0);
+  --color-mute: light-dark(#6e6e78, #9e9eaa);
+  --color-faint: light-dark(#9a9aa2, #74747f);
+
+  /* The brand purple as ink (hover and selected text) and as a solid fill
+     (tooltips, the segmented selection, avatars). White text on the brand
+     fill is 14:1 light and 7.5:1 dark. Not named "solid": that would collide
+     with the outline-solid and border-solid style utilities. */
+  --color-accent: light-dark(#1e1847, #dedef2);
+  --color-brand: light-dark(#1e1847, #4a4aa6);
+  /* Keyboard focus. Bright Purple is 5.6:1 on white but 3.2:1 on the dark
+     surface, so the dark ring takes the 300 step (7:1). */
+  --color-focus: light-dark(#5c5cc0, #9e9ed8);
+
+  /* Links in content: Accent Blue 700, 5:1 on white; blue-300 in the dark.
+     Never a chart slot. */
+  --color-link: light-dark(#0276b0, #6fd5ff);
+
+  /* Selection is green, the CPX way: the active destination and chip, a row
+     under the pointer or open, a figure that just changed. Translucent in the
+     dark theme so the green reads on every surface it lands on. */
+  --color-select: light-dark(#ecfef2, rgb(76 238 118 / 0.12));
+  --color-select-2: light-dark(#d2fbdf, rgb(76 238 118 / 0.22));
+  --color-wash: light-dark(rgb(236 254 242 / 0.6), rgb(76 238 118 / 0.07));
+  --color-flash: light-dark(#d2fbdf, rgb(76 238 118 / 0.24));
 
   /* Status: no amber exists in this palette. "Warn" is needs-attention, in the
-     secondary brand purple, so it never reads as an error. */
-  --color-status-warn-fill: #efeff9;
-  --color-status-warn-ink: #3c3c86; /* 8.6:1 on the warn fill */
+     secondary brand purple, so it never reads as an error. Each tone has a
+     tint (fill), an edge (border) and an ink. */
+  --color-status-warn-fill: light-dark(#efeff9, rgb(123 123 203 / 0.18));
+  --color-status-warn-edge: light-dark(#c2c2e8, rgb(123 123 203 / 0.45));
+  --color-status-warn-ink: light-dark(#3c3c86, #c2c2e8); /* 8.6:1 on the warn fill */
   --color-status-idle: #9a9aa2;
-  --color-green-contrast: #0f7e33; /* green-800, 4.6:1 on white */
+  --color-green-contrast: light-dark(#0f7e33, #5fef87); /* green-800, 4.6:1 on white */
+  --color-good-tint: light-dark(#ecfef2, rgb(76 238 118 / 0.1));
+  --color-good-edge: light-dark(#a8f6c0, rgb(76 238 118 / 0.35));
+  --color-danger: light-dark(#b00030, #ff7095);
+  --color-danger-tint: light-dark(#ffeaf0, rgb(245 14 71 / 0.13));
+  --color-danger-tint-2: light-dark(#ffd0dd, rgb(245 14 71 / 0.22));
+  --color-danger-edge: light-dark(#ffa3bc, rgb(255 54 102 / 0.45));
+  --color-info: light-dark(#0276b0, #6fd5ff);
+  --color-info-tint: light-dark(#ebf9ff, rgb(20 171 245 / 0.12));
+  --color-info-edge: light-dark(#cff0ff, rgb(20 171 245 / 0.35));
 
-  /* Categorical chart slots, fixed order, all from the CPX scales */
-  --color-cat-1: #5c5cc0;
+  /* Categorical chart slots, fixed order, all from the CPX scales. The dark
+     set lifts slot 1 a step and swaps slot 4's Dark Purple (invisible on a
+     dark ground) for bright-200; validated with the dataviz palette check
+     against #16161e: adjacent CVD separation 12.1, normal-vision 22.4, every
+     slot over 3:1. */
+  --color-cat-1: light-dark(#5c5cc0, #7b7bcb);
   --color-cat-2: #18a845;
   --color-cat-3: #0593db;
-  --color-cat-4: #1e1847;
+  --color-cat-4: light-dark(#1e1847, #c2c2e8);
   --color-cat-5: #f50e47;
-  --color-cat-6: #6e6e78;
+  --color-cat-6: light-dark(#6e6e78, #9a9aa2);
 
-  /* Sequential ramp: Bright Purple scale, ending on Dark Purple */
-  --color-seq-1: #efeff9;
-  --color-seq-2: #dedef2;
-  --color-seq-3: #c2c2e8;
-  --color-seq-4: #9e9ed8;
+  /* Sequential ramp: Bright Purple scale, ending on Dark Purple. In the dark
+     theme the ramp runs the other way (more is lighter, so more still means
+     more contrast), starting at bright-800 so the lowest used step clears 2:1. */
+  --color-seq-1: light-dark(#efeff9, #2e2e66);
+  --color-seq-2: light-dark(#dedef2, #3c3c86);
+  --color-seq-3: light-dark(#c2c2e8, #4a4aa6);
+  --color-seq-4: light-dark(#9e9ed8, #5c5cc0);
   --color-seq-5: #7b7bcb;
-  --color-seq-6: #5c5cc0;
-  --color-seq-7: #4a4aa6;
-  --color-seq-8: #3c3c86;
-  --color-seq-9: #1e1847;
+  --color-seq-6: light-dark(#5c5cc0, #9e9ed8);
+  --color-seq-7: light-dark(#4a4aa6, #c2c2e8);
+  --color-seq-8: light-dark(#3c3c86, #dedef2);
+  --color-seq-9: light-dark(#1e1847, #efeff9);
 
   /* Severity, an ordinal scale. One map for every badge, bar and chart
      (docs/03 section 2). Validated with the dataviz palette check: adjacent
      pairs separate under protan, deutan and tritan simulation. Low is a
-     deliberate neutral and, like every severity, always ships its word. */
-  --color-sev-critical: #b00030;
-  --color-sev-high: #ff3666;
+     deliberate neutral and, like every severity, always ships its word. In the
+     dark theme critical takes red-600 and high red-300 (#b00030 is 2.5:1 on
+     the dark surface); the dark set passes CVD, normal-vision and 3:1. */
+  --color-sev-critical: light-dark(#b00030, #d60039);
+  --color-sev-high: light-dark(#ff3666, #ff7095);
   --color-sev-medium: #0593db;
   --color-sev-low: #9a9aa2;
 
-  --shadow-pop: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-pop: 0 10px 15px -3px var(--shadow-ink), 0 4px 6px -4px var(--shadow-ink);
   --tracking-tightish: -0.01em;
 
   /* Motion. Two curves and nothing else: an ease-out for anything arriving or
@@ -164,10 +230,49 @@
   --duration-fast: 150ms;
   --duration-base: 200ms;
   --duration-slow: 240ms;
+
+  /* The theme. lib/theme.ts sets data-theme before first paint (the stored
+     choice, else the OS preference); without it the OS decides. color-scheme
+     resolves every light-dark() token and themes native controls, scrollbars
+     and pickers with it. */
+  color-scheme: light dark;
+
+  /* Theme values that are not Tailwind colours. Shadows barely read on a dark
+     ground, so they deepen; the scrim does too. The mark follows docs/03
+     section 5: green-800 chevron and Dark Purple blocks on light, the reverse
+     mark's #4CEE76 and white on dark. */
+  --shadow-ink: light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.45));
+  --scrim: light-dark(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.6));
+  --mark-chevron: light-dark(#0f7e33, #4cee76);
+  --mark-blocks: light-dark(#1e1847, #ffffff);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Only the logo pair and the theme toggle's icons branch on the theme; every
+   colour goes through a light-dark() token instead. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* A client document stays paper in both themes: the report preview is the
+   artefact as the client receives it, and the PDF is printed from it. */
+.paper {
+  color-scheme: light;
+}
+
+/* Switching theme crossfades the whole console once, over 200ms
+   (components/shell/ThemeToggle.tsx). Reduced motion skips the transition. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--ease-out-quart);
 }
 
 body {
-  color: var(--color-cpx-black);
+  color: var(--color-ink);
   background: var(--color-canvas);
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
@@ -192,7 +297,7 @@ body {
   }
 
   dialog::backdrop {
-    background: rgb(0 0 0 / 0.3);
+    background: var(--scrim);
   }
 
   /* Modal entry, once, on the native dialog: the surface settles in over
@@ -231,7 +336,7 @@ body {
   .cpx-scroll {
     scrollbar-gutter: stable;
     scrollbar-width: thin;
-    scrollbar-color: var(--color-cpx-grey-300) transparent;
+    scrollbar-color: var(--color-ghost) transparent;
   }
   .cpx-scroll::-webkit-scrollbar {
     width: 10px;
@@ -240,12 +345,12 @@ body {
     background: var(--color-band);
   }
   .cpx-scroll::-webkit-scrollbar-thumb {
-    background: var(--color-cpx-grey-300);
+    background: var(--color-ghost);
     border: 2px solid var(--color-band);
     border-radius: 5px;
   }
   .cpx-scroll::-webkit-scrollbar-thumb:hover {
-    background: var(--color-cpx-grey-400);
+    background: var(--color-faint);
   }
 
   /* Route change: a 120ms crossfade and no movement, short enough that a
@@ -292,9 +397,10 @@ body {
 
 /* Keyboard focus is always visible. The CSD-007 guide rings in green, but green is
    1.5:1 on white and fails the 3:1 a focus indicator needs, so the outline stays in
-   the secondary brand purple (5.6:1). Inputs still turn their border green on focus. */
+   the secondary brand purple (5.6:1; the 300 step, 7:1, in the dark theme). Inputs
+   still turn their border green on focus. */
 :focus-visible {
-  outline: 2px solid var(--color-cpx-bright);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -308,6 +414,10 @@ body {
 /* Preview is the PDF path: the browser writes the file from the previewed
    markup, so what is checked and what is exported cannot drift apart. */
 @media print {
+  /* Paper is white whichever theme is on screen. */
+  :root {
+    color-scheme: light !important;
+  }
   /* The shell is a fixed-height, non-scrolling box on screen (app/layout.tsx).
      On paper it must flow, or the paginated preview is clipped to one page. */
   body,
@@ -482,7 +592,7 @@ body {
    "what moved" without a delta the backend does not send. */
 @keyframes changed {
   from {
-    background-color: var(--color-cpx-green-100);
+    background-color: var(--color-flash);
   }
 }
 .changed {
@@ -497,7 +607,7 @@ body {
     box-shadow var(--duration-fast) var(--ease-out-quart);
   &:hover,
   &:focus-within {
-    background-color: color-mix(in srgb, var(--color-cpx-green-50) 60%, transparent);
+    background-color: var(--color-wash);
     box-shadow: inset 2px 0 0 var(--color-cpx-green);
   }
   & .lean {
@@ -508,7 +618,7 @@ body {
   &:hover .lean,
   &:focus-within .lean {
     translate: 2px 0;
-    color: var(--color-cpx-purple);
+    color: var(--color-accent);
   }
 }
 

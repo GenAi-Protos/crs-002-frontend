@@ -77,10 +77,10 @@ const LEVEL: Record<
   IntelligenceDataset["threatLevel"]["level"],
   { ink: string; bar: string; label: string }
 > = {
-  severe: { ink: "text-cpx-red-700", bar: "var(--color-sev-critical)", label: "Severe" },
-  high: { ink: "text-cpx-red-700", bar: "var(--color-sev-high)", label: "High" },
-  elevated: { ink: "text-cpx-bright-700", bar: "var(--color-cpx-bright)", label: "Elevated" },
-  moderate: { ink: "text-cpx-blue-700", bar: "var(--color-sev-medium)", label: "Moderate" },
+  severe: { ink: "text-danger", bar: "var(--color-sev-critical)", label: "Severe" },
+  high: { ink: "text-danger", bar: "var(--color-sev-high)", label: "High" },
+  elevated: { ink: "text-status-warn-ink", bar: "var(--color-cpx-bright)", label: "Elevated" },
+  moderate: { ink: "text-info", bar: "var(--color-sev-medium)", label: "Moderate" },
   low: { ink: "text-green-contrast", bar: "var(--color-green-contrast)", label: "Low" },
 };
 
@@ -96,18 +96,18 @@ export function PosturePanel({ data, p }: { data: IntelligenceDataset; p: Postur
   const tone = (n: number, t: StatTone): StatTone => (n > 0 ? t : "neutral");
   return (
     <Panel title="Threat posture" aside="All held intelligence" enter={0} flush>
-      <div className="grid grid-cols-2 gap-px bg-cpx-grey-100 @4xl/page:grid-cols-6">
-        <div className="col-span-2 flex min-w-0 gap-3 bg-white px-3 py-2.5">
+      <div className="grid grid-cols-2 gap-px bg-fill @4xl/page:grid-cols-6">
+        <div className="col-span-2 flex min-w-0 gap-3 bg-surface px-3 py-2.5">
           <span aria-hidden className="w-1 shrink-0 self-stretch" style={{ background: level.bar }} />
           <div className="min-w-0">
-            <span className="block text-xs font-medium text-cpx-grey-600">Threat level</span>
+            <span className="block text-xs font-medium text-ink-3">Threat level</span>
             <span
               className={`mt-1 block font-display text-xl font-semibold leading-7 tracking-tightish ${level.ink}`}
             >
               {level.label}
             </span>
             <span
-              className="mt-0.5 block text-2xs leading-4 text-cpx-grey-500"
+              className="mt-0.5 block text-2xs leading-4 text-mute"
               title={data.threatLevel.reason}
             >
               <span className="line-clamp-2">
@@ -298,7 +298,7 @@ export function AttentionPanel({
                 </ul>
               )}
               {list && list.total > shown.length && home && (
-                <div className="flex justify-end border-t border-cpx-grey-100 px-3 py-1.5">
+                <div className="flex justify-end border-t border-rule px-3 py-1.5">
                   <PanelLink href={home}>View all {list.total}</PanelLink>
                 </div>
               )}
@@ -314,7 +314,7 @@ function WorkRow({ item, now, draft }: { item: ViewQueueItem; now: Date; draft: 
   const when = item.updatedAt ?? item.createdAt;
   const who = item.assignedTo ?? item.owner;
   return (
-    <li className="row-link relative flex items-center gap-2.5 border-b border-cpx-grey-100 px-3 py-1.5 last:border-b-0">
+    <li className="row-link relative flex items-center gap-2.5 border-b border-rule px-3 py-1.5 last:border-b-0">
       {item.status && <StatusPill tone={statusTone(item.status)} label={statusLabel(item.status)} />}
       {item.href ? (
         <Link
@@ -330,20 +330,20 @@ function WorkRow({ item, now, draft }: { item: ViewQueueItem; now: Date; draft: 
         </span>
       )}
       {who && (
-        <span className="hidden w-32 shrink-0 truncate text-xs text-cpx-grey-500 @xl:block">
+        <span className="hidden w-32 shrink-0 truncate text-xs text-mute @xl:block">
           {userName(who)}
         </span>
       )}
       {when && (
         <span
-          className="w-14 shrink-0 text-right text-xs tabular-nums text-cpx-grey-500"
+          className="w-14 shrink-0 text-right text-xs tabular-nums text-mute"
           title={gstDateTime(when)}
         >
           {agoFromNow(when, now)}
         </span>
       )}
       {draft && <DraftLink id={item.id} title={item.title} label="Draft advisory" />}
-      {item.href && <IconChevronRight className="lean shrink-0 text-cpx-grey-300" />}
+      {item.href && <IconChevronRight className="lean shrink-0 text-ghost" />}
     </li>
   );
 }
@@ -372,8 +372,8 @@ export function InsightPanel({
     const total = points.reduce((s, p) => s + p.value, 0);
     body = (
       <>
-        <p className="mb-2 text-xs text-cpx-grey-500">
-          <span className="font-medium text-cpx-black tabular-nums">{total}</span> released in {window.days}{" "}
+        <p className="mb-2 text-xs text-mute">
+          <span className="font-medium text-ink tabular-nums">{total}</span> released in {window.days}{" "}
           days
         </p>
         <Sparkline points={points} label={insight.title} unit="released" />
@@ -384,7 +384,7 @@ export function InsightPanel({
     // shown; everywhere else an empty insight is a zero, not a paragraph.
     body =
       insight.key === "source-gaps" ? (
-        <p className="text-sm text-cpx-grey-700">{insight.description}</p>
+        <p className="text-sm text-ink-2">{insight.description}</p>
       ) : (
         <EmptyState className="py-3">0 records</EmptyState>
       );
@@ -433,7 +433,7 @@ function InsightRow({ item, onSummary }: { item: ViewInsightItem; onSummary: (e:
         ? gstDate(item.value)
         : String(item.value);
   return (
-    <li className="row-link relative flex items-center gap-2.5 border-b border-cpx-grey-100 px-3 py-1.5 last:border-b-0">
+    <li className="row-link relative flex items-center gap-2.5 border-b border-rule px-3 py-1.5 last:border-b-0">
       {item.status && <StatusPill tone={statusTone(item.status)} label={statusLabel(item.status)} />}
       {item.summaryEndpoint ? (
         <button
@@ -457,9 +457,9 @@ function InsightRow({ item, onSummary }: { item: ViewInsightItem; onSummary: (e:
           {title}
         </span>
       )}
-      {value && <span className="shrink-0 text-xs tabular-nums text-cpx-grey-500">{value}</span>}
+      {value && <span className="shrink-0 text-xs tabular-nums text-mute">{value}</span>}
       {(item.href || item.summaryEndpoint) && (
-        <IconChevronRight className="lean shrink-0 text-cpx-grey-300" />
+        <IconChevronRight className="lean shrink-0 text-ghost" />
       )}
     </li>
   );
@@ -469,13 +469,13 @@ function ClientBriefings({ items, onSummary }: { items: ViewInsightItem[]; onSum
   return (
     <ul className="-mx-3 -my-3">
       {items.map((c, n) => (
-        <li key={c.id ?? n} className="border-b border-cpx-grey-100 px-3 py-2 last:border-b-0">
+        <li key={c.id ?? n} className="border-b border-rule px-3 py-2 last:border-b-0">
           <div className="flex items-center gap-2">
             <span className="min-w-0 flex-1 truncate text-sm font-medium">{c.label ?? c.title}</span>
             <CountBadge n={c.briefings?.length ?? 0} />
           </div>
           {c.briefings && c.briefings.length > 0 ? (
-            <ul className="mt-1.5 space-y-1 border-l-2 border-cpx-grey-100 pl-2.5">
+            <ul className="mt-1.5 space-y-1 border-l-2 border-rule pl-2.5">
               {c.briefings.map((b, i) => (
                 <li key={i} className="flex items-center gap-2 text-xs">
                   {b.summaryEndpoint ? (
@@ -489,12 +489,12 @@ function ClientBriefings({ items, onSummary }: { items: ViewInsightItem[]; onSum
                   ) : (
                     <span className="min-w-0 flex-1 truncate">{b.title}</span>
                   )}
-                  <span className="shrink-0 tabular-nums text-cpx-grey-500">{gstDate(b.publishedAt)}</span>
+                  <span className="shrink-0 tabular-nums text-mute">{gstDate(b.publishedAt)}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-2xs text-cpx-grey-500">0 published briefings</p>
+            <p className="mt-1 text-2xs text-mute">0 published briefings</p>
           )}
         </li>
       ))}
@@ -510,7 +510,7 @@ function DraftLink({ id, title, label = "Draft" }: { id: string; title: string; 
     <Link
       href={`/intelligence?draft=${encodeURIComponent(id)}`}
       title={`Draft an advisory: ${title}`}
-      className="group/d relative z-10 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-sm text-xs font-medium text-link transition-colors duration-150 hover:text-cpx-purple"
+      className="group/d relative z-10 inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-sm text-xs font-medium text-link transition-colors duration-150 hover:text-accent"
     >
       {label}
       <IconChevronRight className="transition-transform duration-150 ease-out-quart group-hover/d:translate-x-0.5" />
@@ -552,15 +552,15 @@ export function CriticalPanel({
           {rows.map((f) => (
             <li
               key={f.id}
-              className="row-link flex items-start gap-2.5 border-b border-cpx-grey-100 px-3 py-1.5 last:border-b-0"
+              className="row-link flex items-start gap-2.5 border-b border-rule px-3 py-1.5 last:border-b-0"
             >
               <SeverityPip level={f.severity} className="mt-1.5" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium" title={f.title}>
                   {f.title}
                 </p>
-                <p className="truncate text-2xs text-cpx-grey-500">
-                  <span className="font-medium text-cpx-grey-700">{SEV_LABEL[f.severity]}</span> · {f.category} ·{" "}
+                <p className="truncate text-2xs text-mute">
+                  <span className="font-medium text-ink-2">{SEV_LABEL[f.severity]}</span> · {f.category} ·{" "}
                   {f.clientCount} {f.clientCount === 1 ? "client" : "clients"} · first seen {gstDate(f.firstSeen)}
                 </p>
               </div>
@@ -625,7 +625,7 @@ export function FindingsPanel({
                       side="bottom"
                       content="Banded from match confidence: 85 and over is critical, 70 to 84 is high."
                     >
-                      <IconInfo className="text-cpx-grey-400" />
+                      <IconInfo className="text-faint" />
                     </Tooltip>
                   </span>
                 </th>
@@ -643,7 +643,7 @@ export function FindingsPanel({
             </thead>
             <tbody>
               {rows.map((f) => (
-                <tr key={f.id} className="row-link border-b border-cpx-grey-100 last:border-b-0">
+                <tr key={f.id} className="row-link border-b border-rule last:border-b-0">
                   <td className={T_TD}>
                     <SeverityBadge level={f.severity} />
                   </td>
@@ -652,18 +652,18 @@ export function FindingsPanel({
                       {f.title}
                     </span>
                   </td>
-                  <td className={`${T_TD} hidden text-cpx-grey-700 @2xl:table-cell`}>
+                  <td className={`${T_TD} hidden text-ink-2 @2xl:table-cell`}>
                     <span className="block truncate" title={f.category}>
                       {f.category}
                     </span>
                   </td>
-                  <td className={`${T_TD} hidden text-cpx-grey-700 @4xl:table-cell`}>
+                  <td className={`${T_TD} hidden text-ink-2 @4xl:table-cell`}>
                     <span className="block truncate" title={f.sectors.join(", ")}>
                       {f.sectors.join(", ") || "-"}
                     </span>
                   </td>
                   <td className={`${T_TD} ${T_NUM}`}>{f.clientCount}</td>
-                  <td className={`${T_TD} hidden whitespace-nowrap text-xs text-cpx-grey-500 @xl:table-cell`}>
+                  <td className={`${T_TD} hidden whitespace-nowrap text-xs text-mute @xl:table-cell`}>
                     {gstDate(f.firstSeen)}
                   </td>
                   {canDraft && (
@@ -677,7 +677,7 @@ export function FindingsPanel({
           </table>
         )}
         {urgent.length > 8 && (
-          <div className="flex justify-end border-t border-cpx-grey-100 px-3 py-1.5">
+          <div className="flex justify-end border-t border-rule px-3 py-1.5">
             <Button variant="ghost" size="sm" onClick={() => setAll((v) => !v)}>
               {all ? "Show fewer" : `Show all ${urgent.length}`}
             </Button>
@@ -700,7 +700,7 @@ export function BreakdownPanel({
 }) {
   const counts = severityCounts(findings);
   const cats = byCategory(findings);
-  const head = "mb-2 text-xs font-medium text-cpx-grey-600";
+  const head = "mb-2 text-xs font-medium text-ink-3";
   return (
     <Panel
       title="Findings breakdown"
@@ -725,7 +725,7 @@ export function BreakdownPanel({
         <section>
           <h3 className={head}>By PIR category</h3>
           {cats.length === 0 ? (
-            <p className="text-sm text-cpx-grey-500">0 findings held.</p>
+            <p className="text-sm text-mute">0 findings held.</p>
           ) : (
             <BarListH items={cats} labelClass="w-28 @md:w-40" />
           )}
@@ -765,7 +765,7 @@ export function CampaignsPanel({
             {rows.map((c) => (
               <li
                 key={c.id}
-                className="row-link relative border-b border-cpx-grey-100 px-3 py-1.5 last:border-b-0"
+                className="row-link relative border-b border-rule px-3 py-1.5 last:border-b-0"
               >
                 <div className="flex items-center gap-2">
                   {c.status === "active" && <StatusPill tone="warn" label="Active" />}
@@ -782,11 +782,11 @@ export function CampaignsPanel({
                       {c.name}
                     </span>
                   )}
-                  <span className="shrink-0 text-2xs tabular-nums text-cpx-grey-500" title="Last activity">
+                  <span className="shrink-0 text-2xs tabular-nums text-mute" title="Last activity">
                     {gstDate(c.lastActivity)}
                   </span>
                 </div>
-                <p className="mt-0.5 truncate pl-0.5 text-2xs text-cpx-grey-500">
+                <p className="mt-0.5 truncate pl-0.5 text-2xs text-mute">
                   {[
                     c.status === "active" ? "" : statusLabel(c.status),
                     c.sectors.join(", "),
@@ -878,18 +878,18 @@ export function RecentIntelPanel({
                     )}
                   </td>
                   <td className={`${T_TD} hidden @3xl:table-cell`}>
-                    <span className="block truncate font-mono text-2xs text-cpx-grey-500">{a.ref}</span>
+                    <span className="block truncate font-mono text-2xs text-mute">{a.ref}</span>
                   </td>
                   <td className={T_TD}>
                     <StatusPill tone={state.tone} label={state.label} />
                   </td>
                   <td className={`${T_TD} hidden @2xl:table-cell`}>
-                    <span className="block truncate text-xs text-cpx-grey-600">
+                    <span className="block truncate text-xs text-ink-3">
                       {a.owner ? userName(a.owner) : "-"}
                     </span>
                   </td>
                   <td
-                    className={`${T_TD} whitespace-nowrap text-xs tabular-nums text-cpx-grey-500`}
+                    className={`${T_TD} whitespace-nowrap text-xs tabular-nums text-mute`}
                     title={gstDateTime(a.updatedAt)}
                   >
                     {agoFromNow(a.updatedAt, now)}
@@ -925,9 +925,9 @@ export function ExposurePanel({
     >
       <div className="grid gap-4 @xl:grid-cols-2">
         <section>
-          <h3 className="mb-2 text-xs font-medium text-cpx-grey-600">By client sector</h3>
+          <h3 className="mb-2 text-xs font-medium text-ink-3">By client sector</h3>
           {sectors.length === 0 ? (
-            <p className="text-sm text-cpx-grey-500">0 sectors exposed.</p>
+            <p className="text-sm text-mute">0 sectors exposed.</p>
           ) : (
             <BarListH
               labelClass="w-24 @md:w-32"
@@ -940,9 +940,9 @@ export function ExposurePanel({
           )}
         </section>
         <section>
-          <h3 className="mb-2 text-xs font-medium text-cpx-grey-600">By region</h3>
+          <h3 className="mb-2 text-xs font-medium text-ink-3">By region</h3>
           {regions.length === 0 ? (
-            <p className="text-sm text-cpx-grey-500">0 regions exposed.</p>
+            <p className="text-sm text-mute">0 regions exposed.</p>
           ) : (
             <BarListH
             labelClass="w-24 @md:w-32"
@@ -988,9 +988,9 @@ export function TrendPanel({
         ].map((s) => (
           <div key={s.label}>
             <div className="mb-1.5 flex items-baseline justify-between gap-2 text-xs">
-              <span className="text-cpx-grey-700">{s.label}</span>
-              <span className="text-cpx-grey-500">
-                <span className="font-medium tabular-nums text-cpx-black">
+              <span className="text-ink-2">{s.label}</span>
+              <span className="text-mute">
+                <span className="font-medium tabular-nums text-ink">
                   {sum(s.points).toLocaleString("en-GB")}
                 </span>{" "}
                 in {s.points.length} days
@@ -1043,15 +1043,15 @@ export function ActivityPanel({
           {rows.map((a, i) => (
             <li
               key={i}
-              className="flex items-start gap-2 border-b border-cpx-grey-100 px-3 py-1.5 text-xs last:border-b-0"
+              className="flex items-start gap-2 border-b border-rule px-3 py-1.5 text-xs last:border-b-0"
             >
               <span className="min-w-0 flex-1">
                 <span className="font-medium">{userName(a.actor)}</span>{" "}
-                <span className="text-cpx-grey-700">{sentenceTail(statusLabel(a.action))}</span>
-                {a.ref && <span className="ml-1 font-mono text-2xs text-cpx-grey-500">{a.ref}</span>}
+                <span className="text-ink-2">{sentenceTail(statusLabel(a.action))}</span>
+                {a.ref && <span className="ml-1 font-mono text-2xs text-mute">{a.ref}</span>}
               </span>
               <span
-                className="shrink-0 tabular-nums text-cpx-grey-500"
+                className="shrink-0 tabular-nums text-mute"
                 title={a.at ? gstDateTime(a.at) : undefined}
               >
                 {a.at ? agoFromNow(a.at, now) : "-"}
@@ -1086,7 +1086,7 @@ export function CollectionPanel({
       flush
       className={className}
     >
-      <div className="grid grid-cols-2 gap-px bg-cpx-grey-100 @3xl/page:grid-cols-4">
+      <div className="grid grid-cols-2 gap-px bg-fill @3xl/page:grid-cols-4">
         <Stat label="Enabled" value={health.enabled} caption={`of ${health.total} sources`} />
         <Stat
           label="Failing"
@@ -1129,7 +1129,7 @@ export function EmergingPanel({
           {threats.slice(0, 5).map((t, i) => (
             <li
               key={i}
-              className="flex items-center gap-2 border-b border-cpx-grey-100 px-3 py-1.5 last:border-b-0"
+              className="flex items-center gap-2 border-b border-rule px-3 py-1.5 last:border-b-0"
             >
               <SeverityPip level={t.severity} />
               <span
@@ -1138,7 +1138,7 @@ export function EmergingPanel({
               >
                 {t.title}
               </span>
-              <span className="shrink-0 text-2xs tabular-nums text-cpx-grey-500">
+              <span className="shrink-0 text-2xs tabular-nums text-mute">
                 {agoFromNow(t.firstSeen, now)}
               </span>
             </li>
@@ -1153,7 +1153,7 @@ export function EmergingPanel({
 export function WithheldLine({ withheld }: { withheld: Withheld[] }) {
   if (withheld.length === 0) return null;
   return (
-    <p className="flex items-center gap-2 text-xs text-cpx-grey-500">
+    <p className="flex items-center gap-2 text-xs text-mute">
       <IconInfo />
       {withheld.map((w) => `${w.count} ${w.label.toLowerCase()}`).join(", ")}, withheld at this access level.
     </p>

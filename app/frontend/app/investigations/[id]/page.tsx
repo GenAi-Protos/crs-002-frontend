@@ -39,7 +39,7 @@ function Back() {
   return (
     <Link
       href="/investigations"
-      className="group/b mb-2 inline-flex items-center gap-0.5 text-xs text-cpx-grey-500 transition-colors duration-150 hover:text-cpx-purple"
+      className="group/b mb-2 inline-flex items-center gap-0.5 text-xs text-mute transition-colors duration-150 hover:text-accent"
     >
       <IconChevronLeft className="transition-transform duration-150 group-hover/b:-translate-x-0.5" />
       Investigations
@@ -119,7 +119,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
     return (
       <Page band>
         <Back />
-        <div className="mb-3 h-7 w-80 bg-cpx-grey-100" />
+        <div className="mb-3 h-7 w-80 bg-fill" />
         <div className="grid gap-3 @4xl/page:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
           <SkeletonPanel rows={6} />
           <SkeletonPanel rows={5} />
@@ -168,7 +168,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
   }
   const post = (path: string, body: Record<string, unknown> = {}) =>
     caseAction(user.id, id, path, { expectedRevision: current.revision, ...body });
-  const label = "block text-xs font-medium text-cpx-grey-700";
+  const label = "block text-xs font-medium text-ink-2";
 
   return (
     <Page band>
@@ -191,7 +191,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
           </Button>
         }
       />
-      <p className="-mt-2 mb-3 font-mono text-2xs text-cpx-grey-500">
+      <p className="-mt-2 mb-3 font-mono text-2xs text-mute">
         {current.id} <span className="font-sans">· Revision {current.revision} · Updated {gstDateTime(current.updatedAt)}</span>
       </p>
       {error && (
@@ -259,13 +259,13 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                   {current.entities.map((entity, i) => (
                     <span
                       key={`${entity.value}-${i}`}
-                      className="flex items-center gap-2 rounded-sm border border-cpx-grey-100 px-2 py-1 text-xs"
+                      className="flex items-center gap-2 rounded-sm border border-rule px-2 py-1 text-xs"
                     >
-                      <span className="text-cpx-grey-500">{entity.type}</span>
+                      <span className="text-mute">{entity.type}</span>
                       <IndicatorChip value={entity.value} />
                     </span>
                   ))}
-                  {!current.entities.length && <p className="text-sm text-cpx-grey-500">0 starting entities.</p>}
+                  {!current.entities.length && <p className="text-sm text-mute">0 starting entities.</p>}
                 </div>
               </Panel>
               <Panel title="Analyst notes" count={current.notes.length} enter={2}>
@@ -273,13 +273,13 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                   {current.notes.map((item) => (
                     <li key={item.id} className="border-l-2 border-cpx-green pl-3">
                       <p className="whitespace-pre-wrap text-sm">{item.text}</p>
-                      <p className="mt-1 text-2xs text-cpx-grey-500">
+                      <p className="mt-1 text-2xs text-mute">
                         {userName(item.by)} · {gstDateTime(item.at)}
                       </p>
                     </li>
                   ))}
                 </ul>
-                {!current.notes.length && <p className="text-sm text-cpx-grey-500">0 notes.</p>}
+                {!current.notes.length && <p className="text-sm text-mute">0 notes.</p>}
                 <label className={`${label} mt-3`}>
                   Add a note
                   <textarea value={note} onChange={(e) => setNote(e.target.value)} disabled={readonly} rows={3} className={fieldClass} />
@@ -301,17 +301,17 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
             <div className="grid gap-3">
               <Panel title="Details" enter={1}>
                 <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-                  <dt className="text-cpx-grey-500">Client</dt>
+                  <dt className="text-mute">Client</dt>
                   <dd className="font-mono text-xs leading-5">{current.clientId ?? "Global"}</dd>
-                  <dt className="text-cpx-grey-500">Assigned to</dt>
+                  <dt className="text-mute">Assigned to</dt>
                   <dd>{userName(current.assignedTo ?? current.createdBy)}</dd>
-                  <dt className="text-cpx-grey-500">Priority</dt>
+                  <dt className="text-mute">Priority</dt>
                   <dd>
                     <PriorityBadge level={current.priority} />
                   </dd>
-                  <dt className="text-cpx-grey-500">Workflow</dt>
+                  <dt className="text-mute">Workflow</dt>
                   <dd className="font-mono text-xs leading-5">{current.workflowRef}</dd>
-                  <dt className="text-cpx-grey-500">Evidence files</dt>
+                  <dt className="text-mute">Evidence files</dt>
                   <dd className="tabular-nums">{current.evidenceIds.length}</dd>
                 </dl>
               </Panel>
@@ -362,7 +362,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                       </option>
                     ))}
                   </select>
-                  <span className="mt-1 block text-2xs font-normal text-cpx-grey-500">
+                  <span className="mt-1 block text-2xs font-normal text-mute">
                     Review and completion follow report approval.
                   </span>
                 </label>
@@ -401,13 +401,13 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                     return (
                       <li
                         key={file.id}
-                        className="row-link flex flex-wrap items-center gap-3 border-b border-cpx-grey-100 px-3 py-1.5 last:border-b-0"
+                        className="row-link flex flex-wrap items-center gap-3 border-b border-rule px-3 py-1.5 last:border-b-0"
                       >
                         <span className="min-w-0 flex-1 truncate text-sm" title={file.fileName}>
                           {file.fileName}
                         </span>
                         <StatusPill label={st.label} tone={st.tone} />
-                        <span className="text-2xs tabular-nums text-cpx-grey-500">{file.chunkCount} excerpts</span>
+                        <span className="text-2xs tabular-nums text-mute">{file.chunkCount} excerpts</span>
                         <Button size="sm" onClick={() => downloadEvidence(user.id, file).catch((e: Error) => setError(e.message))}>
                           Download
                         </Button>
@@ -417,7 +417,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                 </ul>
               )}
               {!readonly && (
-                <div className="border-t border-cpx-grey-100 p-3">
+                <div className="border-t border-rule p-3">
                   <EvidenceUploader
                     value={uploads}
                     onChange={setUploads}
@@ -472,12 +472,12 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
               {data.runs.map((run) => (
                 <div
                   key={run.id}
-                  className="flex flex-wrap items-center gap-3 border-b border-cpx-grey-100 px-3 py-1.5 text-xs last:border-b-0"
+                  className="flex flex-wrap items-center gap-3 border-b border-rule px-3 py-1.5 text-xs last:border-b-0"
                 >
                   <span className="font-mono">{run.id}</span>
                   <StatusPill tone={statusTone(run.status ?? "")} label={statusLabel(run.status ?? "unknown")} />
-                  <span className="font-mono text-cpx-grey-500">{run.workflowRef ?? current.workflowRef}</span>
-                  {run.error && <span className="text-cpx-red-700">{run.error}</span>}
+                  <span className="font-mono text-mute">{run.workflowRef ?? current.workflowRef}</span>
+                  {run.error && <span className="text-danger">{run.error}</span>}
                 </div>
               ))}
               {!data.runs.length && <EmptyState className="py-4">0 runs.</EmptyState>}
@@ -492,9 +492,9 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
               <ul>
                 {included.flatMap((step) =>
                   step.findings.map((finding, i) => (
-                    <li key={`${step.id}-${i}`} className="border-b border-cpx-grey-100 px-3 py-2 last:border-b-0">
+                    <li key={`${step.id}-${i}`} className="border-b border-rule px-3 py-2 last:border-b-0">
                       <p className="text-sm">{defang(finding.claim)}</p>
-                      <p className="mt-1 text-2xs text-cpx-grey-500">
+                      <p className="mt-1 text-2xs text-mute">
                         {step.label} · {finding.citationIds.join(", ") || "No supporting citation"}
                       </p>
                     </li>
@@ -507,15 +507,15 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                 {data.relationships?.map((relationship, index) => (
                   <details
                     key={`${relationship.evidenceId}-${index}`}
-                    className="group/d border-b border-cpx-grey-100 last:border-b-0"
+                    className="group/d border-b border-rule last:border-b-0"
                   >
-                    <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-1.5 text-xs transition-colors duration-150 hover:bg-cpx-grey-50">
-                      <IconChevronDown className="-rotate-90 text-cpx-grey-400 group-open/d:rotate-0" />
+                    <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-1.5 text-xs transition-colors duration-150 hover:bg-inset">
+                      <IconChevronDown className="-rotate-90 text-faint group-open/d:rotate-0" />
                       <IndicatorChip value={relationship.entity} /> mentioned in {relationship.label}
                     </summary>
                     <div className="reveal px-3 pb-2 pl-8">
                       <p className="whitespace-pre-wrap text-sm">{defang(relationship.excerpt)}</p>
-                      <p className="mt-1 font-mono text-2xs text-cpx-grey-500">{relationship.evidenceId}</p>
+                      <p className="mt-1 font-mono text-2xs text-mute">{relationship.evidenceId}</p>
                     </div>
                   </details>
                 ))}
@@ -530,14 +530,14 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                     </p>
                   ))}
                 {!included.some((s) => s.negativeResults?.length) && (
-                  <p className="text-sm text-cpx-grey-500">0 recorded negative results.</p>
+                  <p className="text-sm text-mute">0 recorded negative results.</p>
                 )}
               </Panel>
               <Panel title="Contradictions" enter={3}>
                 {included
                   .flatMap((step) => step.contradictions ?? [])
                   .map((conflict, index) => (
-                    <div key={index} className="mb-3 border-l-2 border-cpx-red-200 pl-3 last:mb-0">
+                    <div key={index} className="mb-3 border-l-2 border-danger-edge pl-3 last:mb-0">
                       <p className="text-sm font-medium">{conflict.subject}</p>
                       <ul className="mt-1 list-disc space-y-1 pl-4">
                         {conflict.claims.map((claim, claimIndex) => (
@@ -549,7 +549,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                     </div>
                   ))}
                 {!included.some((step) => step.contradictions?.length) && (
-                  <p className="text-sm text-cpx-grey-500">0 recorded contradictions.</p>
+                  <p className="text-sm text-mute">0 recorded contradictions.</p>
                 )}
               </Panel>
               <Panel title="Coverage and limitations" enter={4}>
@@ -563,7 +563,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                   </p>
                 ))}
                 {!included.some((s) => s.limitations?.length || s.error) && (
-                  <p className="text-sm text-cpx-grey-500">0 recorded limitations.</p>
+                  <p className="text-sm text-mute">0 recorded limitations.</p>
                 )}
               </Panel>
               <Panel title="Entity pivots" count={current.entities.length} enter={5}>
@@ -580,7 +580,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                     </li>
                   ))}
                 </ul>
-                {!current.entities.length && <p className="text-sm text-cpx-grey-500">0 entities to pivot on.</p>}
+                {!current.entities.length && <p className="text-sm text-mute">0 entities to pivot on.</p>}
               </Panel>
             </div>
           </div>
@@ -621,7 +621,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                 return (
                   <li
                     key={report.ref}
-                    className="row-link relative flex flex-wrap items-center gap-3 border-b border-cpx-grey-100 px-3 py-1.5 last:border-b-0"
+                    className="row-link relative flex flex-wrap items-center gap-3 border-b border-rule px-3 py-1.5 last:border-b-0"
                   >
                     <Link
                       href={`/reports/${encodeURIComponent(report.ref)}`}
@@ -630,7 +630,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
                       {report.title}
                     </Link>
                     <StatusPill tone={st.tone} label={st.label} />
-                    <span className="text-2xs tabular-nums text-cpx-grey-500">v{report.version}</span>
+                    <span className="text-2xs tabular-nums text-mute">v{report.version}</span>
                   </li>
                 );
               })}
@@ -663,7 +663,7 @@ export default function InvestigationDetailPage({ params }: { params: Promise<{ 
               onChange={(event) => setReason(event.target.value)}
             />
           </label>
-          <p className="mt-2 text-2xs text-cpx-grey-500">
+          <p className="mt-2 text-2xs text-mute">
             The reason stays in the audit history. A changed evidence basis needs a new report draft.
           </p>
           <div className="mt-4 flex justify-end gap-2">
@@ -705,31 +705,31 @@ function Contribution({
   onRerun: () => void;
 }) {
   return (
-    <details className="group/c border-b border-cpx-grey-100 last:border-b-0">
-      <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 px-3 py-2 text-sm transition-colors duration-150 hover:bg-cpx-grey-50">
-        <IconChevronDown className="-rotate-90 text-cpx-grey-400 group-open/c:rotate-0" />
-        <strong className={`flex-1 font-medium ${step.excluded ? "text-cpx-grey-500 line-through" : ""}`}>
+    <details className="group/c border-b border-rule last:border-b-0">
+      <summary className="flex cursor-pointer list-none flex-wrap items-center gap-3 px-3 py-2 text-sm transition-colors duration-150 hover:bg-inset">
+        <IconChevronDown className="-rotate-90 text-faint group-open/c:rotate-0" />
+        <strong className={`flex-1 font-medium ${step.excluded ? "text-mute line-through" : ""}`}>
           {step.label || step.agentId}
         </strong>
         <StatusPill tone={statusTone(step.status)} label={statusLabel(step.status)} />
-        <span className="text-xs tabular-nums text-cpx-grey-500">
+        <span className="text-xs tabular-nums text-mute">
           {step.findings.length} findings · {step.evidence.length} evidence records
         </span>
-        {step.excluded && <span className="text-xs font-medium text-cpx-red-700">Excluded</span>}
+        {step.excluded && <span className="text-xs font-medium text-danger">Excluded</span>}
       </summary>
       <div className="reveal space-y-3 px-3 pb-3 pl-9">
-        {step.exclusionReason && <p className="text-xs text-cpx-grey-500">Exclusion reason: {step.exclusionReason}</p>}
-        {step.error && <p className="text-xs text-cpx-red-700">{step.error}</p>}
+        {step.exclusionReason && <p className="text-xs text-mute">Exclusion reason: {step.exclusionReason}</p>}
+        {step.error && <p className="text-xs text-danger">{step.error}</p>}
         {step.limitations?.map((item, i) => (
           <p key={i} className="text-xs text-status-warn-ink">
             {item}
           </p>
         ))}
         {step.evidence.map((evidence) => (
-          <div key={evidence.id} className="border-l-2 border-cpx-grey-200 pl-3">
+          <div key={evidence.id} className="border-l-2 border-rule-strong pl-3">
             <p className="text-xs font-medium">{evidence.label || evidence.id}</p>
             <p className="mt-1 whitespace-pre-wrap text-sm">{defang(evidence.text)}</p>
-            <p className="mt-1 text-2xs text-cpx-grey-500">
+            <p className="mt-1 text-2xs text-mute">
               {evidence.source} · {evidence.id}
               {evidence.observedAt ? ` · ${gstDateTime(evidence.observedAt)}` : ""}
             </p>

@@ -39,7 +39,7 @@ export function AskOptionsBar({
   const outputHint = OUTPUTS.find((o) => o.value === options.output)?.hint;
 
   return (
-    <div className="@container border-b border-cpx-grey-100 bg-cpx-grey-50/60 px-3 py-2">
+    <div className="@container border-b border-rule bg-inset/60 px-3 py-2">
       <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 @md:grid-cols-3 @2xl:grid-cols-5">
         <Field label="Client">
           <select
@@ -121,7 +121,7 @@ export function AskOptionsBar({
         </Field>
       </div>
 
-      <p className="mt-1.5 text-2xs text-cpx-grey-500">
+      <p className="mt-1.5 text-2xs text-mute">
         {options.tlpCeiling
           ? `Evidence above TLP:${options.tlpCeiling} is excluded and counted. The ceiling does not mark the answer.`
           : `${depthHint} ${outputHint}`}
@@ -134,8 +134,8 @@ export function AskOptionsBar({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex min-w-0 flex-col gap-0.5">
-      <span className="text-2xs font-medium text-cpx-grey-600">{label}</span>
-      <span className="[&>select]:h-7 [&>select]:w-full [&>select]:min-w-0 [&>select]:rounded-sm [&>select]:border [&>select]:border-cpx-grey-100 [&>select]:bg-white [&>select]:px-1.5 [&>select]:text-xs [&>select]:transition-colors [&>select]:duration-150 [&>select:hover]:border-cpx-grey-200 [&>select:disabled]:text-cpx-grey-400 [&>select:focus]:outline-none [&>select:focus]:border-cpx-green">
+      <span className="text-2xs font-medium text-ink-3">{label}</span>
+      <span className="[&>select]:h-7 [&>select]:w-full [&>select]:min-w-0 [&>select]:rounded-sm [&>select]:border [&>select]:border-rule [&>select]:bg-surface [&>select]:px-1.5 [&>select]:text-xs [&>select]:transition-colors [&>select]:duration-150 [&>select:hover]:border-rule-strong [&>select:disabled]:text-faint [&>select:focus]:outline-none [&>select:focus]:border-cpx-green">
         {children}
       </span>
     </label>

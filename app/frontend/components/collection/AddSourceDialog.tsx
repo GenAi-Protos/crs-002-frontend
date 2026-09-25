@@ -50,9 +50,9 @@ export function AddSourceDialog({ onClose, onSubmitted }: { onClose: () => void;
       </div>
       <label className="block text-xs">Tags<input placeholder="Comma-separated tags" className={fieldClass} value={tags} onChange={(e) => setTags(e.target.value)} /></label>
       <fieldset><legend className="mb-2 text-xs">Evidence File</legend><EvidenceUploader value={files} onChange={setFiles} tlp={tlp} clientId={clientId || null} purpose="submission" onBusy={setUploading} disabled={busy} /></fieldset>
-      {!description.trim() && !files.length && <p className="text-2xs text-cpx-grey-500">Provide a description or an evidence file.</p>}
-      {error && <p role="alert" className="text-xs text-cpx-red-700">{error}</p>}
-      <div className="flex justify-end gap-2 border-t border-cpx-grey-100 pt-4"><Button disabled={busy} onClick={onClose}>Cancel</Button><Button type="submit" variant="primary" disabled={!valid || busy || uploading}>{busy ? "Submitting" : "Submit to Repository"}</Button></div>
+      {!description.trim() && !files.length && <p className="text-2xs text-mute">Provide a description or an evidence file.</p>}
+      {error && <p role="alert" className="text-xs text-danger">{error}</p>}
+      <div className="flex justify-end gap-2 border-t border-rule pt-4"><Button disabled={busy} onClick={onClose}>Cancel</Button><Button type="submit" variant="primary" disabled={!valid || busy || uploading}>{busy ? "Submitting" : "Submit to Repository"}</Button></div>
     </form>
   </Dialog>;
 }

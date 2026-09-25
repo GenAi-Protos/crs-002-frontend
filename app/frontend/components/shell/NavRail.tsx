@@ -88,7 +88,7 @@ export function NavRail() {
   return (
     <nav
       aria-label="Primary"
-      className={`flex shrink-0 flex-col overflow-y-auto border-r border-cpx-grey-100 bg-white ${width}`}
+      className={`flex shrink-0 flex-col overflow-y-auto border-r border-rule bg-surface ${width}`}
     >
       <ul className="relative flex flex-col gap-1 p-2">
         {activeIndex >= 0 && (
@@ -107,8 +107,8 @@ export function NavRail() {
                 aria-current={active ? "page" : undefined}
                 className={`flex h-8 items-center gap-2.5 rounded-sm text-sm transition-colors duration-150 ${align} ${
                   active
-                    ? "bg-cpx-green-50 font-semibold text-cpx-purple"
-                    : "text-cpx-grey-500 hover:bg-cpx-grey-50 hover:text-cpx-purple"
+                    ? "bg-select font-semibold text-accent"
+                    : "text-mute hover:bg-inset hover:text-accent"
                 }`}
                 title={n.label}
               >
@@ -119,13 +119,13 @@ export function NavRail() {
           );
         })}
       </ul>
-      <div className="mt-auto border-t border-cpx-grey-100 p-2">
+      <div className="mt-auto border-t border-rule p-2">
         <button
           type="button"
           onClick={toggle}
           aria-label="Toggle navigation labels"
           title="Toggle navigation labels"
-          className={`flex h-8 w-full items-center gap-2.5 rounded-sm text-xs text-cpx-grey-500 transition-colors duration-150 hover:bg-cpx-grey-50 hover:text-cpx-purple ${align}`}
+          className={`flex h-8 w-full items-center gap-2.5 rounded-sm text-xs text-mute transition-colors duration-150 hover:bg-inset hover:text-accent ${align}`}
         >
           <IconPanel />
           <span className={label}>Collapse</span>

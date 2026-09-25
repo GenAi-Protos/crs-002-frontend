@@ -77,7 +77,7 @@ export function RowActions({
           e.stopPropagation();
           setOpen(!open);
         }}
-        className="flex h-6 w-6 items-center justify-center rounded-sm text-cpx-grey-500 transition-colors duration-150 hover:bg-cpx-grey-100 hover:text-cpx-black aria-expanded:bg-cpx-grey-100 aria-expanded:text-cpx-black"
+        className="flex h-6 w-6 items-center justify-center rounded-sm text-mute transition-colors duration-150 hover:bg-fill hover:text-ink aria-expanded:bg-fill aria-expanded:text-ink"
       >
         <IconMore />
       </button>
@@ -86,7 +86,7 @@ export function RowActions({
         <div
           role="menu"
           onClick={(e) => e.stopPropagation()}
-          className="pop absolute right-0 top-7 z-50 origin-top-right min-w-[14rem] border border-cpx-grey-100 bg-white py-1 text-left shadow-pop"
+          className="pop absolute right-0 top-7 z-50 origin-top-right min-w-[14rem] border border-rule bg-overlay py-1 text-left shadow-pop"
         >
           {level === "root" && (
             <>
@@ -202,13 +202,13 @@ function Item({
       role="menuitem"
       disabled={disabled}
       onClick={onClick}
-      className="block w-full px-3 py-1.5 text-left text-xs transition-colors duration-100 hover:bg-cpx-grey-50 focus-visible:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
+      className="block w-full px-3 py-1.5 text-left text-xs transition-colors duration-100 hover:bg-inset focus-visible:bg-inset disabled:text-faint disabled:hover:bg-transparent"
     >
       <span className="flex items-center gap-2">
         {label}
-        {chevron && <span className="ml-auto text-cpx-grey-500">&rsaquo;</span>}
+        {chevron && <span className="ml-auto text-mute">&rsaquo;</span>}
       </span>
-      {hint && <span className="mt-0.5 block text-2xs text-cpx-grey-500">{hint}</span>}
+      {hint && <span className="mt-0.5 block text-2xs text-mute">{hint}</span>}
     </button>
   );
 }
@@ -218,7 +218,7 @@ function Back({ onClick, label }: { onClick: () => void; label: string }) {
     <button
       role="menuitem"
       onClick={onClick}
-      className="mb-1 flex w-full items-center gap-2 border-b border-cpx-grey-100 px-3 pb-1.5 text-left text-2xs text-cpx-grey-500 hover:text-cpx-black"
+      className="mb-1 flex w-full items-center gap-2 border-b border-rule px-3 pb-1.5 text-left text-2xs text-mute hover:text-ink"
     >
       <span aria-hidden>&lsaquo;</span>
       {label}
@@ -227,12 +227,12 @@ function Back({ onClick, label }: { onClick: () => void; label: string }) {
 }
 
 function Divider() {
-  return <div className="my-1 border-t border-cpx-grey-100" />;
+  return <div className="my-1 border-t border-rule" />;
 }
 
 function Footer({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-1 border-t border-cpx-grey-100 px-3 pt-1.5 text-2xs text-cpx-grey-500">
+    <p className="mt-1 border-t border-rule px-3 pt-1.5 text-2xs text-mute">
       {children}
     </p>
   );

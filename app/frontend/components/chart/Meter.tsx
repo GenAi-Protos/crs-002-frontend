@@ -3,7 +3,7 @@
 
 export function Meter({ value }: { value: number }) {
   return (
-    <span className="relative inline-block h-2 w-16 bg-cpx-grey-50 align-middle xl:w-24">
+    <span className="relative inline-block h-2 w-16 bg-inset align-middle xl:w-24">
       <span
         className="absolute inset-y-0 left-0"
         style={{

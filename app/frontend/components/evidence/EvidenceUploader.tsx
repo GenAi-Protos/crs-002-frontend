@@ -52,20 +52,20 @@ export function EvidenceUploader({ value, onChange, tlp = "AMBER", clientId = nu
     <div className="flex flex-wrap items-center gap-3">
       <Button size="sm" disabled={busy || disabled || value.length >= 10} onClick={() => input.current?.click()}>{busy ? "Uploading" : "Attach files"}</Button>
       <input ref={input} type="file" aria-label="Evidence files" multiple accept={EVIDENCE_ACCEPT} className="sr-only" onChange={(e) => { const files = Array.from(e.target.files ?? []); e.target.value = ""; if (files.length) void choose(files); }} />
-      <span className="text-2xs text-cpx-grey-500">PDF, Word, Excel, CSV, JPG, PNG · 25 MiB per file</span>
+      <span className="text-2xs text-mute">PDF, Word, Excel, CSV, JPG, PNG · 25 MiB per file</span>
     </div>
-    {error && <p role="alert" className="text-xs text-cpx-red-700">{error}</p>}
-    {value.length > 0 && <ul className="divide-y divide-cpx-grey-100 border border-cpx-grey-100">
+    {error && <p role="alert" className="text-xs text-danger">{error}</p>}
+    {value.length > 0 && <ul className="divide-y divide-rule border border-rule">
       {value.map((file) => <li key={file.id} className="px-3 py-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="min-w-0 flex-1 break-words text-xs font-medium">{file.fileName}</span>
-          <span className="text-2xs text-cpx-grey-500">{file.size < 1024 ? `${file.size} B` : `${(file.size / 1024).toFixed(1)} KiB`}</span>
+          <span className="text-2xs text-mute">{file.size < 1024 ? `${file.size} B` : `${(file.size / 1024).toFixed(1)} KiB`}</span>
           <StatusPill tone={file.status === "ready" ? "good" : file.status === "failed" ? "critical" : "warn"} label={file.status} />
           {file.status === "failed" && <Button size="sm" disabled={disabled} onClick={() => retryEvidence(user.id, file.id).then((next) => onChange(value.map((f) => f.id === next.id ? next : f))).catch((e: Error) => setError(e.message))}>Retry</Button>}
           <Button size="sm" variant="ghost" onClick={() => downloadEvidence(user.id, file).catch((e: Error) => setError(e.message))}>Download</Button>
           <Button size="sm" variant="ghost" disabled={disabled} onClick={() => onChange(value.filter((f) => f.id !== file.id))} aria-label={`Remove ${file.fileName}`}>Remove</Button>
         </div>
-        {file.error && <p className="mt-1 text-xs text-cpx-red-700">{file.error}</p>}
+        {file.error && <p className="mt-1 text-xs text-danger">{file.error}</p>}
         {file.warnings?.map((warning) => <p key={warning} className="mt-1 text-2xs text-status-warn-ink">{warning}</p>)}
       </li>)}
     </ul>}

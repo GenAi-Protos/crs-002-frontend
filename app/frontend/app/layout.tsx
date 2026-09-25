@@ -6,6 +6,7 @@ import { TopBar } from "@/components/shell/TopBar";
 import { NavRail } from "@/components/shell/NavRail";
 import { PRODUCT_NAME, PRODUCT_SUBTITLE } from "@/lib/agent";
 import { publicEnv } from "@/lib/runtime-env";
+import { themeScript } from "@/lib/theme";
 
 // Read the live container env on every request (not at build) so the runtime config
 // injected below reflects the Container App env vars without a rebuild.
@@ -52,10 +53,17 @@ export default function RootLayout({
   // bundle, so window.__ENV exists at hydration.
   const envScript = `window.__ENV=${JSON.stringify(publicEnv()).replace(/</g, "\\u003c")}`;
   return (
+    // suppressHydrationWarning: the theme script sets data-theme on <html>
+    // before React hydrates, so the server's markup never carries it.
     <html
       lang="en"
       className={`${unbounded.variable} ${inter.variable} ${plexArabic.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Before first paint: the stored theme, else the OS preference (lib/theme.ts). */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       {/* The Teams-tab shell, the same shape as the other CPX consoles: the body
           is a fixed-height box that never scrolls, and <main> is the one scroll
           region. Inside a Teams tab that means one scrollbar, sticky bars that
@@ -67,7 +75,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: envScript }} />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:bg-white focus:px-3 focus:py-2 focus:text-cpx-black"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:bg-surface focus:px-3 focus:py-2 focus:text-ink"
         >
           Skip to content
         </a>

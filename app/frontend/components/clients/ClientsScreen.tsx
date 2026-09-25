@@ -159,8 +159,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
   if (!loaded) {
     return (
       <div className="flex min-h-0 flex-1">
-        <aside className="w-72 shrink-0 border-r border-cpx-grey-100 bg-white p-4">
-          <div className="mb-3 h-6 w-24 bg-cpx-grey-100" />
+        <aside className="w-72 shrink-0 border-r border-rule bg-surface p-4">
+          <div className="mb-3 h-6 w-24 bg-fill" />
           <SkeletonRows rows={5} height="h-10" />
         </aside>
         <section className="flex-1 space-y-3 bg-band p-4">
@@ -212,11 +212,11 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
 
   return (
     <div className="flex min-h-0 flex-1">
-      <aside className="w-72 shrink-0 border-r border-cpx-grey-100 bg-white">
+      <aside className="w-72 shrink-0 border-r border-rule bg-surface">
         <div className="flex items-center justify-between px-4 pb-2 pt-4">
           <h1 className="text-lg font-semibold tracking-tightish">Clients</h1>
           <span className="flex items-center gap-1.5">
-            <span className="text-xs tabular-nums text-cpx-grey-500">
+            <span className="text-xs tabular-nums text-mute">
               {list.length} of {allClients.length}
             </span>
             <IconButton label="Add client" onClick={() => setShowAdd(true)}>
@@ -234,8 +234,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         </div>
         <ul>
           {list.length === 0 && (
-            <li className="px-4 py-3 text-sm text-cpx-grey-500">
-              <span className="font-medium text-cpx-black">0 clients</span> matched
+            <li className="px-4 py-3 text-sm text-mute">
+              <span className="font-medium text-ink">0 clients</span> matched
             </li>
           )}
           {list.map((c) => (
@@ -245,14 +245,14 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 aria-current={c.id === client.id ? "page" : undefined}
                 className={`block border-l-2 px-4 py-2 transition-colors duration-150 ${
                   c.id === client.id
-                    ? "border-cpx-green bg-cpx-green-50/60"
-                    : "border-transparent hover:border-cpx-grey-200 hover:bg-cpx-grey-50"
+                    ? "border-cpx-green bg-wash"
+                    : "border-transparent hover:border-rule-strong hover:bg-inset"
                 }`}
               >
                 <span className="block truncate text-sm font-medium" title={c.name}>
                   {c.name}
                 </span>
-                <span className="mt-0.5 flex items-center gap-1.5 text-2xs text-cpx-grey-500">
+                <span className="mt-0.5 flex items-center gap-1.5 text-2xs text-mute">
                   <span className="font-mono">{c.id}</span>· {c.sector} · {c.region}
                 </span>
               </Link>
@@ -265,7 +265,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold tracking-tightish">{client.name}</h2>
-            <p className="mt-0.5 text-xs text-cpx-grey-500">
+            <p className="mt-0.5 text-xs text-mute">
               <span className="font-mono">{client.id}</span> · {client.sector} · {client.region} ·{" "}
               {client.products.length} products · {client.subscribedPirRefs.length} PIRs
             </p>
@@ -290,7 +290,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
 
         <Panel title="Open against this client" count={detailError ? undefined : drp.length} flush enter={0}>
           {detailError ? (
-            <p className="px-3 py-3 text-sm text-cpx-grey-500">Not loaded.</p>
+            <p className="px-3 py-3 text-sm text-mute">Not loaded.</p>
           ) : drp.length === 0 ? (
             <p className="px-3 py-3 text-sm">
               <span className="font-medium">0 open items</span>
@@ -298,7 +298,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
           ) : (
             <ul>
               {drp.map((d) => (
-                <li key={d.id} className="flex items-center gap-3 border-b border-cpx-grey-100 px-3 py-1.5 text-sm last:border-b-0">
+                <li key={d.id} className="flex items-center gap-3 border-b border-rule px-3 py-1.5 text-sm last:border-b-0">
                   <span className="w-36 shrink-0 font-medium @3xl/page:w-44">
                     {DRP_KIND_LABEL[d.kind]}
                   </span>
@@ -312,7 +312,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                   >
                     {d.kind === "impersonating-domain" ? defang(d.subject) : d.subject}
                   </span>
-                  <span className="text-2xs text-cpx-grey-500">
+                  <span className="text-2xs text-mute">
                     {gstDate(d.firstSeen)}
                   </span>
                   <StatusPill {...DRP_TONE[d.status]} />
@@ -389,14 +389,15 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                 {client.products.map((p) => (
                   <span
                     key={p}
-                    className="flex h-6 items-center gap-1 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 pl-2 pr-1 text-xs"
+                    className="flex h-6 items-center gap-1 rounded-sm border border-rule bg-inset pl-2 pr-1 text-xs"
                   >
                     {p}
                     {editing && (
                       <IconButton
                         size="sm"
                         label={`Remove ${p}`}
-                        className="h-4 w-4 hover:bg-cpx-red-50 hover:text-cpx-red-700"
+                        // Red on hover over the icon button's own neutral hover.
+                        className="h-4 w-4 hover:bg-danger-tint! hover:text-danger!"
                         onClick={() =>
                           update((c) => ({
                             ...c,
@@ -425,7 +426,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
             <Row label="PIRs">
               <div>
                 {pirs.length === 0 && (
-                  <p className="pt-1 text-sm text-cpx-grey-500">{offline ? "Not loaded." : "0 PIRs held."}</p>
+                  <p className="pt-1 text-sm text-mute">{offline ? "Not loaded." : "0 PIRs held."}</p>
                 )}
                 <div className="flex flex-wrap gap-1.5">
                   {pirs.map((p) => {
@@ -449,8 +450,8 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                         title={p.question}
                         className={`inline-flex h-7 min-w-11 items-center justify-center gap-1 rounded-sm border px-2 text-xs tabular-nums transition-colors duration-150 ${
                           ticked
-                            ? "border-cpx-green bg-cpx-green-50 font-medium text-cpx-black"
-                            : "border-cpx-grey-100 bg-white text-cpx-grey-500 hover:border-cpx-grey-200 hover:text-cpx-black"
+                            ? "border-cpx-green bg-select font-medium text-ink"
+                            : "border-rule bg-surface text-mute hover:border-rule-strong hover:text-ink"
                         } ${expandedPir === p.ref ? "ring-1 ring-cpx-green" : ""}`}
                       >
                         {ticked && <IconCheck className="text-green-contrast" />}
@@ -460,7 +461,7 @@ export function ClientsScreen({ selectedId }: { selectedId?: string }) {
                   })}
                 </div>
                 {expandedPir && (
-                  <div className="reveal mt-3 rounded-sm border border-cpx-grey-100 bg-cpx-grey-50 p-3">
+                  <div className="reveal mt-3 rounded-sm border border-rule bg-inset p-3">
                     <span className="font-mono text-2xs font-medium">{expandedPir}</span>
                     <p className="mt-1 text-sm leading-relaxed">
                       {pirs.find((p) => p.ref === expandedPir)?.question}
@@ -507,7 +508,7 @@ function AddClientDialog({
     <Dialog title="New client" onClose={onClose} className="max-w-sm">
         <div className="space-y-3">
           <label className="block">
-            <span className="text-xs font-medium text-cpx-grey-700">Name</span>
+            <span className="text-xs font-medium text-ink-2">Name</span>
             <input
               autoFocus
               value={name}
@@ -516,7 +517,7 @@ function AddClientDialog({
             />
           </label>
           <label className="block">
-            <span className="text-xs font-medium text-cpx-grey-700">Sector</span>
+            <span className="text-xs font-medium text-ink-2">Sector</span>
             <select
               value={sector}
               onChange={(e) => setSector(e.target.value)}
@@ -530,7 +531,7 @@ function AddClientDialog({
             </select>
           </label>
           <label className="block">
-            <span className="text-xs font-medium text-cpx-grey-700">Region</span>
+            <span className="text-xs font-medium text-ink-2">Region</span>
             <select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
@@ -568,8 +569,8 @@ function AddClientDialog({
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-4 border-b border-cpx-grey-100 pb-3 last:border-b-0 last:pb-0">
-      <span className="w-20 shrink-0 pt-1 text-xs font-medium text-cpx-grey-600">
+    <div className="flex items-start gap-4 border-b border-rule pb-3 last:border-b-0 last:pb-0">
+      <span className="w-20 shrink-0 pt-1 text-xs font-medium text-ink-3">
         {label}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
@@ -582,7 +583,7 @@ function AddProduct({ onAdd }: { onAdd: (p: string) => void }) {
   const [open, setOpen] = useState(false);
   if (!open) {
     return (
-      <IconButton label="Add product" size="sm" className="border border-dashed border-cpx-grey-200" onClick={() => setOpen(true)}>
+      <IconButton label="Add product" size="sm" className="border border-dashed border-rule-strong" onClick={() => setOpen(true)}>
         <IconPlus />
       </IconButton>
     );
@@ -619,7 +620,7 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
   );
   return (
     <div>
-      <div className="flex flex-wrap items-center gap-2 border-b border-cpx-grey-100 px-3 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-rule px-3 py-2">
         <SearchBox value={q} onChange={setQ} className="w-full max-w-64" />
         <div className="flex-1" />
         <ListMeta
@@ -642,7 +643,7 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
         />
       </div>
       <div className="overflow-x-auto">
-      <table className={`${T_TABLE} table-fixed bg-white text-sm`}>
+      <table className={`${T_TABLE} table-fixed bg-surface text-sm`}>
         <colgroup>
           <col className="w-48" />
           <col className="w-20" />
@@ -662,7 +663,7 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
         <tbody>
           {rows.length === 0 && (
             <EmptyRow colSpan={5}>
-              <span className="font-medium text-cpx-black">0 deliveries</span>
+              <span className="font-medium text-ink">0 deliveries</span>
             </EmptyRow>
           )}
           {rows.map((d, i) => (
@@ -680,7 +681,7 @@ function SentLedger({ clientId, deliveries }: { clientId: string; deliveries: De
               <td className={`${T_TD}`}>
                 <TypeBadge label={d.format.toUpperCase()} />
               </td>
-              <td className={`${T_TD} whitespace-nowrap text-xs text-cpx-grey-700`}>
+              <td className={`${T_TD} whitespace-nowrap text-xs text-ink-2`}>
                 {gstDateTime(d.sentAt)}
               </td>
             </tr>

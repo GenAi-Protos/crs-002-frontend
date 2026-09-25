@@ -20,12 +20,12 @@ export function SpecialistPicker({ value, onChange, disabled, options }: { value
   return <fieldset disabled={disabled} className="space-y-2">
     <legend className="mb-2 text-xs font-medium">Specialists</legend>
     <div className="flex flex-wrap gap-x-5 gap-y-2">{(options ?? SPECIALISTS.map(([id, label]) => ({ id, label, available: true }))).map(({ id, label, available }) => <label key={id} className="flex items-center gap-2 text-xs"><input type="checkbox" disabled={!available} checked={value.includes(id)} onChange={(e) => onChange(e.target.checked ? [...value, id] : value.filter((v) => v !== id))} />{label}{!available ? " (unavailable)" : ""}</label>)}</div>
-    <p className="text-2xs text-cpx-grey-500">Supervisor coordination and evidence checks always run.</p>
+    <p className="text-2xs text-mute">Supervisor coordination and evidence checks always run.</p>
   </fieldset>;
 }
 
 export function SourcePicker({ value, onChange, sources, disabled }: { value: string[] | null; onChange: (value: string[] | null) => void; sources: CaseOptions["sources"]; disabled?: boolean }) {
-  return <fieldset disabled={disabled} className="space-y-3"><legend className="mb-2 text-xs font-medium">Sources for this run</legend><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={value === null} onChange={(event) => onChange(event.target.checked ? null : sources.filter((source) => source.available).map((source) => source.id))} />Choose available sources automatically</label>{value !== null && <div className="max-h-52 space-y-3 overflow-y-auto border border-cpx-grey-100 p-3">{sources.map((source) => <label key={source.id} className="flex items-start gap-2 text-xs"><input type="checkbox" className="mt-0.5" disabled={!source.available} checked={value.includes(source.id)} onChange={(event) => onChange(event.target.checked ? [...value, source.id] : value.filter((id) => id !== source.id))} /><span>{source.name}<span className="ml-2 text-2xs text-cpx-grey-500">{source.status}</span>{source.reason && <span className="mt-1 block text-2xs text-cpx-grey-500">{source.reason}</span>}</span></label>)}</div>}</fieldset>;
+  return <fieldset disabled={disabled} className="space-y-3"><legend className="mb-2 text-xs font-medium">Sources for this run</legend><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={value === null} onChange={(event) => onChange(event.target.checked ? null : sources.filter((source) => source.available).map((source) => source.id))} />Choose available sources automatically</label>{value !== null && <div className="max-h-52 space-y-3 overflow-y-auto border border-rule p-3">{sources.map((source) => <label key={source.id} className="flex items-start gap-2 text-xs"><input type="checkbox" className="mt-0.5" disabled={!source.available} checked={value.includes(source.id)} onChange={(event) => onChange(event.target.checked ? [...value, source.id] : value.filter((id) => id !== source.id))} /><span>{source.name}<span className="ml-2 text-2xs text-mute">{source.status}</span>{source.reason && <span className="mt-1 block text-2xs text-mute">{source.reason}</span>}</span></label>)}</div>}</fieldset>;
 }
 
 export function CaseForm({ onClose, onCreated, initialTitle = "", initialObjective = "", initialEntity, initialClientId }: {
@@ -59,10 +59,10 @@ export function CaseForm({ onClose, onCreated, initialTitle = "", initialObjecti
         {entities.length > 1 && <Button size="sm" variant="ghost" onClick={() => setEntities(entities.filter((_, n) => i !== n))} aria-label={`Remove entity ${i + 1}`}>Remove</Button>}
       </div>)}</div><Button size="sm" className="mt-2" onClick={() => setEntities([...entities, { type: "indicator", value: "" }])}>Add entity</Button></fieldset>
       <div className="grid grid-cols-2 gap-4"><label className="text-xs">Client scope<select aria-label="Client scope" value={clientId} onChange={(e) => setClientId(e.target.value)} className={fieldClass}><option value="">Global</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><label className="text-xs">Priority<select aria-label="Priority" value={priority} onChange={(e) => setPriority(e.target.value as InvestigationCase["priority"])} className={fieldClass}>{["low", "medium", "high", "critical"].map((p) => <option key={p} value={p}>{statusLabel(p)}</option>)}</select></label></div>
-      <p className="text-xs text-cpx-grey-500">Workflow: {options?.workflows[0]?.label ?? "Deep investigation"}</p>
+      <p className="text-xs text-mute">Workflow: {options?.workflows[0]?.label ?? "Deep investigation"}</p>
       <SpecialistPicker value={specialists} onChange={setSpecialists} options={options?.specialists} />
       <SourcePicker value={selectedSourceIds} onChange={setSelectedSourceIds} sources={options?.sources ?? []} disabled={!options} />
-      {error && <p role="alert" className="text-xs text-cpx-red-700">{error}</p>}
+      {error && <p role="alert" className="text-xs text-danger">{error}</p>}
       <div className="flex justify-end gap-2"><Button onClick={onClose}>Cancel</Button><Button type="submit" variant="primary" disabled={busy || !options || !title.trim() || !objective.trim() || !specialists.length || selectedSourceIds?.length === 0}>{busy ? "Creating" : "Create investigation"}</Button></div>
     </form>
   </Dialog>;

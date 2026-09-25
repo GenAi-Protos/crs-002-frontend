@@ -55,7 +55,7 @@ export function Menu<T extends string>({
         }}
         className={
           trigger === "icon"
-            ? "flex h-7 w-7 items-center justify-center rounded-sm text-cpx-grey-500 transition-colors duration-150 hover:bg-cpx-grey-100 hover:text-cpx-black disabled:text-cpx-grey-400 aria-expanded:bg-cpx-grey-100"
+            ? "flex h-7 w-7 items-center justify-center rounded-sm text-mute transition-colors duration-150 hover:bg-fill hover:text-ink disabled:text-faint aria-expanded:bg-fill"
             : buttonClass("secondary", "sm")
         }
       >
@@ -72,13 +72,13 @@ export function Menu<T extends string>({
       {open && (
         <div
           role="menu"
-          className={`pop absolute z-50 mt-1 min-w-[13rem] border border-cpx-grey-100 bg-white py-1 shadow-pop ${
+          className={`pop absolute z-50 mt-1 min-w-[13rem] border border-rule bg-overlay py-1 shadow-pop ${
             align === "right" ? "right-0 origin-top-right" : "left-0 origin-top-left"
           }`}
         >
           {items.map((it) => (
             <div key={it.key}>
-              {it.separated && <div className="my-1 border-t border-cpx-grey-100" />}
+              {it.separated && <div className="my-1 border-t border-rule" />}
               <button
                 role="menuitem"
                 disabled={it.disabled}
@@ -87,11 +87,11 @@ export function Menu<T extends string>({
                   setOpen(false);
                   onSelect(it.key);
                 }}
-                className="block w-full px-3 py-1.5 text-left text-xs transition-colors duration-100 hover:bg-cpx-grey-50 focus-visible:bg-cpx-grey-50 disabled:text-cpx-grey-400 disabled:hover:bg-transparent"
+                className="block w-full px-3 py-1.5 text-left text-xs transition-colors duration-100 hover:bg-inset focus-visible:bg-inset disabled:text-faint disabled:hover:bg-transparent"
               >
                 {it.label}
                 {it.hint && (
-                  <span className="mt-0.5 block text-2xs text-cpx-grey-500">
+                  <span className="mt-0.5 block text-2xs text-mute">
                     {it.hint}
                   </span>
                 )}
@@ -99,7 +99,7 @@ export function Menu<T extends string>({
             </div>
           ))}
           {footer && (
-            <p className="mt-1 border-t border-cpx-grey-100 px-3 pt-1.5 text-2xs text-cpx-grey-500">
+            <p className="mt-1 border-t border-rule px-3 pt-1.5 text-2xs text-mute">
               {footer}
             </p>
           )}
